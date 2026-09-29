@@ -392,6 +392,32 @@ export class Session {
     this.emit();
   }
 
+  startDemo(seconds: number, categories?: string[], single?: boolean): void {
+    const byPhotos = this.state.categories
+      .toSorted((a, b) => b.items.filter((i) => i.image).length - a.items.filter((i) => i.image).length)
+      .map((c) => c.id);
+    let ids = categories && categories.length > 0 ? categories : byPhotos;
+    if (single) ids = ids.slice(0, 1);
+    if (ids.length === 0) {
+      this.log("error", "No categories to demo.");
+      this.emit();
+      return;
+    }
+    this.stopTimer();
+    this.state.settings = {
+      ...this.state.settings,
+      roundSeconds: seconds,
+      autoNextMatch: true,
+      autoNextTournament: true,
+    };
+    this.state.queue = ids.map((categoryId) => ({ categoryId }));
+    this.state.queueIndex = 0;
+    this.state.tournament = null;
+    this.log("info", `Demo: ${ids.length} categories, ${seconds}s rounds`);
+    this.setSimulated(true);
+    this.startTournament(ids[0]);
+  }
+
   reset(): void {
     this.stopTimer();
     this.setSimulated(false);
@@ -473,6 +499,11 @@ export class Session {
       case "sim:set":
         this.setSimulated((payload as { on: boolean } | undefined)?.on ?? !this.state.simulated);
         break;
+      case "demo:start": {
+        const arg = payload as { seconds?: number; categories?: string[]; single?: boolean } | undefined;
+        this.startDemo(arg?.seconds ?? 2, arg?.categories, arg?.single);
+        break;
+      }
       case "session:reset":
         this.reset();
         break;

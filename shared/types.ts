@@ -107,5 +107,6 @@ export interface CommandMap {
   "vote:chat": { text: string; viewer: string };
   "vote:gift": { giftId: string; viewer: string; count?: number };
   "sim:set": { on: boolean } | undefined;
+  "demo:start": { seconds?: number; categories?: string[]; single?: boolean } | undefined;
   "session:reset": undefined;
 }

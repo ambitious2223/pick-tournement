@@ -39,7 +39,11 @@ process.title = "Pick League";
 
 function json(res: http.ServerResponse, status: number, body: unknown): void {
   const text = JSON.stringify(body);
-  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Content-Length": Buffer.byteLength(text) });
+  res.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    "Content-Length": Buffer.byteLength(text),
+  });
   res.end(text);
 }
 
@@ -81,9 +85,9 @@ async function serveStatic(res: http.ServerResponse, urlPath: string, root: stri
     return;
   }
   const ext = path.extname(file).toLowerCase();
-  res.writeHead(200, { "Content-Type": MIME[ext] ?? "application/octet-stream" });
-  if (ext === ".html") res.end(await fs.readFile(file));
-  else res.end(await fs.readFile(file));
+  const cacheControl = ext === ".html" ? "no-store" : "public, max-age=3600";
+  res.writeHead(200, { "Content-Type": MIME[ext] ?? "application/octet-stream", "Cache-Control": cacheControl });
+  res.end(await fs.readFile(file));
 }
 
 async function main(): Promise<void> {

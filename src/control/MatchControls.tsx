@@ -39,6 +39,28 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
         </Button>
       </div>
 
+      <div className="grid grid-cols-2 gap-2">
+        <Button
+          variant="lime"
+          className={SM}
+          title="Play one full bracket fast (photo-rich category) with simulated votes"
+          onClick={() => void send("demo:start", { seconds: 2, single: true })}
+        >
+          ▶ Demo 1 bracket
+        </Button>
+        <Button
+          variant="hot"
+          className={SM}
+          title="Play every category back-to-back, fast, with simulated votes"
+          onClick={() => void send("demo:start", { seconds: 2 })}
+        >
+          ⏩ Demo all
+        </Button>
+      </div>
+      <Button variant="danger" className={SM} onClick={() => void send("session:reset", undefined)}>
+        ■ Stop / reset
+      </Button>
+
       {match && category ? (
         <div className="text-[0.7rem] text-white/50">
           {category.name} · {state.status}

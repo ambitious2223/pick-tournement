@@ -19,6 +19,7 @@
     "lint": "oxlint",
     "test": "node --test \"engine/**/*.test.ts\"",
     "seed": "node server/seed.ts",
+    "demo": "node scripts/demo.ts",
     "seed:photos": "node scripts/fetch-photos.ts"
   },
   "dependencies": {

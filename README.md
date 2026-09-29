@@ -30,6 +30,10 @@ Control Room in a new browser tab (your other tabs are never touched). Skip the 
 The Control page shows a large tournament stage (photos, names, vote bars, timer) with compact
 collapsible controls on the right. The Debug console is tucked behind a small "debug" link.
 
+**Watch the whole game flow fast:** click **Demo 1 bracket** (one photo-rich category, 2s rounds,
+simulated votes) or **Demo all** (every category back-to-back) in the Control sidebar, and
+**Stop / reset** to end. For an instant run with no timers, use `npm run demo` in a terminal.
+
 Or run the steps manually:
 
 ```bash
@@ -81,6 +85,7 @@ Make sure **transparent background** is enabled.
 | `npm run dev` | Server + Vite dev together |
 | `npm run build` | Build the overlay/control web app to `dist/` |
 | `npm start` | Serve `dist/` + API on `:8787` |
+| `npm run demo` | Play every category's full bracket instantly in the terminal (add `-- --category=football`) |
 | `npm run seed` | Write the ten built-in categories (`--force` to overwrite) |
 | `npm run seed:photos` | Fetch free photos (options: `--category=id`, `--limit=N`, `--force`) |
 | `npm run typecheck` / `lint` / `test` | Quality gates |

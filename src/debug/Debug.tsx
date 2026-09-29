@@ -16,12 +16,33 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
   const [burst, setBurst] = useState(20);
   const [round, setRound] = useState("r16");
   const [index, setIndex] = useState(0);
+  const [imgTest, setImgTest] = useState<string[]>([]);
 
   if (!state) return <p className="text-white/50">Connecting…</p>;
 
   const match = activeMatch(state);
   const category = activeCategory(state);
   const { a, b } = activeItems(state);
+
+  const testImages = async () => {
+    const urls = [a?.image, b?.image].filter((u): u is string => Boolean(u));
+    if (urls.length === 0) {
+      setImgTest(["current match has no photo for either side"]);
+      return;
+    }
+    const results = await Promise.all(
+      urls.map(
+        (u) =>
+          new Promise<string>((resolve) => {
+            const img = new Image();
+            img.addEventListener("load", () => resolve(`OK  ${u}  (${img.naturalWidth}x${img.naturalHeight})`), { once: true });
+            img.addEventListener("error", () => resolve(`FAIL ${u}  (could not load)`), { once: true });
+            img.src = u;
+          }),
+      ),
+    );
+    setImgTest(results);
+  };
 
   const sendBurst = async () => {
     for (let i = 0; i < burst; i++) {
@@ -90,6 +111,36 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
             <Button variant="primary" className={SM} disabled={!state.tournament} onClick={() => void send("match:jump", { round: round as never, index })}>
               Jump
             </Button>
+          </div>
+        </Collapsible>
+
+        <Collapsible title="Photos" defaultOpen>
+          <div className="flex flex-col gap-2 text-xs">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
+              {state.categories.map((c) => {
+                const have = c.items.filter((i) => i.image).length;
+                return (
+                  <div key={c.id} className="flex justify-between gap-2">
+                    <span className="truncate text-white/60">{c.name}</span>
+                    <span className={have > 0 ? "text-lime" : "text-hot"}>
+                      {have}/{c.items.length}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <Button variant="ghost" className={SM} onClick={() => void testImages()}>
+              Test current match images
+            </Button>
+            {imgTest.length > 0 ? (
+              <div className="scroll-thin max-h-24 overflow-auto font-mono text-[0.7rem] text-white/70">
+                {imgTest.map((line, i) => (
+                  <div key={i} className={line.startsWith("FAIL") ? "text-hot" : "text-lime"}>
+                    {line}
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
         </Collapsible>
 
