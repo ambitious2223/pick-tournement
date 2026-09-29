@@ -1,0 +1,164 @@
+{
+  "id": "me-countries",
+  "name": "Middle Eastern Countries",
+  "items": [
+    {
+      "id": "saudi-arabia",
+      "name": "Saudi Arabia",
+      "aliases": [
+        "السعودية",
+        "ksa"
+      ],
+      "emoji": "🇸🇦",
+      "image": "/uploads/7d34952f126a.png"
+    },
+    {
+      "id": "united-arab-emirates",
+      "name": "United Arab Emirates",
+      "aliases": [
+        "الإمارات",
+        "uae"
+      ],
+      "emoji": "🇦🇪",
+      "image": "/uploads/020bde1871c7.png"
+    },
+    {
+      "id": "egypt",
+      "name": "Egypt",
+      "aliases": [
+        "مصر"
+      ],
+      "emoji": "🇪🇬",
+      "image": "/uploads/6901d05da1a9.png"
+    },
+    {
+      "id": "qatar",
+      "name": "Qatar",
+      "aliases": [
+        "قطر"
+      ],
+      "emoji": "🇶🇦",
+      "image": "/uploads/a60455d5031b.png"
+    },
+    {
+      "id": "kuwait",
+      "name": "Kuwait",
+      "aliases": [
+        "الكويت"
+      ],
+      "emoji": "🇰🇼",
+      "image": "/uploads/70591a2e01ba.png"
+    },
+    {
+      "id": "bahrain",
+      "name": "Bahrain",
+      "aliases": [
+        "البحرين"
+      ],
+      "emoji": "🇧🇭",
+      "image": "/uploads/4b63ed3e3b92.png"
+    },
+    {
+      "id": "oman",
+      "name": "Oman",
+      "aliases": [
+        "عمان"
+      ],
+      "emoji": "🇴🇲",
+      "image": "/uploads/373bf8c87518.png"
+    },
+    {
+      "id": "jordan",
+      "name": "Jordan",
+      "aliases": [
+        "الأردن"
+      ],
+      "emoji": "🇯🇴",
+      "image": "/uploads/3e668c7d0b0e.png"
+    },
+    {
+      "id": "lebanon",
+      "name": "Lebanon",
+      "aliases": [
+        "لبنان"
+      ],
+      "emoji": "🇱🇧",
+      "image": "/uploads/c72f9ecbce08.png"
+    },
+    {
+      "id": "syria",
+      "name": "Syria",
+      "aliases": [
+        "سوريا"
+      ],
+      "emoji": "🇸🇾",
+      "image": "/uploads/24e58c55a64b.png"
+    },
+    {
+      "id": "iraq",
+      "name": "Iraq",
+      "aliases": [
+        "العراق"
+      ],
+      "emoji": "🇮🇶",
+      "image": "/uploads/ed88299ca97b.png"
+    },
+    {
+      "id": "yemen",
+      "name": "Yemen",
+      "aliases": [
+        "اليمن"
+      ],
+      "emoji": "🇾🇪",
+      "image": "/uploads/202834ef8de1.png"
+    },
+    {
+      "id": "morocco",
+      "name": "Morocco",
+      "aliases": [
+        "المغرب"
+      ],
+      "emoji": "🇲🇦",
+      "image": "/uploads/4bd0652746ce.png"
+    },
+    {
+      "id": "algeria",
+      "name": "Algeria",
+      "aliases": [
+        "الجزائر"
+      ],
+      "emoji": "🇩🇿",
+      "image": "/uploads/12b8db88239c.png"
+    },
+    {
+      "id": "tunisia",
+      "name": "Tunisia",
+      "aliases": [
+        "تونس"
+      ],
+      "emoji": "🇹🇳",
+      "image": "/uploads/14a0f70cd722.png"
+    },
+    {
+      "id": "palestine",
+      "name": "Palestine",
+      "aliases": [
+        "فلسطين"
+      ],
+      "emoji": "🇵🇸",
+      "image": "/uploads/a4bb8bb1c7a1.png"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

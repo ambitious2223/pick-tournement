@@ -1,0 +1,160 @@
+{
+  "id": "me-landmarks",
+  "name": "Middle Eastern Landmarks",
+  "items": [
+    {
+      "id": "burj-khalifa",
+      "name": "Burj Khalifa",
+      "aliases": [
+        "برج خليفة"
+      ],
+      "emoji": "🏗️",
+      "image": "/uploads/4985d27fbad5.jpg"
+    },
+    {
+      "id": "kaaba",
+      "name": "Kaaba",
+      "aliases": [
+        "الكعبة"
+      ],
+      "emoji": "🕋",
+      "image": "/uploads/db836e6a7ded.jpg"
+    },
+    {
+      "id": "petra",
+      "name": "Petra",
+      "aliases": [
+        "البتراء"
+      ],
+      "emoji": "🏛️",
+      "image": "/uploads/5f2ec477559f.jpg"
+    },
+    {
+      "id": "pyramids-of-giza",
+      "name": "Pyramids of Giza",
+      "aliases": [
+        "أهرامات الجيزة"
+      ],
+      "emoji": "🔺",
+      "image": "/uploads/44187deb459c.jpg"
+    },
+    {
+      "id": "masjid-al-haram",
+      "name": "Masjid al-Haram",
+      "aliases": [
+        "المسجد الحرام"
+      ],
+      "emoji": "🕌",
+      "image": "/uploads/36fde310a3fd.jpg"
+    },
+    {
+      "id": "al-aqsa-mosque",
+      "name": "Al-Aqsa Mosque",
+      "aliases": [
+        "المسجد الأقصى"
+      ],
+      "emoji": "🕌",
+      "image": "/uploads/9c0416a29f59.jpg"
+    },
+    {
+      "id": "burj-al-arab",
+      "name": "Burj Al Arab",
+      "aliases": [
+        "برج العرب"
+      ],
+      "emoji": "⛵"
+    },
+    {
+      "id": "sheikh-zayed-grand-mosque",
+      "name": "Sheikh Zayed Grand Mosque",
+      "aliases": [
+        "جامع الشيخ زايد"
+      ],
+      "emoji": "🕌"
+    },
+    {
+      "id": "hagia-sophia",
+      "name": "Hagia Sophia",
+      "aliases": [
+        "آيا صوفيا"
+      ],
+      "emoji": "🏛️",
+      "image": "/uploads/92c2041a706c.jpg"
+    },
+    {
+      "id": "blue-mosque",
+      "name": "Blue Mosque",
+      "aliases": [
+        "المسجد الأزرق"
+      ],
+      "emoji": "🕌",
+      "image": "/uploads/d8c109f2b1dc.jpg"
+    },
+    {
+      "id": "dead-sea",
+      "name": "Dead Sea",
+      "aliases": [
+        "البحر الميت"
+      ],
+      "emoji": "🌊",
+      "image": "/uploads/49731cffe8c9.jpg"
+    },
+    {
+      "id": "nile-river",
+      "name": "Nile River",
+      "aliases": [
+        "نهر النيل"
+      ],
+      "emoji": "🚤",
+      "image": "/uploads/a871b2ed03d4.jpg"
+    },
+    {
+      "id": "palm-jumeirah",
+      "name": "Palm Jumeirah",
+      "aliases": [
+        "نخلة جميرا"
+      ],
+      "emoji": "🌴",
+      "image": "/uploads/3470cdb410ec.jpg"
+    },
+    {
+      "id": "al-ula",
+      "name": "Al-Ula",
+      "aliases": [
+        "العلا"
+      ],
+      "emoji": "🏜️",
+      "image": "/uploads/d106a0114b0d.jpg"
+    },
+    {
+      "id": "wadi-rum",
+      "name": "Wadi Rum",
+      "aliases": [
+        "وادي رم"
+      ],
+      "emoji": "🏜️",
+      "image": "/uploads/4fde5353728e.jpg"
+    },
+    {
+      "id": "citadel-of-aleppo",
+      "name": "Citadel of Aleppo",
+      "aliases": [
+        "قلعة حلب"
+      ],
+      "emoji": "🏰",
+      "image": "/uploads/e6992f5ed683.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

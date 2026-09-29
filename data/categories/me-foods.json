@@ -1,0 +1,161 @@
+{
+  "id": "me-foods",
+  "name": "Middle Eastern Foods",
+  "items": [
+    {
+      "id": "kabsa",
+      "name": "Kabsa",
+      "aliases": [
+        "كبسة"
+      ],
+      "emoji": "🍚",
+      "image": "/uploads/2fedf0647275.jpg"
+    },
+    {
+      "id": "shawarma",
+      "name": "Shawarma",
+      "aliases": [
+        "شاورما"
+      ],
+      "emoji": "🌯",
+      "image": "/uploads/9aa3fbbe0c24.jpg"
+    },
+    {
+      "id": "falafel",
+      "name": "Falafel",
+      "aliases": [
+        "فلافل"
+      ],
+      "emoji": "🧆",
+      "image": "/uploads/dfc996b6adeb.jpg"
+    },
+    {
+      "id": "hummus",
+      "name": "Hummus",
+      "aliases": [
+        "حمص"
+      ],
+      "emoji": "🥣",
+      "image": "/uploads/132c644c4ffa.jpg"
+    },
+    {
+      "id": "mansaf",
+      "name": "Mansaf",
+      "aliases": [
+        "منسف"
+      ],
+      "emoji": "🍲",
+      "image": "/uploads/45e6ea9bf63a.jpg"
+    },
+    {
+      "id": "koshari",
+      "name": "Koshari",
+      "aliases": [
+        "كشري"
+      ],
+      "emoji": "🍝",
+      "image": "/uploads/7d6c6a20ec19.jpg"
+    },
+    {
+      "id": "maqluba",
+      "name": "Maqluba",
+      "aliases": [
+        "مقلوبة"
+      ],
+      "emoji": "🍛",
+      "image": "/uploads/da395c62221c.jpg"
+    },
+    {
+      "id": "mandi",
+      "name": "Mandi",
+      "aliases": [
+        "مندي"
+      ],
+      "emoji": "🍗"
+    },
+    {
+      "id": "fattoush",
+      "name": "Fattoush",
+      "aliases": [
+        "فتوش"
+      ],
+      "emoji": "🥗",
+      "image": "/uploads/a900c5bbaead.jpg"
+    },
+    {
+      "id": "tabbouleh",
+      "name": "Tabbouleh",
+      "aliases": [
+        "تبولة"
+      ],
+      "emoji": "🌿",
+      "image": "/uploads/f672e7f8f29f.jpg"
+    },
+    {
+      "id": "shish-tawook",
+      "name": "Shish Tawook",
+      "aliases": [
+        "شيش طاووق"
+      ],
+      "emoji": "🍢",
+      "image": "/uploads/62cf58d87e97.jpg"
+    },
+    {
+      "id": "molokhia",
+      "name": "Molokhia",
+      "aliases": [
+        "ملوخية"
+      ],
+      "emoji": "🍜",
+      "image": "/uploads/d0c32074a79d.jpg"
+    },
+    {
+      "id": "kibbeh",
+      "name": "Kibbeh",
+      "aliases": [
+        "كبة"
+      ],
+      "emoji": "🥟",
+      "image": "/uploads/9760ffd72de3.jpg"
+    },
+    {
+      "id": "foul-medames",
+      "name": "Foul Medames",
+      "aliases": [
+        "فول مدمس"
+      ],
+      "emoji": "🫘",
+      "image": "/uploads/08760d2aac1f.jpg"
+    },
+    {
+      "id": "musakhan",
+      "name": "Musakhan",
+      "aliases": [
+        "مسخن"
+      ],
+      "emoji": "🍗",
+      "image": "/uploads/bdd84d3e0e1b.jpg"
+    },
+    {
+      "id": "harees",
+      "name": "Harees",
+      "aliases": [
+        "هريس"
+      ],
+      "emoji": "🥣",
+      "image": "/uploads/ad428cd61e9b.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

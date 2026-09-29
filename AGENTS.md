@@ -53,10 +53,19 @@ untested.
 - `engine/tournament.ts` — round/match state machine.
 - `server/index.ts` — HTTP: SSE `/events`, `/api/*`, `/uploads`, static `dist`.
 - `server/session.ts` — authoritative live session (commands, timer, simulator, queue).
-- `server/seed.ts` — the ten built-in categories; runs on first boot.
-- `scripts/fetch-photos.ts` — the only sanctioned downloader.
+- `server/seed.ts` — the ten built-in Middle East categories; runs on first boot.
+- `server/photos.ts` — the only sanctioned downloader (English + Arabic Wikipedia, then Commons).
+- `scripts/serve.mjs` — single-port launcher (build + serve on `:8787`); `scripts/dev.mjs` — dev.
+- `src/bracket` — animated bracket + `MatchStage` (live round floats over the bracket).
 - `src/overlay` — OBS view. `src/control` — host controls. `src/studio` — content editing.
   `src/debug` — vote injection, force outcomes, raw state.
+
+## Run model
+
+- The launcher (`Tournament.bat` → `scripts/serve.mjs`) serves the **built** app from **one port**
+  (`127.0.0.1:8787`) so there is no second URL to get wrong. It binds loopback only — never LAN.
+- `npm run dev` (server `:8787` + Vite `:5173`) is for development only.
+- Every page is wrapped in an ErrorBoundary and shows a "server not reachable" banner when offline.
 
 ## Gates (must pass before saying "done")
 

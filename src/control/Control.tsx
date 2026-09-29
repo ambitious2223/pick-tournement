@@ -6,35 +6,16 @@ import { send } from "../lib/live.ts";
 import { MatchControls } from "./MatchControls.tsx";
 import { SettingsPanel } from "./SettingsPanel.tsx";
 import { QueueEditor } from "./QueueEditor.tsx";
-import { BracketBoard } from "../overlay/BracketBoard.tsx";
-import { Stage } from "../stage/Stage.tsx";
-import { activeCategory, activeMatch } from "../lib/selectors.ts";
+import { MatchStage } from "../bracket/MatchStage.tsx";
 
 export function Control({ state }: { state: SessionState | null }): ReactNode {
   if (!state) return <p className="text-white/50">Connecting to the server…</p>;
 
-  const match = activeMatch(state);
-  const category = activeCategory(state);
-
   return (
     <div className="grid gap-4 xl:grid-cols-[1fr_19rem]">
-      <div className="flex flex-col gap-4">
-        <section className="panel p-6">
-          <Stage state={state} variant="control" />
-        </section>
-        <Collapsible title="Bracket">
-          {state.tournament && match ? (
-            <BracketBoard
-              bracket={state.tournament.bracket}
-              category={category}
-              currentRound={match.round}
-              currentIndex={match.index}
-            />
-          ) : (
-            <p className="text-sm text-white/50">Start a category to see the bracket.</p>
-          )}
-        </Collapsible>
-      </div>
+      <section className="panel overflow-hidden">
+        <MatchStage state={state} variant="control" />
+      </section>
 
       <aside className="flex flex-col gap-3 xl:sticky xl:top-16 xl:self-start">
         <MatchControls state={state} />

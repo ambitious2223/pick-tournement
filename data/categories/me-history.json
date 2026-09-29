@@ -1,0 +1,162 @@
+{
+  "id": "me-history",
+  "name": "Historical Scholars & Leaders",
+  "items": [
+    {
+      "id": "al-khwarizmi",
+      "name": "Al-Khwarizmi",
+      "aliases": [
+        "الخوارزمي"
+      ],
+      "emoji": "🔢",
+      "image": "/uploads/22f11fcfe238.jpg"
+    },
+    {
+      "id": "ibn-sina",
+      "name": "Ibn Sina",
+      "aliases": [
+        "ابن سينا"
+      ],
+      "emoji": "🩺",
+      "image": "/uploads/4c0e97d1533b.jpg"
+    },
+    {
+      "id": "ibn-battuta",
+      "name": "Ibn Battuta",
+      "aliases": [
+        "ابن بطوطة"
+      ],
+      "emoji": "🧭",
+      "image": "/uploads/f6a971e5e478.jpg"
+    },
+    {
+      "id": "ibn-khaldun",
+      "name": "Ibn Khaldun",
+      "aliases": [
+        "ابن خلدون"
+      ],
+      "emoji": "📚",
+      "image": "/uploads/09c70d10c4aa.jpg"
+    },
+    {
+      "id": "al-razi",
+      "name": "Al-Razi",
+      "aliases": [
+        "الرازي"
+      ],
+      "emoji": "⚗️",
+      "image": "/uploads/3c1c14fb2b64.jpg"
+    },
+    {
+      "id": "saladin",
+      "name": "Saladin",
+      "aliases": [
+        "صلاح الدين الأيوبي"
+      ],
+      "emoji": "⚔️",
+      "image": "/uploads/f62af1827b7a.jpg"
+    },
+    {
+      "id": "harun-al-rashid",
+      "name": "Harun al-Rashid",
+      "aliases": [
+        "هارون الرشيد"
+      ],
+      "emoji": "👑",
+      "image": "/uploads/a8729aee21c6.jpg"
+    },
+    {
+      "id": "tariq-ibn-ziyad",
+      "name": "Tariq ibn Ziyad",
+      "aliases": [
+        "طارق بن زياد"
+      ],
+      "emoji": "🔥",
+      "image": "/uploads/121078b8d602.jpg"
+    },
+    {
+      "id": "al-idrisi",
+      "name": "Al-Idrisi",
+      "aliases": [
+        "الإدريسي"
+      ],
+      "emoji": "🗺️",
+      "image": "/uploads/f4ee570ccafc.jpg"
+    },
+    {
+      "id": "jabir-ibn-hayyan",
+      "name": "Jabir ibn Hayyan",
+      "aliases": [
+        "جابر بن حيان"
+      ],
+      "emoji": "🧪",
+      "image": "/uploads/d4981b9cf422.jpg"
+    },
+    {
+      "id": "al-biruni",
+      "name": "Al-Biruni",
+      "aliases": [
+        "البيروني"
+      ],
+      "emoji": "🌍",
+      "image": "/uploads/8b381d4478b2.jpg"
+    },
+    {
+      "id": "ibn-rushd",
+      "name": "Ibn Rushd",
+      "aliases": [
+        "ابن رشد"
+      ],
+      "emoji": "📖",
+      "image": "/uploads/3ba020f6656a.jpg"
+    },
+    {
+      "id": "al-masudi",
+      "name": "Al-Masudi",
+      "aliases": [
+        "المسعودي"
+      ],
+      "emoji": "📜",
+      "image": "/uploads/f4349129844c.jpg"
+    },
+    {
+      "id": "nizam-al-mulk",
+      "name": "Nizam al-Mulk",
+      "aliases": [
+        "نظام الملك"
+      ],
+      "emoji": "🏛️",
+      "image": "/uploads/f95e6e192aa7.png"
+    },
+    {
+      "id": "omar-khayyam",
+      "name": "Omar Khayyam",
+      "aliases": [
+        "عمر الخيام"
+      ],
+      "emoji": "✒️",
+      "image": "/uploads/629b9ece4cf7.jpg"
+    },
+    {
+      "id": "ibn-al-haytham",
+      "name": "Ibn al-Haytham",
+      "aliases": [
+        "ابن الهيثم"
+      ],
+      "emoji": "👁️",
+      "image": "/uploads/a4396e170151.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

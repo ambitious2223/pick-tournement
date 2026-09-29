@@ -1,0 +1,146 @@
+{
+  "id": "arab-singers",
+  "name": "Arab Singers",
+  "items": [
+    {
+      "id": "amr-diab",
+      "name": "Amr Diab",
+      "aliases": [
+        "عمرو دياب"
+      ],
+      "image": "/uploads/0a83cee65994.jpg"
+    },
+    {
+      "id": "mohamed-ramadan",
+      "name": "Mohamed Ramadan",
+      "aliases": [
+        "محمد رمضان"
+      ],
+      "image": "/uploads/c0fe1ab8e87c.jpg"
+    },
+    {
+      "id": "nancy-ajram",
+      "name": "Nancy Ajram",
+      "aliases": [
+        "نانسي عجرم"
+      ],
+      "image": "/uploads/948873f052a2.jpg"
+    },
+    {
+      "id": "fairuz",
+      "name": "Fairuz",
+      "aliases": [
+        "فيروز"
+      ],
+      "image": "/uploads/bc1e41e307c3.jpg"
+    },
+    {
+      "id": "umm-kulthum",
+      "name": "Umm Kulthum",
+      "aliases": [
+        "أم كلثوم"
+      ],
+      "image": "/uploads/2d3059f35cf2.jpg"
+    },
+    {
+      "id": "kadim-al-sahir",
+      "name": "Kadim Al Sahir",
+      "aliases": [
+        "كاظم الساهر"
+      ],
+      "image": "/uploads/831deace115f.jpg"
+    },
+    {
+      "id": "elissa",
+      "name": "Elissa",
+      "aliases": [
+        "إليسا"
+      ],
+      "image": "/uploads/058fba57d4db.jpg"
+    },
+    {
+      "id": "ragheb-alama",
+      "name": "Ragheb Alama",
+      "aliases": [
+        "راغب علامة"
+      ],
+      "image": "/uploads/d3bc3ef0e168.jpg"
+    },
+    {
+      "id": "sherine",
+      "name": "Sherine",
+      "aliases": [
+        "شيرين"
+      ],
+      "image": "/uploads/f0a1433226fa.jpg"
+    },
+    {
+      "id": "tamer-hosny",
+      "name": "Tamer Hosny",
+      "aliases": [
+        "تامر حسني"
+      ],
+      "image": "/uploads/9e7e6f436377.png"
+    },
+    {
+      "id": "hussain-al-jassmi",
+      "name": "Hussain Al Jassmi",
+      "aliases": [
+        "حسين الجسمي"
+      ],
+      "image": "/uploads/d0e73f4d25ee.jpg"
+    },
+    {
+      "id": "balqees",
+      "name": "Balqees",
+      "aliases": [
+        "بلقيس"
+      ],
+      "image": "/uploads/2a053491a2db.jpg"
+    },
+    {
+      "id": "ahlam",
+      "name": "Ahlam",
+      "aliases": [
+        "أحلام"
+      ],
+      "image": "/uploads/c40a8736a852.jpg"
+    },
+    {
+      "id": "mohammed-abdu",
+      "name": "Mohammed Abdu",
+      "aliases": [
+        "محمد عبده"
+      ],
+      "image": "/uploads/915f8d1dd409.jpg"
+    },
+    {
+      "id": "angham",
+      "name": "Angham",
+      "aliases": [
+        "أنغام"
+      ],
+      "image": "/uploads/6038ca8e7551.jpg"
+    },
+    {
+      "id": "wael-kfoury",
+      "name": "Wael Kfoury",
+      "aliases": [
+        "وائل كفوري"
+      ],
+      "image": "/uploads/da3d5821d62d.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

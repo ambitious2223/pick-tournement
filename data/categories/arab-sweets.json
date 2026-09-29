@@ -1,0 +1,160 @@
+{
+  "id": "arab-sweets",
+  "name": "Arabic Desserts & Drinks",
+  "items": [
+    {
+      "id": "kunafa",
+      "name": "Kunafa",
+      "aliases": [
+        "كنافة"
+      ],
+      "emoji": "🍮",
+      "image": "/uploads/f3b54326ea78.jpg"
+    },
+    {
+      "id": "baklava",
+      "name": "Baklava",
+      "aliases": [
+        "بقلاوة"
+      ],
+      "emoji": "🥮",
+      "image": "/uploads/17f03e5cdd68.png"
+    },
+    {
+      "id": "luqaimat",
+      "name": "Luqaimat",
+      "aliases": [
+        "لقيمات"
+      ],
+      "emoji": "🍩",
+      "image": "/uploads/c9af43baa355.jpg"
+    },
+    {
+      "id": "umm-ali",
+      "name": "Umm Ali",
+      "aliases": [
+        "أم علي"
+      ],
+      "emoji": "🥧",
+      "image": "/uploads/998d7e72f1ad.jpg"
+    },
+    {
+      "id": "basbousa",
+      "name": "Basbousa",
+      "aliases": [
+        "بسبوسة"
+      ],
+      "emoji": "🍰",
+      "image": "/uploads/9bf240c44bf9.jpg"
+    },
+    {
+      "id": "muhallebi",
+      "name": "Muhallebi",
+      "aliases": [
+        "مهلبية"
+      ],
+      "emoji": "🍨",
+      "image": "/uploads/98c1a06a71e5.jpg"
+    },
+    {
+      "id": "qatayef",
+      "name": "Qatayef",
+      "aliases": [
+        "قطايف"
+      ],
+      "emoji": "🥟",
+      "image": "/uploads/a1aaf3cb93d9.jpg"
+    },
+    {
+      "id": "ma-amoul",
+      "name": "Ma'amoul",
+      "aliases": [
+        "معمول"
+      ],
+      "emoji": "🍪",
+      "image": "/uploads/262d79761326.jpg"
+    },
+    {
+      "id": "arabic-coffee",
+      "name": "Arabic Coffee",
+      "aliases": [
+        "قهوة عربية"
+      ],
+      "emoji": "☕",
+      "image": "/uploads/8222487029f3.jpg"
+    },
+    {
+      "id": "moroccan-mint-tea",
+      "name": "Moroccan Mint Tea",
+      "aliases": [
+        "شاي مغربي"
+      ],
+      "emoji": "🍵"
+    },
+    {
+      "id": "karkade",
+      "name": "Karkade",
+      "aliases": [
+        "كركديه"
+      ],
+      "emoji": "🌺",
+      "image": "/uploads/9c74d63df13e.jpg"
+    },
+    {
+      "id": "sahlab",
+      "name": "Sahlab",
+      "aliases": [
+        "سحلب"
+      ],
+      "emoji": "🥛",
+      "image": "/uploads/716aedb09f51.jpg"
+    },
+    {
+      "id": "jallab",
+      "name": "Jallab",
+      "aliases": [
+        "جلاب"
+      ],
+      "emoji": "🥤",
+      "image": "/uploads/49e3756c1590.jpg"
+    },
+    {
+      "id": "ayran",
+      "name": "Ayran",
+      "aliases": [
+        "عيران"
+      ],
+      "emoji": "🥛",
+      "image": "/uploads/bf2a825e67f0.jpg"
+    },
+    {
+      "id": "qamar-al-din",
+      "name": "Qamar al-Din",
+      "aliases": [
+        "قمر الدين"
+      ],
+      "emoji": "🍑",
+      "image": "/uploads/32b93bbc9740.jpg"
+    },
+    {
+      "id": "tamarind-drink",
+      "name": "Tamarind Drink",
+      "aliases": [
+        "تمر هندي"
+      ],
+      "emoji": "🥤"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

@@ -19,9 +19,28 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
   const [draft, setDraft] = useState<Category | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [fetchMsg, setFetchMsg] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
 
   if (!state) return <p className="text-white/50">Connecting…</p>;
+
+  const fetchPhotosFor = async (categoryId?: string) => {
+    setFetching(true);
+    setFetchMsg(null);
+    try {
+      const qs = categoryId ? `?category=${encodeURIComponent(categoryId)}` : "";
+      const res = await fetch(`/api/photos/fetch${qs}`, { method: "POST" });
+      const data = (await res.json()) as { changed?: number; skipped?: number; error?: string };
+      if (!res.ok) setFetchMsg(`Failed: ${data.error ?? res.status}`);
+      else setFetchMsg(`Added ${data.changed ?? 0} photo(s), ${data.skipped ?? 0} without a free image.`);
+    } catch {
+      setFetchMsg("Could not reach the server.");
+    } finally {
+      setFetching(false);
+      setTimeout(() => setFetchMsg(null), 6000);
+    }
+  };
 
   const openCategory = (id: string) => {
     const found = state.categories.find((c) => c.id === id) ?? null;
@@ -94,6 +113,10 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
             onChange={(e) => void importCategory(e.target.files?.[0])}
           />
         </div>
+        <Button variant="hot" className="mb-3 w-full" disabled={fetching} onClick={() => void fetchPhotosFor()}>
+          {fetching ? "Fetching…" : "⬇ Fetch all photos"}
+        </Button>
+        {fetchMsg ? <p className="mb-2 text-xs text-lime">{fetchMsg}</p> : null}
         <ul className="flex flex-col gap-1">
           {state.categories.map((c) => (
             <li key={c.id}>
@@ -169,6 +192,9 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
             <div className="flex items-center gap-3">
               <Button variant="lime" onClick={() => void save(draft)}>
                 Save category
+              </Button>
+              <Button variant="ghost" disabled={fetching} onClick={() => void fetchPhotosFor(draft.id)}>
+                {fetching ? "Fetching…" : "Fetch photos"}
               </Button>
               <Button variant="ghost" onClick={exportCategory}>
                 Export JSON

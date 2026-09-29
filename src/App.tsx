@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useLiveState } from "./lib/live.ts";
+import { ErrorBoundary } from "./ui/ErrorBoundary.tsx";
 import { Home } from "./pages/Home.tsx";
 import { Overlay } from "./overlay/Overlay.tsx";
 import { Control } from "./control/Control.tsx";
@@ -15,21 +16,32 @@ function routeFor(pathname: string): string {
 }
 
 export function App(): ReactNode {
-  const state = useLiveState();
+  const { state, connected } = useLiveState();
   const route = routeFor(window.location.pathname);
 
   if (route === "/overlay") {
-    return <Overlay state={state} />;
+    return (
+      <ErrorBoundary>
+        <Overlay state={state} />
+      </ErrorBoundary>
+    );
   }
 
   return (
     <div className="min-h-full">
       <TopNav route={route} />
+      {!connected ? (
+        <div className="border-b border-hot/40 bg-hot/10 px-4 py-2 text-center text-sm text-hot">
+          Server not reachable — close this window and run Tournament.bat again.
+        </div>
+      ) : null}
       <main className="mx-auto max-w-[1600px] px-4 py-4">
-        {route === "/control" ? <Control state={state} /> : null}
-        {route === "/studio" ? <Studio state={state} /> : null}
-        {route === "/debug" ? <Debug state={state} /> : null}
-        {route === "/" ? <Home /> : null}
+        <ErrorBoundary>
+          {route === "/control" ? <Control state={state} /> : null}
+          {route === "/studio" ? <Studio state={state} /> : null}
+          {route === "/debug" ? <Debug state={state} /> : null}
+          {route === "/" ? <Home /> : null}
+        </ErrorBoundary>
       </main>
     </div>
   );

@@ -6,6 +6,7 @@ import { SERVER_PORT } from "../shared/config.ts";
 import type { CommandMap } from "../shared/types.ts";
 import { Session } from "./session.ts";
 import { ensureSeeded, seedCategories } from "./seed.ts";
+import { fetchPhotos, photoCoverage } from "./photos.ts";
 import { DIST_DIR, UPLOADS_DIR, ensureDirs, clearUploads, countUploads } from "./store.ts";
 
 const IMAGE_TYPES: Record<string, string> = {
@@ -160,6 +161,20 @@ async function main(): Promise<void> {
         const written = await seedCategories(url.searchParams.get("force") === "1");
         session.refreshCategories();
         return json(res, 200, { ok: true, written });
+      }
+
+      if (pathname === "/api/photos/coverage" && method === "GET") {
+        return json(res, 200, await photoCoverage());
+      }
+
+      if (pathname === "/api/photos/fetch" && method === "POST") {
+        const category = url.searchParams.get("category") ?? undefined;
+        const force = url.searchParams.get("force") === "1";
+        console.log(`[photos] fetching${category ? ` for ${category}` : ""}…`);
+        const summary = await fetchPhotos({ category, force, log: (line) => console.log(line) });
+        session.refreshCategories();
+        console.log(`[photos] done: +${summary.changed}, ${summary.skipped} skipped`);
+        return json(res, 200, summary);
       }
 
       if (pathname.startsWith("/uploads/")) {

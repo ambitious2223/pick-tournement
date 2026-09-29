@@ -28,32 +28,42 @@ export async function uploadImage(file: File): Promise<string> {
   return data.url;
 }
 
-export function useLiveState(): SessionState | null {
+export function useLiveState(): { state: SessionState | null; connected: boolean } {
   const [state, setState] = useState<SessionState | null>(null);
+  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     fetch("/api/state")
       .then((r) => r.json())
       .then((s: SessionState) => {
-        if (!cancelled) setState(s);
+        if (cancelled) return;
+        setState(s);
+        setConnected(true);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setConnected(false);
+      });
+
     const source = new EventSource("/events");
+    source.addEventListener("open", () => setConnected(true));
+    source.addEventListener("error", () => setConnected(false));
     source.addEventListener("message", (event) => {
       try {
         setState(JSON.parse((event as MessageEvent).data) as SessionState);
+        setConnected(true);
       } catch {
         /* ignore malformed frame */
       }
     });
+
     return () => {
       cancelled = true;
       source.close();
     };
   }, []);
 
-  return state;
+  return { state, connected };
 }
 
 export function useNow(active: boolean, intervalMs = 100): number {

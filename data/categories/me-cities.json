@@ -1,0 +1,161 @@
+{
+  "id": "me-cities",
+  "name": "Middle Eastern Cities",
+  "items": [
+    {
+      "id": "dubai",
+      "name": "Dubai",
+      "aliases": [
+        "دبي"
+      ],
+      "emoji": "🌆"
+    },
+    {
+      "id": "riyadh",
+      "name": "Riyadh",
+      "aliases": [
+        "الرياض"
+      ],
+      "emoji": "🏙️",
+      "image": "/uploads/051a06573a18.jpg"
+    },
+    {
+      "id": "cairo",
+      "name": "Cairo",
+      "aliases": [
+        "القاهرة"
+      ],
+      "emoji": "🐪",
+      "image": "/uploads/cca0471b6f49.jpg"
+    },
+    {
+      "id": "doha",
+      "name": "Doha",
+      "aliases": [
+        "الدوحة"
+      ],
+      "emoji": "🏗️",
+      "image": "/uploads/fc5f2f7594a7.jpg"
+    },
+    {
+      "id": "abu-dhabi",
+      "name": "Abu Dhabi",
+      "aliases": [
+        "أبوظبي"
+      ],
+      "emoji": "🏛️",
+      "image": "/uploads/53cbc30e29e6.jpg"
+    },
+    {
+      "id": "beirut",
+      "name": "Beirut",
+      "aliases": [
+        "بيروت"
+      ],
+      "emoji": "🌊",
+      "image": "/uploads/723b0c62df84.jpg"
+    },
+    {
+      "id": "amman",
+      "name": "Amman",
+      "aliases": [
+        "عمّان"
+      ],
+      "emoji": "🏛️",
+      "image": "/uploads/40b84eb94b41.png"
+    },
+    {
+      "id": "casablanca",
+      "name": "Casablanca",
+      "aliases": [
+        "الدار البيضاء"
+      ],
+      "emoji": "🕌",
+      "image": "/uploads/5ab79b608a78.jpg"
+    },
+    {
+      "id": "istanbul",
+      "name": "Istanbul",
+      "aliases": [
+        "إسطنبول"
+      ],
+      "emoji": "🌉",
+      "image": "/uploads/936643e3c509.jpg"
+    },
+    {
+      "id": "mecca",
+      "name": "Mecca",
+      "aliases": [
+        "مكة"
+      ],
+      "emoji": "🕋",
+      "image": "/uploads/347e20f44fe3.jpg"
+    },
+    {
+      "id": "medina",
+      "name": "Medina",
+      "aliases": [
+        "المدينة المنورة"
+      ],
+      "emoji": "🕌",
+      "image": "/uploads/49a1897caa85.jpg"
+    },
+    {
+      "id": "muscat",
+      "name": "Muscat",
+      "aliases": [
+        "مسقط"
+      ],
+      "emoji": "⛵",
+      "image": "/uploads/39ac49d7dcf3.jpg"
+    },
+    {
+      "id": "kuwait-city",
+      "name": "Kuwait City",
+      "aliases": [
+        "مدينة الكويت"
+      ],
+      "emoji": "🏙️",
+      "image": "/uploads/54d99dd21d0a.jpg"
+    },
+    {
+      "id": "manama",
+      "name": "Manama",
+      "aliases": [
+        "المنامة"
+      ],
+      "emoji": "🌴",
+      "image": "/uploads/1794d84718f1.jpg"
+    },
+    {
+      "id": "jeddah",
+      "name": "Jeddah",
+      "aliases": [
+        "جدة"
+      ],
+      "emoji": "⚓",
+      "image": "/uploads/4e45e2360b16.jpg"
+    },
+    {
+      "id": "alexandria",
+      "name": "Alexandria",
+      "aliases": [
+        "الإسكندرية"
+      ],
+      "emoji": "🌊",
+      "image": "/uploads/b2adb0b8eb30.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

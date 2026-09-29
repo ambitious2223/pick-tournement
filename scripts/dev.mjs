@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { openDefaultBrowser, waitForServer } from "./browser.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const children = [];
@@ -64,29 +65,6 @@ function shutdown(code = 0) {
 
 process.on("SIGINT", () => shutdown(0));
 process.on("SIGTERM", () => shutdown(0));
-
-// Opens the page in a NEW TAB of the default browser. It never closes or reloads
-// existing tabs; it only asks the OS to open a URL.
-function openDefaultBrowser(target) {
-  const options = { detached: true, stdio: "ignore", windowsHide: true };
-  if (process.platform === "win32") spawn("cmd", ["/c", "start", "", target], options).unref();
-  else if (process.platform === "darwin") spawn("open", [target], options).unref();
-  else spawn("xdg-open", [target], options).unref();
-}
-
-async function waitForServer(url, timeoutMs = 30000) {
-  const started = Date.now();
-  while (Date.now() - started < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return true;
-    } catch {
-      // not up yet
-    }
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-  return false;
-}
 
 run("server", ["server/index.ts"]);
 run("vite", ["node_modules/vite/bin/vite.js"]);

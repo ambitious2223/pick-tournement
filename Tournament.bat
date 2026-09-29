@@ -28,7 +28,7 @@ if not exist "node_modules" (
   )
 )
 
-if not exist "data\categories\football.json" (
+if not exist "data\categories\arab-football.json" (
   echo Seeding the ten built-in categories...
   call npm run seed
 )
@@ -47,24 +47,33 @@ if not exist "data\.photos-done" (
   )
 )
 
+echo Building the app...
+call npm run build
+if errorlevel 1 (
+  echo.
+  echo Build failed. See the messages above.
+  pause
+  exit /b 1
+)
+
 echo.
-echo   Control Room : http://127.0.0.1:5173/control
-echo   Content Studio: http://127.0.0.1:5173/studio
-echo   Debug Console : http://127.0.0.1:5173/debug
-echo   OBS Overlay   : http://127.0.0.1:5173/overlay
+echo   Control Room : http://127.0.0.1:8787/control
+echo   Content Studio: http://127.0.0.1:8787/studio
+echo   Debug Console : http://127.0.0.1:8787/debug
+echo   OBS Overlay   : http://127.0.0.1:8787/overlay
 echo.
 
-rem Opens the Control Room in a NEW TAB of your default browser, once the server
-rem is ready. It never closes or reloads your other tabs. Set PL_NO_BROWSER=1 to skip.
-echo.
+rem One server, one port, so there is no second URL to get wrong.
+rem Opens the Control Room in a NEW TAB of your default browser once it is ready.
+rem It never closes or reloads your other tabs. Set PL_NO_BROWSER=1 to skip.
 echo Keep this window open while testing. Press Ctrl+C to stop.
 echo.
 if /i "%PL_NO_BROWSER%"=="1" (
   echo Browser auto-open is OFF. Paste a link above into the tab you want.
-  call npm run dev
+  call npm run serve
 ) else (
   echo Opening the Control Room in your default browser once it is ready...
-  call npm run dev -- --open
+  call npm run serve -- --open
 )
 
 echo.
