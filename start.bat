@@ -32,17 +32,17 @@ if not exist "data\categories\football.json" (
   call npm run seed
 )
 
-if not "%PL_NO_BROWSER%"=="1" (
-  echo.
-  echo Opening the Control Room in your browser ^(+4 seconds^)...
-  start "" powershell -NoProfile -Command "Start-Sleep -Seconds 4; Start-Process 'http://127.0.0.1:5173/control'"
-)
-
 echo.
 echo   Control Room : http://127.0.0.1:5173/control
 echo   Content Studio: http://127.0.0.1:5173/studio
 echo   Debug Console : http://127.0.0.1:5173/debug
 echo   OBS Overlay   : http://127.0.0.1:5173/overlay
+echo.
+echo This window does NOT open a browser. Paste a link above into the tab you want.
+if /i "%PL_OPEN_BROWSER%"=="1" (
+  echo Auto-open is ON - opening the Control Room ^(+4 seconds^)...
+  start "" powershell -NoProfile -Command "Start-Sleep -Seconds 4; Start-Process 'http://127.0.0.1:5173/control'"
+)
 echo.
 echo Keep this window open while testing. Press Ctrl+C to stop.
 echo.
