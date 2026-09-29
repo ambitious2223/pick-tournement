@@ -1,9 +1,33 @@
 import { spawn } from "node:child_process";
+import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const children = [];
+
+function isPortFree(port) {
+  return new Promise((resolve) => {
+    const socket = net.createConnection({ host: "127.0.0.1", port });
+    socket.on("connect", () => {
+      socket.destroy();
+      resolve(false);
+    });
+    socket.on("error", () => resolve(true));
+  });
+}
+
+for (const [port, name] of [
+  [8787, "the game server"],
+  [5173, "the web app"],
+]) {
+  if (!(await isPortFree(port))) {
+    console.error(`[dev] Port ${port} (${name}) is already in use.`);
+    console.error("[dev] Another Pick League window is probably still running.");
+    console.error("[dev] Close that window (or restart your PC) and run this again.");
+    process.exit(1);
+  }
+}
 
 const OPEN_URL = "http://127.0.0.1:5173/control";
 const wantsBrowser = process.argv.includes("--open") || process.env.PL_OPEN_BROWSER === "1";
