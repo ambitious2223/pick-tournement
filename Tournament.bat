@@ -1,6 +1,7 @@
 @echo off
 setlocal
 cd /d "%~dp0"
+title Pick League
 
 echo ==========================================
 echo   Pick League - starting up

@@ -6,6 +6,13 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const children = [];
 
+// Name the console window after the project, and keep the name even if a child
+// process (npm, vite, node) tries to set its own title.
+process.title = "Pick League";
+setInterval(() => {
+  process.title = "Pick League";
+}, 2000).unref();
+
 function isPortFree(port) {
   return new Promise((resolve) => {
     const socket = net.createConnection({ host: "127.0.0.1", port });
@@ -61,7 +68,7 @@ process.on("SIGTERM", () => shutdown(0));
 // Opens the page in a NEW TAB of the default browser. It never closes or reloads
 // existing tabs; it only asks the OS to open a URL.
 function openDefaultBrowser(target) {
-  const options = { detached: true, stdio: "ignore" };
+  const options = { detached: true, stdio: "ignore", windowsHide: true };
   if (process.platform === "win32") spawn("cmd", ["/c", "start", "", target], options).unref();
   else if (process.platform === "darwin") spawn("open", [target], options).unref();
   else spawn("xdg-open", [target], options).unref();

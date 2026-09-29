@@ -35,6 +35,8 @@ const MIME: Record<string, string> = {
 const MAX_UPLOAD = 8 * 1024 * 1024;
 const MAX_JSON = 2 * 1024 * 1024;
 
+process.title = "Pick League";
+
 function json(res: http.ServerResponse, status: number, body: unknown): void {
   const text = JSON.stringify(body);
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Content-Length": Buffer.byteLength(text) });
