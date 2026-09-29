@@ -1,0 +1,125 @@
+{
+  "id": "movies",
+  "name": "Movies",
+  "items": [
+    {
+      "id": "the-godfather",
+      "name": "The Godfather",
+      "aliases": [],
+      "emoji": "🍊"
+    },
+    {
+      "id": "the-dark-knight",
+      "name": "The Dark Knight",
+      "aliases": [
+        "batman dark knight"
+      ],
+      "emoji": "🦇"
+    },
+    {
+      "id": "pulp-fiction",
+      "name": "Pulp Fiction",
+      "aliases": [],
+      "emoji": "🍔"
+    },
+    {
+      "id": "inception",
+      "name": "Inception",
+      "aliases": [],
+      "emoji": "🌀"
+    },
+    {
+      "id": "interstellar",
+      "name": "Interstellar",
+      "aliases": [],
+      "emoji": "🚀"
+    },
+    {
+      "id": "fight-club",
+      "name": "Fight Club",
+      "aliases": [],
+      "emoji": "🥊"
+    },
+    {
+      "id": "forrest-gump",
+      "name": "Forrest Gump",
+      "aliases": [],
+      "emoji": "🍫"
+    },
+    {
+      "id": "the-matrix",
+      "name": "The Matrix",
+      "aliases": [],
+      "emoji": "🕶️"
+    },
+    {
+      "id": "gladiator",
+      "name": "Gladiator",
+      "aliases": [],
+      "emoji": "⚔️",
+      "image": "/uploads/ea048e64c633.jpg"
+    },
+    {
+      "id": "titanic",
+      "name": "Titanic",
+      "aliases": [],
+      "emoji": "🚢",
+      "image": "/uploads/44050b6609fb.jpg"
+    },
+    {
+      "id": "avengers-endgame",
+      "name": "Avengers Endgame",
+      "aliases": [
+        "avengers"
+      ],
+      "emoji": "🛡️"
+    },
+    {
+      "id": "the-shawshank-redemption",
+      "name": "The Shawshank Redemption",
+      "aliases": [
+        "shawshank"
+      ],
+      "emoji": "⛓️"
+    },
+    {
+      "id": "goodfellas",
+      "name": "Goodfellas",
+      "aliases": [],
+      "emoji": "🔫"
+    },
+    {
+      "id": "the-lion-king",
+      "name": "The Lion King",
+      "aliases": [
+        "lion king"
+      ],
+      "emoji": "🦁"
+    },
+    {
+      "id": "spirited-away",
+      "name": "Spirited Away",
+      "aliases": [],
+      "emoji": "🐉"
+    },
+    {
+      "id": "parasite",
+      "name": "Parasite",
+      "aliases": [],
+      "emoji": "🐛",
+      "image": "/uploads/e53bbc7608b9.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

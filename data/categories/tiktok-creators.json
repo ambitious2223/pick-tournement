@@ -1,0 +1,134 @@
+{
+  "id": "tiktok-creators",
+  "name": "TikTok Creators",
+  "items": [
+    {
+      "id": "charli-damelio",
+      "name": "Charli DAmelio",
+      "aliases": [
+        "charli"
+      ]
+    },
+    {
+      "id": "khaby-lame",
+      "name": "Khaby Lame",
+      "aliases": [
+        "khaby"
+      ]
+    },
+    {
+      "id": "addison-rae",
+      "name": "Addison Rae",
+      "aliases": [
+        "addison"
+      ]
+    },
+    {
+      "id": "bella-poarch",
+      "name": "Bella Poarch",
+      "aliases": [
+        "bella"
+      ]
+    },
+    {
+      "id": "mrbeast",
+      "name": "MrBeast",
+      "aliases": [
+        "beast"
+      ],
+      "image": "/uploads/6d1ae4c8d594.png"
+    },
+    {
+      "id": "zach-king",
+      "name": "Zach King",
+      "aliases": [
+        "zach"
+      ]
+    },
+    {
+      "id": "josh-richards",
+      "name": "Josh Richards",
+      "aliases": [
+        "josh"
+      ]
+    },
+    {
+      "id": "bryce-hall",
+      "name": "Bryce Hall",
+      "aliases": [
+        "bryce"
+      ]
+    },
+    {
+      "id": "liza-koshy",
+      "name": "Liza Koshy",
+      "aliases": [
+        "liza"
+      ],
+      "image": "/uploads/38f2dfb921df.jpg"
+    },
+    {
+      "id": "david-dobrik",
+      "name": "David Dobrik",
+      "aliases": [
+        "david"
+      ]
+    },
+    {
+      "id": "dixie-damelio",
+      "name": "Dixie DAmelio",
+      "aliases": [
+        "dixie"
+      ]
+    },
+    {
+      "id": "loren-gray",
+      "name": "Loren Gray",
+      "aliases": [
+        "loren"
+      ]
+    },
+    {
+      "id": "avani-gregg",
+      "name": "Avani Gregg",
+      "aliases": [
+        "avani"
+      ]
+    },
+    {
+      "id": "noah-beck",
+      "name": "Noah Beck",
+      "aliases": [
+        "noah"
+      ],
+      "image": "/uploads/f997b6736c34.png"
+    },
+    {
+      "id": "nessa-barrett",
+      "name": "Nessa Barrett",
+      "aliases": [
+        "nessa"
+      ],
+      "image": "/uploads/d5ddf0987d04.jpg"
+    },
+    {
+      "id": "jaden-hossler",
+      "name": "Jaden Hossler",
+      "aliases": [
+        "jaden"
+      ]
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

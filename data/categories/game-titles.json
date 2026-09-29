@@ -1,0 +1,140 @@
+{
+  "id": "game-titles",
+  "name": "Video Game Titles",
+  "items": [
+    {
+      "id": "minecraft",
+      "name": "Minecraft",
+      "aliases": [],
+      "emoji": "⛏️"
+    },
+    {
+      "id": "grand-theft-auto-v",
+      "name": "Grand Theft Auto V",
+      "aliases": [
+        "gta",
+        "gta 5",
+        "gta v"
+      ],
+      "emoji": "🚗"
+    },
+    {
+      "id": "fortnite",
+      "name": "Fortnite",
+      "aliases": [],
+      "emoji": "🏗️"
+    },
+    {
+      "id": "roblox",
+      "name": "Roblox",
+      "aliases": [],
+      "emoji": "🟥"
+    },
+    {
+      "id": "breath-of-the-wild",
+      "name": "Breath of the Wild",
+      "aliases": [
+        "zelda botw"
+      ],
+      "emoji": "🏔️"
+    },
+    {
+      "id": "elden-ring",
+      "name": "Elden Ring",
+      "aliases": [],
+      "emoji": "💍"
+    },
+    {
+      "id": "call-of-duty-warzone",
+      "name": "Call of Duty Warzone",
+      "aliases": [
+        "warzone"
+      ],
+      "emoji": "🎯"
+    },
+    {
+      "id": "among-us",
+      "name": "Among Us",
+      "aliases": [
+        "among us",
+        "imposter"
+      ],
+      "emoji": "🔪"
+    },
+    {
+      "id": "playerunknowns-battlegrounds",
+      "name": "PlayerUnknowns Battlegrounds",
+      "aliases": [
+        "pubg"
+      ],
+      "emoji": "🪖"
+    },
+    {
+      "id": "genshin-impact",
+      "name": "Genshin Impact",
+      "aliases": [
+        "genshin"
+      ],
+      "emoji": "🌸"
+    },
+    {
+      "id": "league-of-legends",
+      "name": "League of Legends",
+      "aliases": [
+        "lol"
+      ],
+      "emoji": "⚔️",
+      "image": "/uploads/52e0c529bc33.png"
+    },
+    {
+      "id": "valorant",
+      "name": "Valorant",
+      "aliases": [],
+      "emoji": "🔫",
+      "image": "/uploads/3bac8c5060c2.png"
+    },
+    {
+      "id": "god-of-war",
+      "name": "God of War",
+      "aliases": [],
+      "emoji": "🪓"
+    },
+    {
+      "id": "red-dead-redemption-2",
+      "name": "Red Dead Redemption 2",
+      "aliases": [
+        "rdr2",
+        "red dead"
+      ],
+      "emoji": "🤠"
+    },
+    {
+      "id": "skyrim",
+      "name": "Skyrim",
+      "aliases": [
+        "elder scrolls"
+      ],
+      "emoji": "🐉"
+    },
+    {
+      "id": "cyberpunk-2077",
+      "name": "Cyberpunk 2077",
+      "aliases": [
+        "cyberpunk"
+      ],
+      "emoji": "🌃"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

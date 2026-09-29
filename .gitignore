@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dist-electron/
+*.local
+.DS_Store
+
+# Runtime/generated state (kept out of git; categories in data/categories ARE tracked)
+data/session.json
+data/uploads/
+data/photos.log
+
+# Backups
+*.bak
+*.log

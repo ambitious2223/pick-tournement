@@ -1,0 +1,147 @@
+{
+  "id": "anime-characters",
+  "name": "Anime Characters",
+  "items": [
+    {
+      "id": "goku",
+      "name": "Goku",
+      "aliases": [
+        "son goku"
+      ],
+      "emoji": "🥋"
+    },
+    {
+      "id": "vegeta",
+      "name": "Vegeta",
+      "aliases": [
+        "prince vegeta"
+      ],
+      "emoji": "👑"
+    },
+    {
+      "id": "naruto-uzumaki",
+      "name": "Naruto Uzumaki",
+      "aliases": [
+        "naruto"
+      ],
+      "emoji": "🍜"
+    },
+    {
+      "id": "sasuke-uchiha",
+      "name": "Sasuke Uchiha",
+      "aliases": [
+        "sasuke"
+      ],
+      "emoji": "⚡"
+    },
+    {
+      "id": "monkey-d-luffy",
+      "name": "Monkey D Luffy",
+      "aliases": [
+        "luffy"
+      ],
+      "emoji": "🏴‍☠️"
+    },
+    {
+      "id": "roronoa-zoro",
+      "name": "Roronoa Zoro",
+      "aliases": [
+        "zoro"
+      ],
+      "emoji": "🗡️"
+    },
+    {
+      "id": "itachi-uchiha",
+      "name": "Itachi Uchiha",
+      "aliases": [
+        "itachi"
+      ],
+      "emoji": "👁️"
+    },
+    {
+      "id": "levi-ackerman",
+      "name": "Levi Ackerman",
+      "aliases": [
+        "levi"
+      ],
+      "emoji": "🧹"
+    },
+    {
+      "id": "eren-yeager",
+      "name": "Eren Yeager",
+      "aliases": [
+        "eren"
+      ],
+      "emoji": "🗿"
+    },
+    {
+      "id": "saitama",
+      "name": "Saitama",
+      "aliases": [
+        "one punch man"
+      ],
+      "emoji": "👊"
+    },
+    {
+      "id": "light-yagami",
+      "name": "Light Yagami",
+      "aliases": [
+        "kira"
+      ],
+      "emoji": "📓"
+    },
+    {
+      "id": "l-lawliet",
+      "name": "L Lawliet",
+      "aliases": [
+        "l"
+      ],
+      "emoji": "🍬",
+      "image": "/uploads/291e8abd181d.png"
+    },
+    {
+      "id": "tanjiro-kamado",
+      "name": "Tanjiro Kamado",
+      "aliases": [
+        "tanjiro"
+      ],
+      "emoji": "💧"
+    },
+    {
+      "id": "nezuko-kamado",
+      "name": "Nezuko Kamado",
+      "aliases": [
+        "nezuko"
+      ],
+      "emoji": "🎀"
+    },
+    {
+      "id": "satoru-gojo",
+      "name": "Satoru Gojo",
+      "aliases": [
+        "gojo"
+      ],
+      "emoji": "🕶️"
+    },
+    {
+      "id": "ichigo-kurosaki",
+      "name": "Ichigo Kurosaki",
+      "aliases": [
+        "ichigo"
+      ],
+      "emoji": "⚔️"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "id": "football",
+  "name": "Football / Players",
+  "items": [
+    {
+      "id": "cristiano-ronaldo",
+      "name": "Cristiano Ronaldo",
+      "aliases": [
+        "cr7",
+        "ronaldo"
+      ],
+      "image": "/uploads/69718b0b0c18.jpg"
+    },
+    {
+      "id": "lionel-messi",
+      "name": "Lionel Messi",
+      "aliases": [
+        "messi",
+        "leo"
+      ],
+      "image": "/uploads/753ed7038f06.jpg"
+    },
+    {
+      "id": "neymar-jr",
+      "name": "Neymar Jr",
+      "aliases": [
+        "neymar"
+      ],
+      "image": "/uploads/c44cb9930e74.jpg"
+    },
+    {
+      "id": "kylian-mbappe",
+      "name": "Kylian Mbappe",
+      "aliases": [
+        "mbappe"
+      ]
+    },
+    {
+      "id": "erling-haaland",
+      "name": "Erling Haaland",
+      "aliases": [
+        "haaland"
+      ],
+      "image": "/uploads/fb19546e5a46.jpg"
+    },
+    {
+      "id": "karim-benzema",
+      "name": "Karim Benzema",
+      "aliases": [
+        "benzema"
+      ],
+      "image": "/uploads/51ebef753f38.jpg"
+    },
+    {
+      "id": "luka-modric",
+      "name": "Luka Modric",
+      "aliases": [
+        "modric"
+      ],
+      "image": "/uploads/6d1ca0b3c951.jpg"
+    },
+    {
+      "id": "kevin-de-bruyne",
+      "name": "Kevin De Bruyne",
+      "aliases": [
+        "kdb"
+      ],
+      "image": "/uploads/16763fdca08b.jpg"
+    },
+    {
+      "id": "robert-lewandowski",
+      "name": "Robert Lewandowski",
+      "aliases": [
+        "lewandowski"
+      ],
+      "image": "/uploads/00e0d460fa72.jpg"
+    },
+    {
+      "id": "mohamed-salah",
+      "name": "Mohamed Salah",
+      "aliases": [
+        "salah"
+      ],
+      "image": "/uploads/95f3e0c06e67.jpg"
+    },
+    {
+      "id": "virgil-van-dijk",
+      "name": "Virgil van Dijk",
+      "aliases": [
+        "vvd"
+      ],
+      "image": "/uploads/54f2c4ab2434.jpg"
+    },
+    {
+      "id": "thibaut-courtois",
+      "name": "Thibaut Courtois",
+      "aliases": [
+        "courtois"
+      ],
+      "image": "/uploads/3e5cf864292d.jpg"
+    },
+    {
+      "id": "vinicius-junior",
+      "name": "Vinicius Junior",
+      "aliases": [
+        "vinicius"
+      ],
+      "image": "/uploads/06052609b7e5.jpg"
+    },
+    {
+      "id": "jude-bellingham",
+      "name": "Jude Bellingham",
+      "aliases": [
+        "bellingham"
+      ],
+      "image": "/uploads/a0d7156f586d.jpg"
+    },
+    {
+      "id": "zinedine-zidane",
+      "name": "Zinedine Zidane",
+      "aliases": [
+        "zidane"
+      ],
+      "image": "/uploads/4803df9d69be.jpg"
+    },
+    {
+      "id": "diego-maradona",
+      "name": "Diego Maradona",
+      "aliases": [
+        "maradona"
+      ],
+      "image": "/uploads/d5e539bdbe1f.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ]
+}
