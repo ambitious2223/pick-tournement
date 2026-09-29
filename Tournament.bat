@@ -32,6 +32,20 @@ if not exist "data\categories\football.json" (
   call npm run seed
 )
 
+rem One-time photo fetch. Only talks to Wikipedia/Wikimedia; skipped on every later run.
+rem Set PL_NO_PHOTOS=1 to skip it (offline, or you prefer to add your own photos).
+if not exist "data\.photos-done" (
+  if /i "%PL_NO_PHOTOS%"=="1" (
+    echo Skipping photo fetch ^(PL_NO_PHOTOS=1^).
+  ) else (
+    echo.
+    echo One-time setup: downloading free photos from Wikipedia/Wikimedia.
+    echo This can take a few minutes and only happens once.
+    call npm run seed:photos
+    echo done > "data\.photos-done"
+  )
+)
+
 echo.
 echo   Control Room : http://127.0.0.1:5173/control
 echo   Content Studio: http://127.0.0.1:5173/studio

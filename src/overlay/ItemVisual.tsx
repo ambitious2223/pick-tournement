@@ -9,24 +9,20 @@ function colorFor(seed: string): string {
   return TILE_COLORS[hash % TILE_COLORS.length] ?? TILE_COLORS[0]!;
 }
 
-function Tile({ item, size }: { item: Item; size: number }): ReactNode {
-  const label = item.emoji ?? item.name.slice(0, 1).toUpperCase();
-  return (
-    <div
-      style={{ width: size, height: size, background: `color-mix(in srgb, ${colorFor(item.id)} 22%, #0d1226)` }}
-      className="grid place-items-center rounded-2xl border border-line text-[5rem] font-black leading-none"
-    >
-      {label}
-    </div>
-  );
-}
-
-export function ItemVisual({ item, size = 220 }: { item: Item | null; size?: number }): ReactNode {
+export function ItemVisual({
+  item,
+  className = "",
+  emojiClassName = "text-6xl",
+}: {
+  item: Item | null;
+  className?: string;
+  emojiClassName?: string;
+}): ReactNode {
   const [broken, setBroken] = useState(false);
 
   if (!item) {
     return (
-      <div style={{ width: size, height: size }} className="grid place-items-center rounded-2xl border border-dashed border-line text-white/30">
+      <div className={`grid place-items-center rounded-xl border border-dashed border-line text-white/30 ${className}`}>
         TBD
       </div>
     );
@@ -37,13 +33,20 @@ export function ItemVisual({ item, size = 220 }: { item: Item | null; size?: num
       <img
         src={item.image}
         alt={item.name}
-        style={{ width: size, height: size }}
-        className="rounded-2xl border border-line object-cover"
+        className={`rounded-xl object-cover ${className}`}
         loading="lazy"
         onError={() => setBroken(true)}
       />
     );
   }
 
-  return <Tile item={item} size={size} />;
+  const label = item.emoji ?? item.name.slice(0, 1).toUpperCase();
+  return (
+    <div
+      style={{ background: `color-mix(in srgb, ${colorFor(item.id)} 22%, #0d1226)` }}
+      className={`grid place-items-center rounded-xl border border-line font-black leading-none ${emojiClassName} ${className}`}
+    >
+      {label}
+    </div>
+  );
 }

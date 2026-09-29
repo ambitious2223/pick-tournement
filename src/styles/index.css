@@ -26,6 +26,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+html:has(.overlay-root),
+body:has(.overlay-root) {
+  background: transparent;
+}
+
 .overlay-root {
   background: transparent;
 }
@@ -44,6 +49,14 @@ body {
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  background: color-mix(in srgb, var(--color-ink) 55%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.shadow-text {
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.9),
+    0 2px 12px rgba(0, 0, 0, 0.7);
 }
 
 .glow-a {

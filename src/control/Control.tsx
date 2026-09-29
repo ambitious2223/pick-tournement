@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import type { SessionState } from "../../shared/types.ts";
-import { Panel, Toggle } from "../ui/primitives.tsx";
+import { Toggle } from "../ui/primitives.tsx";
+import { Collapsible } from "../ui/Collapsible.tsx";
 import { send } from "../lib/live.ts";
 import { MatchControls } from "./MatchControls.tsx";
 import { SettingsPanel } from "./SettingsPanel.tsx";
 import { QueueEditor } from "./QueueEditor.tsx";
 import { BracketBoard } from "../overlay/BracketBoard.tsx";
+import { Stage } from "../stage/Stage.tsx";
 import { activeCategory, activeMatch } from "../lib/selectors.ts";
 
 export function Control({ state }: { state: SessionState | null }): ReactNode {
@@ -15,25 +17,12 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
   const category = activeCategory(state);
 
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      <div className="flex flex-col gap-5">
-        <MatchControls state={state} />
-        <SettingsPanel settings={state.settings} />
-        <Panel title="Simulator">
-          <Toggle
-            label="Simulated crowd (no TikTok needed)"
-            checked={state.simulated}
-            onChange={(on) => void send("sim:set", { on })}
-          />
-          <p className="mt-2 text-xs text-white/50">
-            Fires fake chat + gift votes at the live match so you can rehearse a full tournament offline.
-          </p>
-        </Panel>
-      </div>
-
-      <div className="flex flex-col gap-5">
-        <QueueEditor state={state} />
-        <Panel title="Bracket">
+    <div className="grid gap-4 xl:grid-cols-[1fr_19rem]">
+      <div className="flex flex-col gap-4">
+        <section className="panel p-6">
+          <Stage state={state} variant="control" />
+        </section>
+        <Collapsible title="Bracket">
           {state.tournament && match ? (
             <BracketBoard
               bracket={state.tournament.bracket}
@@ -44,8 +33,28 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
           ) : (
             <p className="text-sm text-white/50">Start a category to see the bracket.</p>
           )}
-        </Panel>
+        </Collapsible>
       </div>
+
+      <aside className="flex flex-col gap-3 xl:sticky xl:top-16 xl:self-start">
+        <MatchControls state={state} />
+        <Collapsible title="Settings">
+          <SettingsPanel settings={state.settings} />
+        </Collapsible>
+        <Collapsible title="Queue" hint={state.queue.length ? String(state.queue.length) : undefined}>
+          <QueueEditor state={state} />
+        </Collapsible>
+        <Collapsible title="Simulator" hint={state.simulated ? "on" : undefined}>
+          <Toggle
+            label="Simulated crowd (no TikTok needed)"
+            checked={state.simulated}
+            onChange={(on) => void send("sim:set", { on })}
+          />
+          <p className="mt-2 text-xs text-white/50">
+            Fires fake chat + gift votes at the live match so you can rehearse a full tournament offline.
+          </p>
+        </Collapsible>
+      </aside>
     </div>
   );
 }

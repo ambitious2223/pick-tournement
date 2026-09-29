@@ -1,10 +1,13 @@
 import { useState, type ReactNode } from "react";
 import type { SessionState } from "../../shared/types.ts";
 import { ROUND_ORDER, ROUND_LABELS } from "../../shared/config.ts";
-import { Panel, Button, Field, TextInput, Select } from "../ui/primitives.tsx";
+import { Button, Field, TextInput, Select } from "../ui/primitives.tsx";
+import { Collapsible } from "../ui/Collapsible.tsx";
 import { send } from "../lib/live.ts";
 import { activeCategory, activeItems, activeMatch } from "../lib/selectors.ts";
 import { fakeViewer } from "../../engine/simulate.ts";
+
+const SM = "px-2 py-1 text-xs";
 
 export function Debug({ state }: { state: SessionState | null }): ReactNode {
   const [text, setText] = useState("");
@@ -28,119 +31,110 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
   };
 
   return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      <div className="flex flex-col gap-5">
-        <Panel title="Vote injector">
-          <div className="grid grid-cols-2 gap-3">
+    <div className="grid gap-3 lg:grid-cols-3">
+      <div className="flex flex-col gap-3">
+        <Collapsible title="Vote injector" defaultOpen>
+          <div className="flex flex-col gap-2">
             <Field label="Chat message">
-              <TextInput value={text} onChange={(e) => setText(e.target.value)} placeholder={a?.name ?? "name"} />
+              <TextInput className={SM} value={text} onChange={(e) => setText(e.target.value)} placeholder={a?.name ?? "name"} />
             </Field>
             <Field label="Viewer">
-              <TextInput value={viewer} onChange={(e) => setViewer(e.target.value)} />
+              <TextInput className={SM} value={viewer} onChange={(e) => setViewer(e.target.value)} />
             </Field>
-          </div>
-          <div className="mt-3 flex gap-2">
-            <Button
-              variant="primary"
-              onClick={() => void send("vote:chat", { text: text || a?.name || "", viewer })}
-            >
-              Send chat vote
+            <div className="grid grid-cols-2 gap-2">
+              <Button variant="primary" className={SM} onClick={() => void send("vote:chat", { text: text || a?.name || "", viewer })}>
+                Chat vote
+              </Button>
+              <Button variant="hot" className={SM} onClick={() => void send("vote:gift", { giftId, viewer, count: 1 })}>
+                Gift vote
+              </Button>
+            </div>
+            <div className="grid grid-cols-[1fr_5rem] gap-2">
+              <Field label="Gift id">
+                <TextInput className={SM} value={giftId} onChange={(e) => setGiftId(e.target.value)} />
+              </Field>
+              <Field label="Burst">
+                <TextInput className={SM} type="number" min={1} value={burst} onChange={(e) => setBurst(Number(e.target.value))} />
+              </Field>
+            </div>
+            <Button variant="lime" className={SM} disabled={!match} onClick={() => void sendBurst()}>
+              Simulate {burst} voters
             </Button>
-            <Button
-              variant="hot"
-              onClick={() => void send("vote:gift", { giftId, viewer, count: 1 })}
-            >
-              Send gift vote
-            </Button>
           </div>
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            <Field label="Gift id">
-              <TextInput value={giftId} onChange={(e) => setGiftId(e.target.value)} />
-            </Field>
-            <Field label="Burst voters">
-              <TextInput type="number" min={1} value={burst} onChange={(e) => setBurst(Number(e.target.value))} />
-            </Field>
-          </div>
-          <Button variant="lime" className="mt-3 w-full" onClick={() => void sendBurst()} disabled={!match}>
-            Simulate {burst} voters now
-          </Button>
-        </Panel>
+        </Collapsible>
 
-        <Panel title="Force outcomes">
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="ghost" disabled={!match} onClick={() => void send("match:forceWinner", "a")}>
-              Force left (A)
+        <Collapsible title="Force outcomes" defaultOpen>
+          <div className="grid grid-cols-2 gap-2">
+            <Button variant="ghost" className={SM} disabled={!match} onClick={() => void send("match:forceWinner", "a")}>
+              Force left
             </Button>
-            <Button variant="ghost" disabled={!match} onClick={() => void send("match:forceWinner", "b")}>
-              Force right (B)
+            <Button variant="ghost" className={SM} disabled={!match} onClick={() => void send("match:forceWinner", "b")}>
+              Force right
             </Button>
-            <Button variant="ghost" disabled={!match} onClick={() => void send("match:skip", undefined)}>
-              Skip timer (resolve)
+            <Button variant="ghost" className={SM} disabled={!match} onClick={() => void send("match:skip", undefined)}>
+              Skip / resolve
             </Button>
-            <Button variant="ghost" disabled={!match} onClick={() => void send("match:extend", 30)}>
+            <Button variant="ghost" className={SM} disabled={!match} onClick={() => void send("match:extend", 30)}>
               Extend +30s
             </Button>
           </div>
-          <div className="mt-3 grid grid-cols-[1fr_5rem_auto] gap-2">
-            <Select value={round} onChange={(e) => setRound(e.target.value)}>
+          <div className="mt-2 grid grid-cols-[1fr_4rem_auto] gap-2">
+            <Select className={SM} value={round} onChange={(e) => setRound(e.target.value)}>
               {ROUND_ORDER.map((r) => (
                 <option key={r} value={r}>
                   {ROUND_LABELS[r]}
                 </option>
               ))}
             </Select>
-            <TextInput type="number" min={0} value={index} onChange={(e) => setIndex(Number(e.target.value))} />
-            <Button variant="primary" disabled={!state.tournament} onClick={() => void send("match:jump", { round: round as never, index })}>
+            <TextInput className={SM} type="number" min={0} value={index} onChange={(e) => setIndex(Number(e.target.value))} />
+            <Button variant="primary" className={SM} disabled={!state.tournament} onClick={() => void send("match:jump", { round: round as never, index })}>
               Jump
             </Button>
           </div>
-        </Panel>
+        </Collapsible>
 
-        <Panel title="Danger zone">
+        <Collapsible title="Danger zone">
           <div className="flex flex-wrap gap-2">
-            <Button variant="danger" onClick={() => void send("session:reset", undefined)}>
+            <Button variant="danger" className={SM} onClick={() => void send("session:reset", undefined)}>
               Reset session
             </Button>
-            <Button variant="ghost" onClick={() => void fetch("/api/uploads/clear", { method: "POST" })}>
+            <Button variant="ghost" className={SM} onClick={() => void fetch("/api/uploads/clear", { method: "POST" })}>
               Clear uploads
             </Button>
-            <Button variant="ghost" onClick={() => void fetch("/api/seed?force=1", { method: "POST" })}>
-              Reseed categories (force)
+            <Button variant="ghost" className={SM} onClick={() => void fetch("/api/seed?force=1", { method: "POST" })}>
+              Reseed categories
             </Button>
           </div>
-          <p className="mt-2 text-xs text-white/50">
-            Reseed overwrites the ten built-in categories only; custom categories stay.
-          </p>
-        </Panel>
+        </Collapsible>
       </div>
 
-      <div className="flex flex-col gap-5">
-        <Panel title="Current match">
-          {match && category ? (
-            <div className="text-sm">
-              <div className="flex justify-between">
-                <span>
-                  A: {a?.name ?? "—"} · votes {match.votesA}
-                </span>
-                <span>
-                  B: {b?.name ?? "—"} · votes {match.votesB}
-                </span>
-              </div>
-              <div className="mt-2 text-xs text-white/50">
-                voters A: {match.votersA.join(", ") || "none"}
-                <br />
-                voters B: {match.votersB.join(", ") || "none"}
-              </div>
+      <Collapsible title="Current match" defaultOpen>
+        {match && category ? (
+          <div className="flex flex-col gap-2 text-xs">
+            <div className="flex justify-between gap-2">
+              <span className="truncate">
+                A: {a?.name ?? "—"} · <span className="text-brand">{match.votesA}</span>
+              </span>
+              <span className="truncate text-right">
+                <span className="text-brand-2">{match.votesB}</span> · {b?.name ?? "—"} :B
+              </span>
             </div>
-          ) : (
-            <p className="text-sm text-white/50">No live match.</p>
-          )}
-        </Panel>
+            <div className="text-white/50">
+              voters A: {match.votersA.join(", ") || "none"}
+              <br />
+              voters B: {match.votersB.join(", ") || "none"}
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-white/50">No live match.</p>
+        )}
+      </Collapsible>
 
-        <Panel title="Event log">
-          <div className="scroll-thin max-h-64 overflow-auto font-mono text-xs">
+      <div className="flex flex-col gap-3">
+        <Collapsible title="Event log" defaultOpen>
+          <div className="scroll-thin max-h-72 overflow-auto font-mono text-[0.7rem]">
             {state.log.toReversed().map((entry, i) => (
-              <div key={i} className="border-b border-line/40 py-1">
+              <div key={i} className="border-b border-line/40 py-0.5">
                 <span className="text-white/40">{new Date(entry.at).toLocaleTimeString()} </span>
                 <span
                   className={
@@ -159,13 +153,13 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
               </div>
             ))}
           </div>
-        </Panel>
+        </Collapsible>
 
-        <Panel title="Raw state">
-          <pre className="scroll-thin max-h-64 overflow-auto rounded-lg bg-ink-2 p-3 text-xs text-white/70">
+        <Collapsible title="Raw state">
+          <pre className="scroll-thin max-h-72 overflow-auto rounded-lg bg-ink-2 p-2 text-[0.7rem] text-white/70">
             {JSON.stringify(state, null, 2)}
           </pre>
-        </Panel>
+        </Collapsible>
       </div>
     </div>
   );

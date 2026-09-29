@@ -10,8 +10,9 @@ import { loadCategories, saveCategory, UPLOADS_DIR, DATA_DIR, ensureDirs } from 
  * Safety contract (do not weaken):
  *  - Only talks to an explicit allowlist of Wikimedia hosts.
  *  - Only writes files whose response Content-Type is a real image type.
- *  - Caps every download and logs every URL to data/photos.log.
- *  - Runs on demand only (npm run seed:photos). Never at app runtime.
+ *  - Caps every download, times out every request, and logs every URL to data/photos.log.
+ *  - Rejects non-free / fair-use images.
+ *  - Runs on demand only (Tournament.bat first run, or npm run seed:photos). Never at app runtime.
  */
 
 const ALLOWED_HOSTS = new Set([
@@ -22,7 +23,8 @@ const ALLOWED_HOSTS = new Set([
 ]);
 const USER_AGENT = "PickLeague/0.1 (local tournament overlay; contact: local user)";
 const MAX_BYTES = 6 * 1024 * 1024;
-const DELAY_MS = 250;
+const REQUEST_TIMEOUT_MS = 15000;
+const DELAY_MS = 200;
 
 const IMAGE_EXT: Record<string, string> = {
   "image/png": ".png",
@@ -49,8 +51,7 @@ function parseArgs(): Options {
 }
 
 async function logUrl(message: string): Promise<void> {
-  const line = `${new Date().toISOString()} ${message}\n`;
-  await fs.appendFile(path.join(DATA_DIR, "photos.log"), line, "utf8");
+  await fs.appendFile(path.join(DATA_DIR, "photos.log"), `${new Date().toISOString()} ${message}\n`, "utf8");
 }
 
 function safeFetch(urlString: string): Promise<Response> {
@@ -58,31 +59,103 @@ function safeFetch(urlString: string): Promise<Response> {
   if (url.protocol !== "https:" || !ALLOWED_HOSTS.has(url.hostname)) {
     throw new Error(`Blocked non-allowlisted host: ${url.hostname}`);
   }
-  return fetch(url, { headers: { "User-Agent": USER_AGENT, Accept: "application/json,image/*" } });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  return fetch(url, {
+    headers: { "User-Agent": USER_AGENT, Accept: "application/json,image/*" },
+    signal: controller.signal,
+  }).finally(() => clearTimeout(timer));
 }
 
-async function findThumbnail(name: string, aliases: string[]): Promise<{ url: string; title: string } | null> {
-  const candidates = [name, ...aliases].slice(0, 3);
-  for (const candidate of candidates) {
-    const title = encodeURIComponent(candidate.trim().replace(/\s+/g, "_"));
-    const res = await safeFetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${title}`);
-    if (!res.ok) continue;
-    const data = (await res.json()) as {
-      type?: string;
-      thumbnail?: { source?: string };
-      originalimage?: { source?: string };
-    };
-    if (data.type === "disambiguation") continue;
-    const thumb = data.thumbnail?.source;
-    if (thumb) return { url: thumb, title: candidate };
-    const original = data.originalimage?.source;
-    if (original && original.includes("/commons/")) return { url: original, title: candidate };
+async function fetchJson<T>(url: string): Promise<T | null> {
+  try {
+    const res = await safeFetch(url);
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
+  }
+}
+
+function isFreeUrl(url: string): boolean {
+  return !url.includes("/wikipedia/en/") && !url.includes("/wikipedia/fairuse/");
+}
+
+interface Summary {
+  type?: string;
+  thumbnail?: { source?: string };
+  originalimage?: { source?: string };
+}
+
+async function summaryThumb(title: string): Promise<string | null> {
+  const slug = encodeURIComponent(title.trim().replace(/\s+/g, "_"));
+  const data = await fetchJson<Summary>(`https://en.wikipedia.org/api/rest_v1/page/summary/${slug}`);
+  if (!data || data.type === "disambiguation") return null;
+  const thumb = data.thumbnail?.source;
+  if (thumb) return thumb;
+  const original = data.originalimage?.source;
+  if (original && original.includes("/commons/")) return original;
+  return null;
+}
+
+interface QueryPages {
+  query?: { pages?: Record<string, { thumbnail?: { source?: string }; imageinfo?: { mime?: string; thumburl?: string }[] }> };
+}
+
+async function pageImage(title: string): Promise<string | null> {
+  const data = await fetchJson<QueryPages>(
+    `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageimages&piprop=thumbnail&pithumbsize=400&titles=${encodeURIComponent(title)}`,
+  );
+  const pages = data?.query?.pages;
+  if (!pages) return null;
+  for (const key of Object.keys(pages)) {
+    const src = pages[key]?.thumbnail?.source;
+    if (src) return src;
   }
   return null;
 }
 
+interface SearchResult {
+  query?: { search?: { title?: string }[] };
+}
+
+async function searchTitles(query: string): Promise<string[]> {
+  const data = await fetchJson<SearchResult>(
+    `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srlimit=3&srsearch=${encodeURIComponent(query)}`,
+  );
+  const results = data?.query?.search ?? [];
+  return results.map((r) => r.title).filter((t): t is string => Boolean(t));
+}
+
+async function commonsImage(query: string): Promise<string | null> {
+  const data = await fetchJson<QueryPages>(
+    `https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=5&prop=imageinfo&iiprop=url|mime&iiurlwidth=400&gsrsearch=${encodeURIComponent(query)}`,
+  );
+  const pages = data?.query?.pages;
+  if (!pages) return null;
+  for (const key of Object.keys(pages)) {
+    const info = pages[key]?.imageinfo?.[0];
+    if (info?.thumburl && /^image\/(jpeg|png|webp|gif)$/.test(info.mime ?? "")) return info.thumburl;
+  }
+  return null;
+}
+
+async function findImage(name: string, aliases: string[]): Promise<{ url: string; via: string } | null> {
+  for (const candidate of [name, ...aliases].slice(0, 3)) {
+    const url = await summaryThumb(candidate);
+    if (url) return { url, via: "summary" };
+  }
+  for (const title of await searchTitles(name)) {
+    const url = await pageImage(title);
+    if (url) return { url, via: "search" };
+  }
+  const commons = await commonsImage(name);
+  if (commons) return { url: commons, via: "commons" };
+  return null;
+}
+
 async function downloadImage(url: string): Promise<string | null> {
-  if (url.includes("/wikipedia/en/") || url.includes("/wikipedia/fairuse/")) {
+  if (!isFreeUrl(url)) {
     await logUrl(`REJECT ${url} (non-free / fair-use)`);
     return null;
   }
@@ -101,7 +174,7 @@ async function downloadImage(url: string): Promise<string | null> {
 
 async function processItem(item: Item, force: boolean): Promise<boolean> {
   if (item.image && !force) return false;
-  const found = await findThumbnail(item.name, item.aliases);
+  const found = await findImage(item.name, item.aliases);
   if (!found) {
     await logUrl(`SKIP ${item.name} (no free image)`);
     return false;
@@ -112,7 +185,7 @@ async function processItem(item: Item, force: boolean): Promise<boolean> {
     return false;
   }
   item.image = local;
-  console.log(`  + ${item.name} <- ${found.url}`);
+  console.log(`  + ${item.name} (${found.via})`);
   return true;
 }
 
@@ -129,10 +202,8 @@ async function main(): Promise<void> {
     console.log(`\n[${category.name}]`);
     let dirty = false;
     const items: Item[] = [...category.items];
-    for (let i = 0; i < items.length; i++) {
+    for (const item of items) {
       if (budget <= 0) break;
-      const item = items[i];
-      if (!item) continue;
       try {
         if (await processItem(item, options.force)) {
           changed++;

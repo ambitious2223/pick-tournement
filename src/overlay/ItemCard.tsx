@@ -8,33 +8,41 @@ export function ItemCard({
   gift,
   side,
   state,
+  size,
+  emojiClass,
+  nameClass = "text-2xl",
+  voteClass = "text-4xl",
 }: {
   item: Item | null;
   votes: number;
   gift: Gift | null;
   side: "a" | "b";
   state: "normal" | "leading" | "winner" | "losing";
+  size: string;
+  emojiClass: string;
+  nameClass?: string;
+  voteClass?: string;
 }): ReactNode {
   const isWinner = state === "winner";
   const dim = state === "losing";
-  const ring = isWinner ? "border-lime" : state === "leading" ? (side === "a" ? "border-brand" : "border-brand-2") : "border-line";
+  const ring = isWinner ? "ring-lime" : state === "leading" ? (side === "a" ? "ring-brand" : "ring-brand-2") : "ring-line";
   const glow = state === "leading" ? (side === "a" ? "glow-a" : "glow-b") : "";
 
   return (
-    <div className={`panel animate-rise flex flex-col items-center gap-3 p-4 ${glow} ${dim ? "opacity-45" : ""}`}>
-      <div className="relative">
-        <div className={`rounded-2xl border-2 ${ring}`}>
-          <ItemVisual item={item} />
+    <div className={`animate-rise flex flex-col items-center gap-2 ${dim ? "opacity-40" : ""}`}>
+      <div className={`relative shrink-0 ${size}`}>
+        <div className={`h-full w-full overflow-hidden rounded-xl ring-2 ${ring} ${glow}`}>
+          <ItemVisual item={item} className="h-full w-full" emojiClassName={emojiClass} />
         </div>
         {gift ? (
-          <div className="absolute -bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border border-line bg-ink px-3 py-1 text-sm">
+          <div className="absolute -bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border border-line bg-ink px-2 py-0.5 text-xs">
             <span>{gift.icon}</span>
-            <span className="text-xs text-white/70">{gift.name}</span>
+            <span className="text-white/70">{gift.name}</span>
           </div>
         ) : null}
       </div>
-      <div className="mt-2 max-w-[15rem] truncate text-center text-2xl font-black">{item?.name ?? "TBD"}</div>
-      <div className={`text-4xl font-black ${side === "a" ? "text-brand" : "text-brand-2"}`}>{votes}</div>
+      <div className={`shadow-text mt-2 max-w-[16rem] truncate text-center font-black ${nameClass}`}>{item?.name ?? "TBD"}</div>
+      <div className={`shadow-text font-black ${side === "a" ? "text-brand" : "text-brand-2"} ${voteClass}`}>{votes}</div>
     </div>
   );
 }

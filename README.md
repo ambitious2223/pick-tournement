@@ -22,9 +22,13 @@ run or rehearse: a built-in simulator drives the whole thing.
 
 ## Quick start
 
-**Easiest (Windows):** double-click **`Tournament.bat`**. It installs dependencies on the first
-run, seeds the categories, starts both servers, and opens the Control Room in a new browser tab
-(your other tabs are never touched). Set `PL_NO_BROWSER=1` before running it to skip the browser.
+**Easiest (Windows):** double-click **`Tournament.bat`**. On the first run it installs
+dependencies, seeds the categories, downloads free photos once, starts both servers, and opens the
+Control Room in a new browser tab (your other tabs are never touched). Skip the browser with
+`PL_NO_BROWSER=1`, or skip the one-time photo fetch with `PL_NO_PHOTOS=1`.
+
+The Control page shows a large tournament stage (photos, names, vote bars, timer) with compact
+collapsible controls on the right. The Debug console is tucked behind a small "debug" link.
 
 Or run the steps manually:
 
