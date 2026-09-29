@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import type { Category, Item, SessionState } from "../../shared/types.ts";
 import { Panel, Button, TextInput } from "../ui/primitives.tsx";
 import { send } from "../lib/live.ts";
@@ -21,13 +21,13 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
   const [savedFlash, setSavedFlash] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!state) return;
-    const found = state.categories.find((c) => c.id === selectedId) ?? null;
-    setDraft(found ? normalize(structuredClone(found)) : null);
-  }, [selectedId, state]);
-
   if (!state) return <p className="text-white/50">Connecting…</p>;
+
+  const openCategory = (id: string) => {
+    const found = state.categories.find((c) => c.id === id) ?? null;
+    setSelectedId(id);
+    setDraft(found ? normalize(structuredClone(found)) : null);
+  };
 
   const save = async (category: Category) => {
     const cleaned: Category = {
@@ -98,7 +98,7 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
           {state.categories.map((c) => (
             <li key={c.id}>
               <button
-                onClick={() => setSelectedId(c.id)}
+                onClick={() => openCategory(c.id)}
                 className={`w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
                   selectedId === c.id ? "bg-brand/15 text-brand" : "hover:bg-surface"
                 }`}

@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import type { CommandMap, SessionState } from "../../shared/types.ts";
 
 export async function send<K extends keyof CommandMap>(command: K, payload?: CommandMap[K]): Promise<void> {
-  await fetch("/api/command", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ command, payload }),
-  });
+  try {
+    const res = await fetch("/api/command", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ command, payload }),
+    });
+    if (!res.ok) console.error(`[pick-league] command "${command}" failed: ${res.status}`);
+  } catch (error) {
+    console.error(`[pick-league] command "${command}" could not reach the server`, error);
+  }
 }
 
 export async function uploadImage(file: File): Promise<string> {

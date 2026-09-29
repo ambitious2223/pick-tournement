@@ -16,15 +16,12 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
     <Panel title="Match controls">
       <div className="mb-4 flex items-center gap-3">
         <Select
-          defaultValue=""
+          value={state.tournament?.categoryId ?? ""}
           onChange={(e) => {
-            if (e.target.value) {
-              void send("tournament:start", { categoryId: e.target.value });
-              e.target.value = "";
-            }
+            if (e.target.value) void send("tournament:start", { categoryId: e.target.value });
           }}
         >
-          <option value="">Start a category…</option>
+          <option value="">Pick a category…</option>
           {state.categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
