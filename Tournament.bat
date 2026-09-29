@@ -38,16 +38,19 @@ echo   Content Studio: http://127.0.0.1:5173/studio
 echo   Debug Console : http://127.0.0.1:5173/debug
 echo   OBS Overlay   : http://127.0.0.1:5173/overlay
 echo.
-echo This window does NOT open a browser. Paste a link above into the tab you want.
-if /i "%PL_OPEN_BROWSER%"=="1" (
-  echo Auto-open is ON - opening the Control Room ^(+4 seconds^)...
-  start "" powershell -NoProfile -Command "Start-Sleep -Seconds 4; Start-Process 'http://127.0.0.1:5173/control'"
-)
+
+rem Opens the Control Room in a NEW TAB of your default browser, once the server
+rem is ready. It never closes or reloads your other tabs. Set PL_NO_BROWSER=1 to skip.
 echo.
 echo Keep this window open while testing. Press Ctrl+C to stop.
 echo.
-
-call npm run dev
+if /i "%PL_NO_BROWSER%"=="1" (
+  echo Browser auto-open is OFF. Paste a link above into the tab you want.
+  call npm run dev
+) else (
+  echo Opening the Control Room in your default browser once it is ready...
+  call npm run dev -- --open
+)
 
 echo.
 echo Server stopped.

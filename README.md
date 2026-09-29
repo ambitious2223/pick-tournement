@@ -22,6 +22,12 @@ run or rehearse: a built-in simulator drives the whole thing.
 
 ## Quick start
 
+**Easiest (Windows):** double-click **`Tournament.bat`**. It installs dependencies on the first
+run, seeds the categories, starts both servers, and opens the Control Room in a new browser tab
+(your other tabs are never touched). Set `PL_NO_BROWSER=1` before running it to skip the browser.
+
+Or run the steps manually:
+
 ```bash
 npm install
 npm run seed          # writes the ten built-in categories (auto-runs on first serve too)
