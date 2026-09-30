@@ -53,13 +53,13 @@ export const DICT = {
   },
   "setup.s4.title": { ar: "4) ابدأ العرض", en: "4) Start the show" },
   "setup.s4.body": {
-    ar: "من غرفة التحكم، اختر فئة أو املأ القائمة، ثم اضغط \"العرض ← ابدأ\". يتولّى التسلسل التالي: تصويت الفئة ← الجدول ← المباريات ← النتائج ← البطل.",
-    en: "From the Control Room pick a category or fill the queue, then press Show → Start. It runs: category vote → bracket → matches → results → champion.",
+    ar: "من غرفة التحكم، اختر فئة أو املأ القائمة، ثم اضغط \"العرض ← ابدأ\". يتولّى التسلسل التالي: تصويت الفئة ← مقدمة الجولة ← الجدول ← المباريات ← النتائج ← البطل، ثم ينتقل تلقائياً إلى الفئة التالية.",
+    en: "From the Control Room pick a category or fill the queue, then press Show → Start. It runs: category vote → round intro → bracket → matches → results → champion, then the next category automatically.",
   },
   "setup.s5.title": { ar: "5) أضفه إلى OBS", en: "5) Add it to OBS" },
   "setup.s5.body": {
-    ar: "أضف مصدر متصفح (Browser Source) بالرابط ‎http://127.0.0.1:8787/overlay وغيّر حجمه ليناسب المنطقة الوسطى بين الكاميرا والتعليقات. الخلفية شفافة افتراضياً؛ ويمكنك ضبط هوامش آمنة من الإعدادات.",
-    en: "Add a Browser Source with http://127.0.0.1:8787/overlay and size it to the middle band between your camera and comments. The background is transparent by default; tune safe-area margins in Settings.",
+    ar: "أضف مصدر متصفح (Browser Source) بالرابط ‎http://127.0.0.1:8787/overlay وغيّر حجمه ليناسب المنطقة الوسطى بين الكاميرا والتعليقات. الخلفية شفافة افتراضياً؛ ويمكنك ضبط هوامش آمنة من الإعدادات. اضغط زر الصوت مرة واحدة على صفحة البث لتفعيل الصوت (يفعّله OBS تلقائياً).",
+    en: "Add a Browser Source with http://127.0.0.1:8787/overlay and size it to the middle band between your camera and comments. The background is transparent by default; tune safe-area margins in Settings. Press the sound button once on the broadcast page to enable audio (OBS does this automatically).",
   },
   "setup.s6.title": { ar: "6) تدرّب بدون تيك توك", en: "6) Rehearse without TikTok" },
   "setup.s6.body": {
@@ -94,8 +94,8 @@ export const DICT = {
   },
   "home.debug.title": { ar: "وحدة التصحيح", en: "Debug Console" },
   "home.debug.body": {
-    ar: "احقن أصواتًا، افرض النتائج، حاكِ الجمهور، وافحص الحالة الخام وسجل الأحداث.",
-    en: "Inject votes, force outcomes, simulate crowds, inspect raw state and the event log.",
+    ar: "احقن أصواتًا، افرض النتائج، حاكِ الجمهور، واضبط الاتصال المباشر ومزيج الصوت، وافحص الحالة الخام.",
+    en: "Inject votes, force outcomes, simulate crowds, set up the live connection and the sound mixer, and inspect raw state.",
   },
   "home.overlay.title": { ar: "أوفرلاي OBS", en: "OBS Overlay" },
   "home.overlay.body": {

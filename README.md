@@ -27,7 +27,7 @@ local **Tikora** hub — no TikTok login inside this app.
   all tunable.
 - **Live TikTok via Tikora:** chat votes, gifts vote by gift name, and likes/follows/shares build the
   supporter leaderboard (with cached avatars).
-- **Configurable round timer**, queue ("combinations"), auto-advance, and tie rules.
+- **Configurable round timer**, a category queue, auto-advance, and tie rules.
 - **Content Studio** — create categories, edit 16 items, add aliases, and upload photos.
 - **Debug console** — inject votes, simulate a crowd, force outcomes, jump rounds, the **Live
   connection** panel, the **Sound & Music** mixer, and raw state.
