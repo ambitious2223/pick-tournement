@@ -13,14 +13,15 @@ export function Collapsible({
 }): ReactNode {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className="panel overflow-hidden">
+    <section className="panel min-w-0 overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left transition hover:bg-surface/60"
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-start transition hover:bg-surface/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
       >
-        <span className="text-[0.7rem] font-bold uppercase tracking-widest text-brand">{title}</span>
-        <span className="flex items-center gap-2">
+        <span className="min-w-0 break-words text-start text-[0.7rem] font-bold uppercase tracking-widest text-brand">{title}</span>
+        <span className="flex shrink-0 items-center gap-2">
           {hint ? <span className="text-[0.65rem] text-white/40">{hint}</span> : null}
           <span className="text-white/40">{open ? "−" : "+"}</span>
         </span>

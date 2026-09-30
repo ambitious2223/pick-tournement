@@ -7,7 +7,10 @@ import type { CommandMap } from "../shared/types.ts";
 import { Session } from "./session.ts";
 import { ensureSeeded, seedCategories } from "./seed.ts";
 import { fetchPhotos, photoCoverage } from "./photos.ts";
-import { DIST_DIR, UPLOADS_DIR, ensureDirs, clearUploads, countUploads } from "./store.ts";
+import { DIST_DIR, UPLOADS_DIR, SOUNDS_DIR, ensureDirs, clearUploads, countUploads } from "./store.ts";
+import { AVATARS_DIR } from "./avatars.ts";
+import { loadLiveConfig } from "./liveConfig.ts";
+import { LiveClient } from "./live.ts";
 
 const IMAGE_TYPES: Record<string, string> = {
   "image/png": ".png",
@@ -96,6 +99,17 @@ async function main(): Promise<void> {
   await ensureSeeded();
   const session = await Session.create();
 
+  const liveConfig = await loadLiveConfig();
+  const live = new LiveClient({
+    config: liveConfig,
+    onEvent: (event) => session.handleLiveEvent(event),
+    onEffect: (effect, payload) => session.handleLiveEffect(effect, payload),
+    onStatus: (connected) => session.setLiveStatus(connected),
+    onLog: (line) => console.log(`[live] ${line}`),
+  });
+  session.attachLive(live, liveConfig);
+  live.start();
+
   const clients = new Set<http.ServerResponse>();
 
   session.subscribe((event) => {
@@ -179,6 +193,22 @@ async function main(): Promise<void> {
 
       if (pathname.startsWith("/uploads/")) {
         return serveStatic(res, pathname.replace("/uploads", ""), UPLOADS_DIR, false);
+      }
+
+      if (pathname.startsWith("/avatars/")) {
+        return serveStatic(res, pathname.replace("/avatars", ""), AVATARS_DIR, false);
+      }
+
+      if (pathname === "/api/sounds" && method === "GET") {
+        const names = await fs
+          .readdir(SOUNDS_DIR)
+          .then((files) => files.filter((f) => /\.(mp3|ogg|wav|webm)$/i.test(f)))
+          .catch(() => [] as string[]);
+        return json(res, 200, names);
+      }
+
+      if (pathname.startsWith("/sounds/")) {
+        return serveStatic(res, pathname.replace("/sounds", ""), SOUNDS_DIR, false);
       }
 
       return serveStatic(res, pathname, DIST_DIR, true);

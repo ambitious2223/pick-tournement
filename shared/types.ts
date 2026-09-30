@@ -1,5 +1,74 @@
 export type RoundId = "r16" | "qf" | "sf" | "final";
 
+export type StageView = "match" | "bracket";
+
+export type LiveEventType = "chat" | "gift" | "like" | "follow" | "share" | "member" | "subscribe" | "roomUser";
+
+export interface LiveEvent {
+  type: LiveEventType;
+  userId: string;
+  username: string;
+  name: string;
+  avatar: string;
+  at: number;
+  message?: string;
+  giftName?: string;
+  giftId?: string | number;
+  coins?: number;
+  count?: number;
+  likeCount?: number;
+}
+
+export interface Supporter {
+  id: string;
+  name: string;
+  avatar: string;
+  points: number;
+}
+
+export interface LiveState {
+  connected: boolean;
+  url: string;
+  game: string;
+  keySet: boolean;
+  lastEventAt: number | null;
+  counts: Record<LiveEventType, number>;
+  supporters: Supporter[];
+  lastEvents: LiveEvent[];
+}
+
+export type ShowPhase =
+  | "idle"
+  | "category"
+  | "round-intro"
+  | "bracket-intro"
+  | "match"
+  | "bracket-outro"
+  | "result"
+  | "champion";
+
+export interface ShowResult {
+  round: RoundId;
+  a: string | null;
+  b: string | null;
+  winner: string | null;
+  votesA: number;
+  votesB: number;
+  votersA: string[];
+  votersB: string[];
+}
+
+export interface ShowState {
+  active: boolean;
+  paused: boolean;
+  phase: ShowPhase;
+  phaseEndsAt: number | null;
+  categoryVotes: Record<string, number>;
+  categoryVoters: string[];
+  result: ShowResult | null;
+  champion: string | null;
+}
+
 export interface Gift {
   id: string;
   name: string;
@@ -18,6 +87,7 @@ export interface Item {
 export interface Category {
   id: string;
   name: string;
+  nameAr?: string;
   items: Item[];
   giftPair?: [Gift, Gift];
   roundSeconds?: number;
@@ -44,6 +114,18 @@ export interface Bracket {
 
 export type TieRule = "sudden-death" | "random" | "higher-seed";
 
+export interface SoundSettings {
+  muted: boolean;
+  master: number;
+  music: number;
+  sfx: number;
+  voice: number;
+  musicEnabled: boolean;
+  escalation: boolean;
+  disabledCues: string[];
+  trackVolume: Record<string, number>;
+}
+
 export interface Settings {
   roundSeconds: number;
   suddenDeathSeconds: number;
@@ -53,6 +135,17 @@ export interface Settings {
   tieRule: TieRule;
   autoNextMatch: boolean;
   autoNextTournament: boolean;
+  autoStageView: boolean;
+  showVoteHint: boolean;
+  categorySeconds: number;
+  roundIntroSeconds: number;
+  bracketIntroSeconds: number;
+  bracketOutroSeconds: number;
+  resultSeconds: number;
+  showBackground: "transparent" | "dark";
+  safeTopPct: number;
+  safeBottomPct: number;
+  sound: SoundSettings;
 }
 
 export interface Tournament {
@@ -83,6 +176,9 @@ export interface SessionState {
   queueIndex: number;
   tournament: Tournament | null;
   matchEndsAt: number | null;
+  stageView: StageView;
+  show: ShowState;
+  live: LiveState;
   simulated: boolean;
   categories: Category[];
   log: LogEntry[];
@@ -106,6 +202,18 @@ export interface CommandMap {
   "match:jump": { round?: RoundId; index?: number };
   "vote:chat": { text: string; viewer: string };
   "vote:gift": { giftId: string; viewer: string; count?: number };
+  "view:set": StageView;
+  "show:start": undefined;
+  "show:stop": undefined;
+  "show:pause": undefined;
+  "show:resume": undefined;
+  "show:skipPhase": undefined;
+  "live:connect": undefined;
+  "live:disconnect": undefined;
+  "live:update": { url?: string; slug?: string; key?: string };
+  "live:inject": LiveEvent;
+  "sound:update": Partial<SoundSettings>;
+  "cue:emit": { id: string };
   "sim:set": { on: boolean } | undefined;
   "demo:start": { seconds?: number; categories?: string[]; single?: boolean } | undefined;
   "session:reset": undefined;

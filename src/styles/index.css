@@ -12,6 +12,27 @@
   --font-display: "Segoe UI", system-ui, sans-serif;
 }
 
+:root {
+  --round: #22d3ee;
+  --round-soft: rgba(34, 211, 238, 0.16);
+}
+.round-r16 {
+  --round: #22d3ee;
+  --round-soft: rgba(34, 211, 238, 0.16);
+}
+.round-qf {
+  --round: #3b82f6;
+  --round-soft: rgba(59, 130, 246, 0.18);
+}
+.round-sf {
+  --round: #a855f7;
+  --round-soft: rgba(168, 85, 247, 0.18);
+}
+.round-final {
+  --round: #f5c518;
+  --round-soft: rgba(245, 197, 24, 0.18);
+}
+
 html,
 body,
 #root {
@@ -33,6 +54,7 @@ body:has(.overlay-root) {
 
 .overlay-root {
   background: transparent;
+  overflow: hidden;
 }
 
 .panel {
@@ -51,6 +73,12 @@ body:has(.overlay-root) {
   text-transform: uppercase;
   background: color-mix(in srgb, var(--color-ink) 55%, transparent);
   backdrop-filter: blur(4px);
+}
+
+.chip-lg {
+  padding: 0.45rem 1.2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 .shadow-text {
@@ -97,6 +125,72 @@ body:has(.overlay-root) {
   animation: pulse-ring 1.6s ease-in-out infinite;
 }
 
+@keyframes view-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-view-in {
+  animation: view-in 0.4s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+@keyframes round-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+    filter: blur(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-round-pop {
+  animation: round-pop 0.6s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
+
+@keyframes focus-in {
+  from {
+    transform: scale(0.86);
+    opacity: 0.4;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.animate-focus-in {
+  animation: focus-in 0.5s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+@keyframes match-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-match-in {
+  animation: match-in 0.5s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
 @keyframes rise {
   from {
     transform: translateY(8px);
@@ -111,9 +205,26 @@ body:has(.overlay-root) {
   animation: rise 0.25s ease-out;
 }
 
+/* Arabic (RTL) is a connected script: letter-spacing and uppercase make it
+   wider than its container and cause clipping. Neutralize them in RTL. */
+[dir="rtl"] .uppercase,
+[dir="rtl"] .chip {
+  text-transform: none;
+}
+[dir="rtl"] .tracking-wide,
+[dir="rtl"] .tracking-wider,
+[dir="rtl"] .tracking-widest,
+[dir="rtl"] .chip {
+  letter-spacing: normal;
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
 .scroll-thin::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 .scroll-thin::-webkit-scrollbar-thumb {
   background: var(--color-line);

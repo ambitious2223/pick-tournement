@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { Item } from "../../shared/types.ts";
+import { useI18n } from "../i18n/index.tsx";
 
 const TILE_COLORS = ["#22d3ee", "#a855f7", "#fb7185", "#a3e635", "#f59e0b", "#38bdf8"];
 
@@ -18,12 +19,13 @@ export function ItemVisual({
   className?: string;
   emojiClassName?: string;
 }): ReactNode {
+  const { t } = useI18n();
   const [broken, setBroken] = useState(false);
 
   if (!item) {
     return (
       <div className={`grid place-items-center rounded-xl border border-dashed border-line text-white/30 ${className}`}>
-        TBD
+        {t("common.tbd")}
       </div>
     );
   }

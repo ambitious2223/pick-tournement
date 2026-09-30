@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import type { Gift, Item } from "../../shared/types.ts";
+import { useI18n } from "../i18n/index.tsx";
+import { itemName } from "../lib/selectors.ts";
 import { ItemVisual } from "./ItemVisual.tsx";
 
 export function ItemCard({
@@ -23,6 +25,7 @@ export function ItemCard({
   nameClass?: string;
   voteClass?: string;
 }): ReactNode {
+  const { t, lang } = useI18n();
   const isWinner = state === "winner";
   const dim = state === "losing";
   const ring = isWinner ? "ring-lime" : state === "leading" ? (side === "a" ? "ring-brand" : "ring-brand-2") : "ring-line";
@@ -41,7 +44,9 @@ export function ItemCard({
           </div>
         ) : null}
       </div>
-      <div className={`shadow-text mt-2 max-w-[16rem] truncate text-center font-black ${nameClass}`}>{item?.name ?? "TBD"}</div>
+      <div className={`shadow-text mt-2 max-w-[16rem] truncate text-center font-black ${nameClass}`}>
+        {item ? itemName(item, lang) : t("common.tbd")}
+      </div>
       <div className={`shadow-text font-black ${side === "a" ? "text-brand" : "text-brand-2"} ${voteClass}`}>{votes}</div>
     </div>
   );

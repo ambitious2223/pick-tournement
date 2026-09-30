@@ -57,10 +57,14 @@ if errorlevel 1 (
 )
 
 echo.
-echo   Control Room : http://127.0.0.1:8787/control
+echo   Setup Guide   : http://127.0.0.1:8787/setup
+echo   Control Room  : http://127.0.0.1:8787/control
 echo   Content Studio: http://127.0.0.1:8787/studio
 echo   Debug Console : http://127.0.0.1:8787/debug
-echo   OBS Overlay   : http://127.0.0.1:8787/overlay
+echo   Broadcast(OBS): http://127.0.0.1:8787/overlay
+echo.
+echo   New here? Open the Setup Guide first - it walks through connecting
+echo   TikTok (via Tikora) and adding the OBS browser source.
 echo.
 
 rem One server, one port, so there is no second URL to get wrong.

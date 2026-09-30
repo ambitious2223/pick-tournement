@@ -3,6 +3,7 @@ import type { Item } from "../../shared/types.ts";
 import { TextInput, Button } from "../ui/primitives.tsx";
 import { uploadImage } from "../lib/live.ts";
 import { slug } from "../lib/slug.ts";
+import { useI18n } from "../i18n/index.tsx";
 
 export function ItemRow({
   index,
@@ -13,6 +14,7 @@ export function ItemRow({
   item: Item;
   onChange: (next: Item) => void;
 }): ReactNode {
+  const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,9 +37,9 @@ export function ItemRow({
   return (
     <div className="grid grid-cols-[2rem_1fr_1fr_5rem_auto] items-center gap-2 rounded-lg border border-line bg-ink-2 p-2">
       <span className="text-center text-xs text-white/40">{index + 1}</span>
-      <TextInput placeholder="Name" value={item.name} onChange={(e) => set({ name: e.target.value })} />
+      <TextInput placeholder={t("item.name")} value={item.name} onChange={(e) => set({ name: e.target.value })} />
       <TextInput
-        placeholder="aliases, comma"
+        placeholder={t("item.aliases")}
         value={item.aliases.join(", ")}
         onChange={(e) =>
           set({
@@ -56,7 +58,7 @@ export function ItemRow({
       />
       <div className="flex items-center gap-1">
         <label className="cursor-pointer rounded-lg border border-line px-2 py-1 text-xs hover:border-brand">
-          {busy ? "…" : item.image ? "🖼" : "photo"}
+          {busy ? "…" : item.image ? "🖼" : t("item.photo")}
           <input
             type="file"
             accept="image/png,image/jpeg,image/webp,image/gif"
@@ -66,7 +68,7 @@ export function ItemRow({
         </label>
         {item.image ? (
           <Button className="px-2 py-1 text-xs" onClick={() => set({ image: undefined })}>
-            clear
+            {t("common.clear")}
           </Button>
         ) : null}
       </div>

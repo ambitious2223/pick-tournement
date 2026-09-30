@@ -8,6 +8,7 @@ type SeedItem = [name: string, aliases: string, emoji?: string];
 interface SeedCategory {
   id: string;
   name: string;
+  nameAr: string;
   emoji: string;
   items: SeedItem[];
 }
@@ -21,6 +22,7 @@ const SEED: SeedCategory[] = [
   {
     id: "arab-football",
     name: "Arab Football Stars",
+    nameAr: "نجوم الكرة العربية",
     emoji: "⚽",
     items: [
       ["Mohamed Salah", "محمد صلاح, salah"],
@@ -44,6 +46,7 @@ const SEED: SeedCategory[] = [
   {
     id: "arab-singers",
     name: "Arab Singers",
+    nameAr: "مطربون عرب",
     emoji: "🎤",
     items: [
       ["Amr Diab", "عمرو دياب"],
@@ -67,6 +70,7 @@ const SEED: SeedCategory[] = [
   {
     id: "arab-actors",
     name: "Arab Actors",
+    nameAr: "ممثلون عرب",
     emoji: "🎬",
     items: [
       ["Adel Emam", "عادل إمام"],
@@ -90,6 +94,7 @@ const SEED: SeedCategory[] = [
   {
     id: "quran-reciters",
     name: "Quran Reciters",
+    nameAr: "قُرّاء القرآن",
     emoji: "📖",
     items: [
       ["Mishary Alafasy", "مشاري العفاسي, alafasy"],
@@ -113,6 +118,7 @@ const SEED: SeedCategory[] = [
   {
     id: "me-foods",
     name: "Middle Eastern Foods",
+    nameAr: "أكلات الشرق الأوسط",
     emoji: "🍽️",
     items: [
       ["Kabsa", "كبسة", "🍚"],
@@ -136,6 +142,7 @@ const SEED: SeedCategory[] = [
   {
     id: "me-cities",
     name: "Middle Eastern Cities",
+    nameAr: "مدن الشرق الأوسط",
     emoji: "🏙️",
     items: [
       ["Dubai", "دبي", "🌆"],
@@ -159,6 +166,7 @@ const SEED: SeedCategory[] = [
   {
     id: "me-landmarks",
     name: "Middle Eastern Landmarks",
+    nameAr: "معالم الشرق الأوسط",
     emoji: "🕌",
     items: [
       ["Burj Khalifa", "برج خليفة", "🏗️"],
@@ -182,6 +190,7 @@ const SEED: SeedCategory[] = [
   {
     id: "arab-sweets",
     name: "Arabic Desserts & Drinks",
+    nameAr: "حلويات ومشروبات عربية",
     emoji: "🍮",
     items: [
       ["Kunafa", "كنافة", "🍮"],
@@ -205,6 +214,7 @@ const SEED: SeedCategory[] = [
   {
     id: "me-history",
     name: "Historical Scholars & Leaders",
+    nameAr: "علماء وقادة تاريخيون",
     emoji: "📜",
     items: [
       ["Al-Khwarizmi", "الخوارزمي", "🔢"],
@@ -228,6 +238,7 @@ const SEED: SeedCategory[] = [
   {
     id: "me-countries",
     name: "Middle Eastern Countries",
+    nameAr: "دول الشرق الأوسط",
     emoji: "🌍",
     items: [
       ["Saudi Arabia", "السعودية, ksa", "🇸🇦"],
@@ -275,6 +286,7 @@ function buildCategory(seed: SeedCategory): Category {
   return {
     id: seed.id,
     name: seed.name,
+    nameAr: seed.nameAr,
     items,
     giftPair: DEFAULT_GIFT_PAIR,
   };
@@ -299,10 +311,45 @@ export async function seedCategories(force = false): Promise<string[]> {
   return written;
 }
 
+/**
+ * Adds the Arabic name (`nameAr`) to the built-in categories on existing installs.
+ * It only touches a category when its stored name still matches the original English
+ * seed name, so user-renamed or user-edited categories are left alone.
+ */
+export async function migrateCategoryArabicNames(): Promise<string[]> {
+  await ensureDirs();
+  const changed: string[] = [];
+  for (const seed of SEED) {
+    const file = path.join(CATEGORIES_DIR, `${seed.id}.json`);
+    let raw: string;
+    try {
+      raw = await fs.readFile(file, "utf8");
+    } catch {
+      continue;
+    }
+    let category: Category;
+    try {
+      category = JSON.parse(raw) as Category;
+    } catch {
+      continue;
+    }
+    if (!category || category.id !== seed.id) continue;
+    if (category.nameAr || category.name !== seed.name) continue;
+    category.nameAr = seed.nameAr;
+    await fs.writeFile(file, `${JSON.stringify(category, null, 2)}\n`, "utf8");
+    changed.push(seed.id);
+  }
+  return changed;
+}
+
 export async function ensureSeeded(): Promise<void> {
   const written = await seedCategories(false);
   if (written.length > 0) {
     console.log(`[seed] created ${written.length} categories: ${written.join(", ")}`);
+  }
+  const migrated = await migrateCategoryArabicNames();
+  if (migrated.length > 0) {
+    console.log(`[seed] added Arabic names to ${migrated.length} categories`);
   }
 }
 

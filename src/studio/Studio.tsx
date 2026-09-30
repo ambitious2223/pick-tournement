@@ -3,7 +3,9 @@ import type { Category, Item, SessionState } from "../../shared/types.ts";
 import { Panel, Button, TextInput } from "../ui/primitives.tsx";
 import { send } from "../lib/live.ts";
 import { slug } from "../lib/slug.ts";
+import { categoryName } from "../lib/selectors.ts";
 import { ItemRow } from "./ItemRow.tsx";
+import { useI18n } from "../i18n/index.tsx";
 
 function blankItems(): Item[] {
   return Array.from({ length: 16 }, (_, i) => ({ id: `item-${i + 1}`, name: "", aliases: [] }));
@@ -16,6 +18,7 @@ function normalize(category: Category): Category {
 }
 
 export function Studio({ state }: { state: SessionState | null }): ReactNode {
+  const { t, lang } = useI18n();
   const [draft, setDraft] = useState<Category | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
@@ -23,7 +26,7 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
   const [fetchMsg, setFetchMsg] = useState<string | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
 
-  if (!state) return <p className="text-white/50">Connecting…</p>;
+  if (!state) return <p className="text-white/50">{t("common.connecting")}</p>;
 
   const fetchPhotosFor = async (categoryId?: string) => {
     setFetching(true);
@@ -32,10 +35,10 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
       const qs = categoryId ? `?category=${encodeURIComponent(categoryId)}` : "";
       const res = await fetch(`/api/photos/fetch${qs}`, { method: "POST" });
       const data = (await res.json()) as { changed?: number; skipped?: number; error?: string };
-      if (!res.ok) setFetchMsg(`Failed: ${data.error ?? res.status}`);
-      else setFetchMsg(`Added ${data.changed ?? 0} photo(s), ${data.skipped ?? 0} without a free image.`);
+      if (!res.ok) setFetchMsg(t("studio.failed", { error: data.error ?? res.status }));
+      else setFetchMsg(t("studio.fetchSummary", { changed: data.changed ?? 0, skipped: data.skipped ?? 0 }));
     } catch {
-      setFetchMsg("Could not reach the server.");
+      setFetchMsg(t("studio.serverUnreachable"));
     } finally {
       setFetching(false);
       setTimeout(() => setFetchMsg(null), 6000);
@@ -67,6 +70,7 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
     const category: Category = {
       id: `new-${Date.now().toString(36)}`,
       name: "New Category",
+      nameAr: "فئة جديدة",
       items: blankItems(),
       giftPair: [
         { id: "rose", name: "Rose", icon: "🌹" },
@@ -97,13 +101,13 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[18rem_1fr]">
-      <Panel title="Categories">
+      <Panel title={t("studio.categories")}>
         <div className="mb-3 flex gap-2">
           <Button variant="primary" className="flex-1" onClick={newCategory}>
-            + New
+            {t("studio.new")}
           </Button>
           <Button variant="ghost" onClick={() => importRef.current?.click()}>
-            Import
+            {t("studio.import")}
           </Button>
           <input
             ref={importRef}
@@ -114,7 +118,7 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
           />
         </div>
         <Button variant="hot" className="mb-3 w-full" disabled={fetching} onClick={() => void fetchPhotosFor()}>
-          {fetching ? "Fetching…" : "⬇ Fetch all photos"}
+          {fetching ? t("studio.fetching") : t("studio.fetchAll")}
         </Button>
         {fetchMsg ? <p className="mb-2 text-xs text-lime">{fetchMsg}</p> : null}
         <ul className="flex flex-col gap-1">
@@ -122,56 +126,60 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
             <li key={c.id}>
               <button
                 onClick={() => openCategory(c.id)}
-                className={`w-full truncate rounded-lg px-3 py-2 text-left text-sm transition ${
+                className={`w-full truncate rounded-lg px-3 py-2 text-start text-sm transition ${
                   selectedId === c.id ? "bg-brand/15 text-brand" : "hover:bg-surface"
                 }`}
               >
-                {c.name}
-                <span className="ml-2 text-xs text-white/40">{c.items.length}</span>
+                {categoryName(c, lang)}
+                <span className="ms-2 text-xs text-white/40">{c.items.length}</span>
               </button>
             </li>
           ))}
         </ul>
       </Panel>
 
-      <Panel title={draft ? "Edit category" : "Select or create a category"}>
+      <Panel title={draft ? t("studio.editCategory") : t("studio.selectOrCreate")}>
         {draft ? (
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
               <TextInput
                 className="flex-1"
-                value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                placeholder="Category name"
-              />
-              <TextInput
-                className="w-40"
-                value={draft.giftPair?.[0]?.icon ?? "🌹"}
+                value={lang === "ar" ? (draft.nameAr ?? draft.name ?? "") : draft.name}
                 onChange={(e) =>
-                  setDraft({
-                    ...draft,
-                    giftPair: [
-                      { id: "rose", name: "Rose", icon: e.target.value || "🌹" },
-                      draft.giftPair?.[1] ?? { id: "tiktok", name: "TikTok", icon: "🎵" },
-                    ],
-                  })
+                  lang === "ar" ? setDraft({ ...draft, nameAr: e.target.value }) : setDraft({ ...draft, name: e.target.value })
                 }
-                placeholder="left gift"
+                placeholder={t("studio.categoryName")}
               />
-              <TextInput
-                className="w-40"
-                value={draft.giftPair?.[1]?.icon ?? "🎵"}
-                onChange={(e) =>
-                  setDraft({
-                    ...draft,
-                    giftPair: [
-                      draft.giftPair?.[0] ?? { id: "rose", name: "Rose", icon: "🌹" },
-                      { id: "tiktok", name: "TikTok", icon: e.target.value || "🎵" },
-                    ],
-                  })
-                }
-                placeholder="right gift"
-              />
+              <div className="w-40 shrink-0">
+                <TextInput
+                  value={draft.giftPair?.[0]?.icon ?? "🌹"}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      giftPair: [
+                        { id: "rose", name: "Rose", icon: e.target.value || "🌹" },
+                        draft.giftPair?.[1] ?? { id: "tiktok", name: "TikTok", icon: "🎵" },
+                      ],
+                    })
+                  }
+                  placeholder={t("studio.leftGift")}
+                />
+              </div>
+              <div className="w-40 shrink-0">
+                <TextInput
+                  value={draft.giftPair?.[1]?.icon ?? "🎵"}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      giftPair: [
+                        draft.giftPair?.[0] ?? { id: "rose", name: "Rose", icon: "🌹" },
+                        { id: "tiktok", name: "TikTok", icon: e.target.value || "🎵" },
+                      ],
+                    })
+                  }
+                  placeholder={t("studio.rightGift")}
+                />
+              </div>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -191,13 +199,13 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
 
             <div className="flex items-center gap-3">
               <Button variant="lime" onClick={() => void save(draft)}>
-                Save category
+                {t("studio.saveCategory")}
               </Button>
               <Button variant="ghost" disabled={fetching} onClick={() => void fetchPhotosFor(draft.id)}>
-                {fetching ? "Fetching…" : "Fetch photos"}
+                {fetching ? t("studio.fetching") : t("studio.fetchPhotos")}
               </Button>
               <Button variant="ghost" onClick={exportCategory}>
-                Export JSON
+                {t("studio.exportJson")}
               </Button>
               {selectedId ? (
                 <Button
@@ -207,17 +215,14 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
                     setSelectedId(null);
                   }}
                 >
-                  Delete
+                  {t("common.delete")}
                 </Button>
               ) : null}
-              {savedFlash ? <span className="text-sm text-lime">Saved ✓</span> : null}
+              {savedFlash ? <span className="text-sm text-lime">{t("common.saved")}</span> : null}
             </div>
           </div>
         ) : (
-          <p className="text-sm text-white/50">
-            Pick a category on the left, or create a new one. Each category holds 16 items with a name, aliases for chat
-            matching, an emoji fallback, and an optional photo.
-          </p>
+          <p className="text-sm text-white/50">{t("studio.hint")}</p>
         )}
       </Panel>
     </div>

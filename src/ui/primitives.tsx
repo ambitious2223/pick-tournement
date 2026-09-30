@@ -34,7 +34,7 @@ export function Panel({ title, children, className = "" }: { title?: string; chi
 
 export function Field({ label, children }: { label: string; children: ReactNode }): ReactNode {
   return (
-    <label className="flex flex-col gap-1 text-xs uppercase tracking-wide text-white/60">
+    <label className="flex min-w-0 flex-col gap-1 break-words text-xs uppercase tracking-wide text-white/60">
       {label}
       {children}
     </label>
@@ -45,7 +45,7 @@ export function TextInput({ className = "", ...props }: InputHTMLAttributes<HTML
   return (
     <input
       {...props}
-      className={`rounded-lg border border-line bg-ink-2 px-3 py-2 text-sm text-white outline-none focus:border-brand ${className}`}
+      className={`w-full min-w-0 rounded-lg border border-line bg-ink-2 px-3 py-2 text-sm text-white outline-none focus:border-brand ${className}`}
     />
   );
 }
@@ -54,7 +54,7 @@ export function Select({ className = "", children, ...props }: SelectHTMLAttribu
   return (
     <select
       {...props}
-      className={`rounded-lg border border-line bg-ink-2 px-3 py-2 text-sm text-white outline-none focus:border-brand ${className}`}
+      className={`w-full min-w-0 rounded-lg border border-line bg-ink-2 px-3 py-2 text-sm text-white outline-none focus:border-brand ${className}`}
     >
       {children}
     </select>
@@ -65,8 +65,11 @@ export function Toggle({ checked, onChange, label }: { checked: boolean; onChang
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between rounded-lg border border-line bg-ink-2 px-3 py-2 text-sm"
+      className="flex w-full items-center justify-between rounded-lg border border-line bg-ink-2 px-3 py-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand"
     >
       <span className="text-white/70">{label}</span>
       <span className={`h-5 w-9 rounded-full p-0.5 transition ${checked ? "bg-brand" : "bg-line"}`}>

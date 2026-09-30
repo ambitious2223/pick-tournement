@@ -1,9 +1,13 @@
 # AGENTS.md — Pick League
 
-Pick League is a local web app for TikTok Live creators. It runs 16-item single-elimination
-tournament brackets (one category at a time, with a queue of categories) and is meant to be added
-to OBS as a **Browser Source**. The project owner does not read or write code — every report must
-be in plain language: what changed, what it looks like now, whether it works.
+Pick League is a local, **Arabic-first (RTL)** web app for TikTok Live creators. It runs 16-item
+single-elimination tournament brackets (one category at a time, with a queue of categories) and is
+meant to be added to OBS as a **Browser Source**. It runs with a built-in simulator, or with real
+TikTok events relayed by the local **Tikora** hub. It has an automatic broadcast flow, per-round
+visual themes, a Web Audio sound system, and cached viewer avatars.
+
+The project owner does not read or write code — every report must be in plain language: what
+changed, what it looks like now, whether it works.
 
 ## Safety & downloads (read first — this outranks everything below)
 
@@ -18,8 +22,13 @@ command line that downloaded and wrote a file. That must never happen again.
    Wikimedia hosts, validates every response is a real image type, caps size, and logs every URL to
    `data/photos.log`. Run it on demand only — never at app runtime.
 3. **Prefer package managers.** Dependencies come from `npm install`, never from a raw URL.
+   - One approved exception to the "no downloads" rule: `server/avatars.ts` (`cacheAvatar`) fetches
+     individual TikTok viewer avatars from URLs delivered by the local Tikora hub, verifies each is a
+     real image type, caps the size, and caches it under `data/avatars/` (gitignored) so the overlay
+     stays local. It is the only extra fetch path besides `scripts/fetch-photos.ts`.
 4. **Never commit non-free media.** The fetcher rejects `/wikipedia/en/` (fair-use) images. Uploaded
-   photos live in `data/uploads/` and are **gitignored** to stay copyright-safe.
+   photos live in `data/uploads/`, cached avatars in `data/avatars/`, and host-provided sounds in
+   `data/sounds/` — all **gitignored** to stay copyright-safe.
 5. **Never touch antivirus.** If Defender flags anything, stop and report it — do not retry.
 
 ## Non-negotiable: never claim something works without proving it
@@ -39,9 +48,14 @@ untested.
   the React UI. Never duplicate bracket/vote logic in a component.
 - The **server is authoritative** and holds the live session; the browser renders state received via
   SSE. Control commands go through `POST /api/command`.
-- Keep files small and single-purpose (`shared/`, `engine/`, `server/`, `src/{control,studio,debug,overlay}`).
+- Keep files small and single-purpose (`shared/`, `engine/`, `server/`, `src/{broadcast,control,studio,debug,setup,sound,i18n}`).
 - Categories are plain JSON in `data/categories/`, editable at runtime through the Studio (no rebuild).
-- All runtime asset handling is **local**; the overlay makes no external network calls.
+- **Arabic-first with an English toggle**, RTL-safe (use logical Tailwind utilities like `ms-`/`me-`/
+  `ps-`/`pe-`/`start-`/`end-`). All user-facing strings live in `src/i18n/`.
+- **Sound** is client-side Web Audio (`src/sound/`); only the broadcast page plays audio.
+- **Live events** come from the Tikora hub relay via `server/live.ts`; no TikTok credentials live here.
+- All runtime asset handling is **local**; the only external fetch paths are `scripts/fetch-photos.ts`
+  and `server/avatars.ts` (a single avatar, cached).
 
 ## Architecture map
 
@@ -51,20 +65,29 @@ untested.
 - `engine/matcher.ts` — normalize + match chat text to a name/alias.
 - `engine/match.ts` — vote tallying, dedupe, gift weight, tie rules.
 - `engine/tournament.ts` — round/match state machine.
-- `server/index.ts` — HTTP: SSE `/events`, `/api/*`, `/uploads`, static `dist`.
-- `server/session.ts` — authoritative live session (commands, timer, simulator, queue).
+- `server/index.ts` — HTTP: SSE `/events`, `/api/*`, `/uploads`, `/avatars`, `/sounds`, static `dist`.
+- `server/session.ts` — authoritative live session (commands, timers, show flow, simulator, queue, live vote routing, supporters).
+- `server/live.ts` — Tikora hub WebSocket client (events + effects + cue emit); `server/liveConfig.ts` — its saved config.
+- `server/avatars.ts` — caches one viewer avatar locally (the one extra fetch path).
 - `server/seed.ts` — the ten built-in Middle East categories; runs on first boot.
-- `server/photos.ts` — the only sanctioned downloader (English + Arabic Wikipedia, then Commons).
+- `server/photos.ts` — the sanctioned photo downloader (English + Arabic Wikipedia, then Commons).
 - `scripts/serve.mjs` — single-port launcher (build + serve on `:8787`); `scripts/dev.mjs` — dev.
-- `src/bracket` — animated bracket + `MatchStage` (live round floats over the bracket).
-- `src/overlay` — OBS view. `src/control` — host controls. `src/studio` — content editing.
-  `src/debug` — vote injection, force outcomes, raw state.
+- `src/broadcast` — the one OBS page (automatic show flow, themes, animations).
+- `src/sound` — Web Audio engine, cue catalog, manager, `useSound` hook.
+- `src/i18n` — Arabic/English strings + RTL provider.
+- `src/bracket` — bracket board + `MatchStage` (used by Control); `src/stage` — the round view.
+- `src/overlay` — round widgets (ItemCard, VoteBar, RoundTimer, WinnerReveal).
+- `src/control` — host controls. `src/studio` — content editing. `src/debug` — vote injection,
+  live connection, sound mixer, raw state. `src/pages` — Home + Setup.
+- `tikora.manifest.json` — declared effects/events for the Tikora hub.
 
 ## Run model
 
 - The launcher (`Tournament.bat` → `scripts/serve.mjs`) serves the **built** app from **one port**
   (`127.0.0.1:8787`) so there is no second URL to get wrong. It binds loopback only — never LAN.
 - `npm run dev` (server `:8787` + Vite `:5173`) is for development only.
+- The single broadcast page lives at `/overlay` (alias `/show`); the in-app guide is `/setup`.
+- Control and Debug lock the shell to the viewport so only the content area scrolls.
 - Every page is wrapped in an ErrorBoundary and shows a "server not reachable" banner when offline.
 
 ## Gates (must pass before saying "done")

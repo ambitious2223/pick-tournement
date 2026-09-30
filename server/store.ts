@@ -8,6 +8,7 @@ export const ROOT = path.resolve(here, "..");
 export const DATA_DIR = path.join(ROOT, "data");
 export const CATEGORIES_DIR = path.join(DATA_DIR, "categories");
 export const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
+export const SOUNDS_DIR = path.join(DATA_DIR, "sounds");
 export const SESSION_FILE = path.join(DATA_DIR, "session.json");
 export const DIST_DIR = path.join(ROOT, "dist");
 

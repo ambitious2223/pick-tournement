@@ -2,8 +2,11 @@ import type { ReactNode } from "react";
 import type { SessionState } from "../../shared/types.ts";
 import { Button, Select } from "../ui/primitives.tsx";
 import { send } from "../lib/live.ts";
+import { categoryName } from "../lib/selectors.ts";
+import { useI18n } from "../i18n/index.tsx";
 
 export function QueueEditor({ state }: { state: SessionState }): ReactNode {
+  const { t, lang } = useI18n();
   const queue = state.queue;
 
   const move = (from: number, to: number) => {
@@ -26,16 +29,16 @@ export function QueueEditor({ state }: { state: SessionState }): ReactNode {
           }
         }}
       >
-        <option value="">Add a category…</option>
+        <option value="">{t("queue.add")}</option>
         {state.categories.map((c) => (
           <option key={c.id} value={c.id}>
-            {c.name}
+            {categoryName(c, lang)}
           </option>
         ))}
       </Select>
 
       {queue.length === 0 ? (
-        <p className="text-xs text-white/50">Empty. Pick one above to chain it after the current category.</p>
+        <p className="text-xs text-white/50">{t("queue.empty")}</p>
       ) : (
         <ol className="flex flex-col gap-1">
           {queue.map((entry, i) => {
@@ -49,7 +52,7 @@ export function QueueEditor({ state }: { state: SessionState }): ReactNode {
                 }`}
               >
                 <span className="w-4 text-white/40">{i + 1}</span>
-                <span className="flex-1 truncate">{category?.name ?? entry.categoryId}</span>
+                <span className="flex-1 truncate">{category ? categoryName(category, lang) : entry.categoryId}</span>
                 <button onClick={() => move(i, i - 1)} className="px-1 text-white/50 hover:text-white">
                   ↑
                 </button>
@@ -66,7 +69,7 @@ export function QueueEditor({ state }: { state: SessionState }): ReactNode {
       )}
 
       <Button variant="ghost" className="px-2 py-1 text-xs" onClick={() => void send("queue:set", [])}>
-        Clear queue
+        {t("queue.clear")}
       </Button>
     </div>
   );

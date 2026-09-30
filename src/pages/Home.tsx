@@ -1,46 +1,30 @@
 import type { ReactNode } from "react";
+import { useI18n, type TKey } from "../i18n/index.tsx";
 
-const CARDS = [
-  {
-    href: "/control",
-    title: "Control Room",
-    body: "Run the tournament: start, pause, extend, force winners, manage the category queue and the simulator.",
-  },
-  {
-    href: "/studio",
-    title: "Content Studio",
-    body: "Create categories and 16 items, add aliases and gifts, upload item photos.",
-  },
-  {
-    href: "/debug",
-    title: "Debug Console",
-    body: "Inject votes, force outcomes, simulate crowds, inspect raw state and the event log.",
-  },
-  {
-    href: "/overlay",
-    title: "OBS Overlay",
-    body: "The transparent browser source. Add http://127.0.0.1:8787/overlay to OBS.",
-  },
+const CARDS: { href: string; title: TKey; body: TKey }[] = [
+  { href: "/setup", title: "home.setup.title", body: "home.setup.body" },
+  { href: "/control", title: "home.control.title", body: "home.control.body" },
+  { href: "/studio", title: "home.studio.title", body: "home.studio.body" },
+  { href: "/debug", title: "home.debug.title", body: "home.debug.body" },
+  { href: "/overlay", title: "home.overlay.title", body: "home.overlay.body" },
 ];
 
 export function Home(): ReactNode {
+  const { t } = useI18n();
   return (
     <div className="flex flex-col gap-8">
       <section className="panel animate-rise overflow-hidden p-8">
-        <p className="chip inline-block text-brand">TikTok Live Bracket</p>
+        <p className="chip inline-block text-brand">{t("home.badge")}</p>
         <h1 className="mt-4 text-5xl font-black tracking-tight">
-          16 fighters. <span className="text-brand">One champion.</span>
+          {t("home.title1")} <span className="text-brand">{t("home.title2")}</span>
         </h1>
-        <p className="mt-3 max-w-2xl text-white/60">
-          Viewers vote by typing the on-screen name or sending the gift shown beside a side. Every match runs on a
-          configurable timer, and categories chain automatically — no looping back.
-        </p>
+        <p className="mt-3 max-w-2xl text-white/60">{t("home.body")}</p>
       </section>
       <div className="grid gap-4 sm:grid-cols-2">
         {CARDS.map((card) => (
           <a key={card.href} href={card.href} className="panel p-5 transition hover:border-brand">
-            <h2 className="text-lg font-bold">{card.title}</h2>
-            <p className="mt-1 text-sm text-white/60">{card.body}</p>
+            <h2 className="text-lg font-bold">{t(card.title)}</h2>
+            <p className="mt-1 text-sm text-white/60">{t(card.body)}</p>
           </a>
         ))}
       </div>

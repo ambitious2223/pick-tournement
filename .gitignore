@@ -10,6 +10,13 @@ data/uploads/
 data/photos.log
 data/.photos-done
 
+# Live connection (may hold a Tikora game key) + cached viewer avatars
+data/live.json
+data/avatars/
+
+# Host-provided sound files (override the built-in synth cues)
+data/sounds/
+
 # Backups
 *.bak
 *.log
