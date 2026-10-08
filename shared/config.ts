@@ -37,6 +37,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showBackground: "transparent",
   safeTopPct: 0,
   safeBottomPct: 0,
+  stageTextScale: 1.15,
   sound: {
     muted: false,
     master: 0.8,
@@ -44,7 +45,7 @@ export const DEFAULT_SETTINGS: Settings = {
     sfx: 0.85,
     voice: 1,
     musicEnabled: true,
-    escalation: true,
+    musicTrack: "auto",
     disabledCues: [],
     trackVolume: {},
   },
@@ -84,7 +85,7 @@ export const SOUND_CUE_IDS = [
   "live.member",
 ] as const;
 
-/** Every music bed id (kept in sync with src/sound/manager.ts MUSIC_TRACKS). */
+/** Every show slot a music bed can be requested for (see src/sound/music.ts SLOT_TRACK). */
 export const MUSIC_TRACK_IDS = [
   "music.category",
   "music.match.r16",
@@ -93,3 +94,27 @@ export const MUSIC_TRACK_IDS = [
   "music.match.final",
   "music.champion",
 ] as const;
+
+/**
+ * Effect keys the session implements. The manifest declares exactly these; a
+ * test asserts the two lists match, so an effect can never be advertised and
+ * unimplemented (or implemented and forgotten).
+ */
+export const HANDLED_EFFECT_KEYS = [
+  "add_vote",
+  "boost_side",
+  "steal_votes",
+  "block_side",
+  "add_time",
+  "rush_timer",
+  "freeze_timer",
+  "set_side_gift",
+  "swap_sides",
+  "category_vote",
+] as const;
+
+export type HandledEffectKey = (typeof HANDLED_EFFECT_KEYS)[number];
+
+export function isHandledEffect(key: string): key is HandledEffectKey {
+  return (HANDLED_EFFECT_KEYS as readonly string[]).includes(key);
+}

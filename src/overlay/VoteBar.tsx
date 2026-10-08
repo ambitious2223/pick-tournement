@@ -8,6 +8,8 @@ export function VoteBar({
   showCounts = true,
   votersA,
   votersB,
+  pctPx,
+  labelPx,
 }: {
   votesA: number;
   votesB: number;
@@ -15,6 +17,8 @@ export function VoteBar({
   showCounts?: boolean;
   votersA?: number;
   votersB?: number;
+  pctPx?: number;
+  labelPx?: number;
 }): ReactNode {
   const { t } = useI18n();
   const total = votesA + votesB;
@@ -44,19 +48,19 @@ export function VoteBar({
       <div className={`flex overflow-hidden rounded-full border border-line bg-ink-2 ${heightClass} ${pulse ? "animate-pulse-ring" : ""}`}>
         <div
           className="flex items-center justify-start bg-gradient-to-r from-brand to-brand/60 ps-3 text-sm font-black text-ink transition-all duration-300 rtl:bg-gradient-to-l"
-          style={{ width: `${pctA}%` }}
+          style={{ width: `${pctA}%`, fontSize: pctPx }}
         >
           {pctA >= 12 ? `${pctA}%` : ""}
         </div>
         <div
           className="flex items-center justify-end bg-gradient-to-l from-brand-2 to-brand-2/60 pe-3 text-sm font-black text-white transition-all duration-300 rtl:bg-gradient-to-r"
-          style={{ width: `${100 - pctA}%` }}
+          style={{ width: `${100 - pctA}%`, fontSize: pctPx }}
         >
           {100 - pctA >= 12 ? `${100 - pctA}%` : ""}
         </div>
       </div>
       {showCounts ? (
-        <div className="flex justify-between px-1 text-xs text-white/50">
+        <div className="flex justify-between px-1 text-xs text-white/50" style={{ fontSize: labelPx }}>
           <span>{t("stage.votes", { n: votesA })}</span>
           <span>{voterLine}</span>
           <span>{t("stage.votes", { n: votesB })}</span>

@@ -121,7 +121,8 @@ export interface SoundSettings {
   sfx: number;
   voice: number;
   musicEnabled: boolean;
-  escalation: boolean;
+  /** Background track: "auto" escalates per round, otherwise a MUSIC_LIBRARY id. */
+  musicTrack: string;
   disabledCues: string[];
   trackVolume: Record<string, number>;
 }
@@ -145,6 +146,8 @@ export interface Settings {
   showBackground: "transparent" | "dark";
   safeTopPct: number;
   safeBottomPct: number;
+  /** Multiplier for match text (header, names, votes, vote bar, vote hint). */
+  stageTextScale: number;
   sound: SoundSettings;
 }
 
@@ -169,6 +172,28 @@ export interface LogEntry {
   message: string;
 }
 
+/**
+ * A timed power-up applied to one side of the live match: `boost` makes that
+ * side's votes count extra, `block` stops it scoring at all. `until` is epoch
+ * ms, so the broadcast can count the badge down itself.
+ */
+export interface SideEffect {
+  kind: "boost" | "block";
+  side: "a" | "b";
+  until: number;
+  multiplier?: number;
+}
+
+/**
+ * The clock is being held instead of counting down — either frozen by a
+ * power-up (`until` = epoch ms when it releases) or paused by the host
+ * (`until` = null). `remainingMs` is the value to keep showing the whole time.
+ */
+export interface ClockHold {
+  until: number | null;
+  remainingMs: number;
+}
+
 export interface SessionState {
   status: "idle" | "running" | "paused" | "done";
   settings: Settings;
@@ -176,6 +201,8 @@ export interface SessionState {
   queueIndex: number;
   tournament: Tournament | null;
   matchEndsAt: number | null;
+  matchHold: ClockHold | null;
+  sideEffects: SideEffect[];
   stageView: StageView;
   show: ShowState;
   live: LiveState;
@@ -217,4 +244,29 @@ export interface CommandMap {
   "sim:set": { on: boolean } | undefined;
   "demo:start": { seconds?: number; categories?: string[]; single?: boolean } | undefined;
   "session:reset": undefined;
+}
+
+export interface ManifestParam {
+  key: string;
+  label?: string;
+  type?: string;
+}
+
+export interface ManifestEffect {
+  key: string;
+  label?: string;
+  kind?: string;
+  params?: ManifestParam[];
+}
+
+export interface ManifestEvent {
+  key: string;
+  label?: string;
+}
+
+/** Shape of tikora.manifest.json — the single source of truth for hub effects. */
+export interface GameManifest {
+  slug: string;
+  effects: ManifestEffect[];
+  events: ManifestEvent[];
 }

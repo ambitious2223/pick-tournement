@@ -67,11 +67,17 @@ untested.
 - `engine/tournament.ts` — round/match state machine.
 - `server/index.ts` — HTTP: SSE `/events`, `/api/*`, `/uploads`, `/avatars`, `/sounds`, static `dist`.
 - `server/session.ts` — authoritative live session (commands, timers, show flow, simulator, queue, live vote routing, supporters).
-- `server/live.ts` — Tikora hub WebSocket client (events + effects + cue emit); `server/liveConfig.ts` — its saved config.
+- `server/live.ts` — Tikora hub WebSocket client (events + effects + manifest capabilities); `server/liveConfig.ts` — its saved config.
+- `server/manifest.ts` — loads `tikora.manifest.json` (the declared effect list) for the hub connection.
+- `server/tikoraKey.ts` — resolves the Tikora game key with **no manual step**: environment Tikora
+  injects → saved `data/live.json` → Tikora's own database (registering the game + key if missing).
 - `server/avatars.ts` — caches one viewer avatar locally (the one extra fetch path).
 - `server/seed.ts` — the ten built-in Middle East categories; runs on first boot.
 - `server/photos.ts` — the sanctioned photo downloader (English + Arabic Wikipedia, then Commons).
 - `scripts/serve.mjs` — single-port launcher (build + serve on `:8787`); `scripts/dev.mjs` — dev.
+- `scripts/manifest.ts` — builds the hub manifest; `scripts/gen-manifest.ts` writes it (`npm run manifest`);
+  `scripts/smoke-hub.ts` — drives every declared hub effect end-to-end and restores `data/session.json`;
+  `scripts/smoke-key.ts` — proves the game key resolves with no manual step.
 - `src/broadcast` — the one OBS page (automatic show flow, themes, animations).
 - `src/sound` — Web Audio engine, cue catalog, manager, `useSound` hook.
 - `src/i18n` — Arabic/English strings + RTL provider.
@@ -79,7 +85,8 @@ untested.
 - `src/overlay` — round widgets (ItemCard, VoteBar, RoundTimer, WinnerReveal).
 - `src/control` — host controls. `src/studio` — content editing. `src/debug` — vote injection,
   live connection, sound mixer, raw state. `src/pages` — Home + Setup.
-- `tikora.manifest.json` — declared effects/events for the Tikora hub.
+- `tikora.manifest.json` — effects/events declared to the Tikora hub. Generated from
+  `scripts/manifest.ts`; edit that file and run `npm run manifest`, never the JSON by hand.
 
 ## Run model
 
@@ -95,9 +102,12 @@ untested.
 ```
 npm run typecheck   # tsc --noEmit, 0 errors
 npm run lint        # oxlint, 0 errors / 0 warnings
-npm run test        # node --test engine, all pass
+npm run test        # node --test engine + scripts, all pass
 npm run build       # vite build, succeeds
 ```
+
+`npm run smoke` additionally proves the hub wiring end to end (auto game key + every declared
+effect); it temporarily rewrites `data/live.json` and `data/session.json`, restoring both.
 
 ## Workflow
 

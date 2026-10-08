@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Settings } from "../../shared/types.ts";
-import { Field, TextInput, Select, Toggle } from "../ui/primitives.tsx";
+import { Field, TextInput, Select, Toggle, Slider } from "../ui/primitives.tsx";
 import { send } from "../lib/live.ts";
 import { useI18n } from "../i18n/index.tsx";
 
@@ -55,6 +55,16 @@ export function SettingsPanel({ settings }: { settings: Settings }): ReactNode {
           <TextInput type="number" min={0} max={45} value={settings.safeBottomPct} onChange={(e) => patch({ safeBottomPct: Number(e.target.value) })} className="px-2 py-1 text-xs" />
         </Field>
       </div>
+
+      <Slider
+        label={t("settings.stageTextScale")}
+        min={0.6}
+        max={2.5}
+        step={0.05}
+        value={settings.stageTextScale}
+        onChange={(v) => patch({ stageTextScale: v })}
+        display={(v) => `${Math.round(v * 100)}%`}
+      />
 
       <div className="mt-1 text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("settings.showTimings")}</div>
       <div className="grid grid-cols-2 gap-2">

@@ -17,11 +17,16 @@ function roundIndex(state: SessionState): number {
 /**
  * Drives the whole soundscape from the live session. Mounted only on the
  * broadcast page so viewers hear one clean mix and the host never gets doubles.
+ *
+ * Two sources feed it: the automatic show's phase machine, and — when the host
+ * runs matches manually from the Control room — the live match state itself.
  */
 export function useSound(state: SessionState | null): void {
   const phaseRef = useRef<string>("");
   const tickRef = useRef<number>(-1);
   const timersRef = useRef<number[]>([]);
+  const matchRef = useRef<string>("");
+  const champRef = useRef<string>("");
 
   useEffect(() => {
     if (state) sound.setConfig(state.settings.sound);
@@ -55,6 +60,7 @@ export function useSound(state: SessionState | null): void {
     };
   }, [state?.show.phase]);
 
+  // --- Automatic show: phase-driven cues -------------------------------------
   useEffect(() => {
     if (!state) return;
     const phase = state.show.phase;
@@ -88,13 +94,9 @@ export function useSound(state: SessionState | null): void {
         if (state.show.champion) {
           sound.setMusic("music.champion");
           sound.play("champion.win");
-          timersRef.current.push(
-            window.setTimeout(() => sound.play("champion.reveal"), 800),
-          );
+          timersRef.current.push(window.setTimeout(() => sound.play("champion.reveal"), 800));
           state.live.supporters.forEach((_, i) => {
-            timersRef.current.push(
-              window.setTimeout(() => sound.play("champion.supporter"), 1500 + i * 350),
-            );
+            timersRef.current.push(window.setTimeout(() => sound.play("champion.supporter"), 1500 + i * 350));
           });
         }
         break;
@@ -107,6 +109,47 @@ export function useSound(state: SessionState | null): void {
         sound.setMusic(null);
     }
   }, [state?.show.phase]);
+
+  // --- Manual play (no show active): match-driven cues -----------------------
+  useEffect(() => {
+    if (!state || state.show.active) return;
+    const match = activeMatch(state);
+    if (!match) {
+      matchRef.current = "";
+      return;
+    }
+    const key = `${match.id}:${match.status}`;
+    if (matchRef.current === key) return;
+    const wasLive = matchRef.current.endsWith(":live");
+    matchRef.current = key;
+
+    if (match.status === "live") {
+      sound.play("match.start");
+      sound.setMusic(`music.match.${match.round}`);
+    } else if (match.status === "done" && wasLive) {
+      sound.play("result.win");
+    }
+  }, [state?.status, state?.show.active, state?.tournament]);
+
+  // Manual champion reveal.
+  useEffect(() => {
+    if (!state || state.show.active) return;
+    const id = state.tournament?.status === "done" ? state.tournament.id : "";
+    if (!id) {
+      champRef.current = "";
+      return;
+    }
+    if (champRef.current === id) return;
+    champRef.current = id;
+    sound.play("champion.win");
+    sound.setMusic("music.champion");
+  }, [state?.tournament?.status, state?.tournament?.id, state?.show.active]);
+
+  // Stop the music bed when nothing is running any more.
+  useEffect(() => {
+    if (!state) return;
+    if (!state.tournament && !state.show.active) sound.setMusic(null);
+  }, [state?.tournament?.id, state?.show.active]);
 
   // Live events (chat/gift/like/follow/share/subscribe/member).
   useEffect(() => {
@@ -123,15 +166,15 @@ export function useSound(state: SessionState | null): void {
     sound.observeLeader(leader);
   }, [state?.tournament]);
 
-  // Countdown + last-10-second ticks, scheduled against the real end time.
+  // Countdown + last-10-second ticks for the live match (show or manual).
   useEffect(() => {
-    if (!state || state.show.phase !== "match" || state.status !== "running") {
+    const match = state ? activeMatch(state) : null;
+    if (!state || state.status !== "running" || !match || match.status !== "live" || match.endsAt === null) {
       tickRef.current = -1;
       return;
     }
+    const endsAt = match.endsAt;
     const id = window.setInterval(() => {
-      const endsAt = state.matchEndsAt;
-      if (!endsAt) return;
       const remaining = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
       if (remaining <= 10 && remaining > 0 && remaining !== tickRef.current) {
         tickRef.current = remaining;
@@ -139,5 +182,5 @@ export function useSound(state: SessionState | null): void {
       }
     }, 200);
     return () => window.clearInterval(id);
-  }, [state?.show.phase, state?.status, state?.matchEndsAt]);
+  }, [state?.status, state?.matchEndsAt, state?.tournament]);
 }

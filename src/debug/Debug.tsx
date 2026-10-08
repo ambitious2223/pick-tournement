@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { SessionState } from "../../shared/types.ts";
 import { ROUND_ORDER } from "../../shared/config.ts";
-import { Button, Field, TextInput, Select } from "../ui/primitives.tsx";
+import { Button, Field, TextInput, Select, Slider } from "../ui/primitives.tsx";
 import { Collapsible } from "../ui/Collapsible.tsx";
 import { LivePanel } from "./LivePanel.tsx";
 import { SoundPanel } from "./SoundPanel.tsx";
@@ -64,6 +64,19 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
 
         <Collapsible title={t("sound.title")}>
           <SoundPanel state={state} />
+        </Collapsible>
+
+        <Collapsible title={t("debug.display")} defaultOpen>
+          <Slider
+            label={t("settings.stageTextScale")}
+            min={0.6}
+            max={2.5}
+            step={0.05}
+            value={state.settings.stageTextScale}
+            onChange={(v) => void send("settings:update", { stageTextScale: v })}
+            display={(v) => `${Math.round(v * 100)}%`}
+          />
+          <p className="mt-2 text-xs text-white/50">{t("debug.displayHelp")}</p>
         </Collapsible>
 
         <Collapsible title={t("debug.voteInjector")} defaultOpen>

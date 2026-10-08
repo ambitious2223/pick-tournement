@@ -1,6 +1,7 @@
 import type {
   Category,
   CommandMap,
+  Gift,
   Item,
   LiveEvent,
   LogEntry,
@@ -8,16 +9,32 @@ import type {
   QueueEntry,
   SessionState,
   Settings,
+  SideEffect,
   SoundSettings,
   StageView,
   Supporter,
 } from "../shared/types.ts";
-import { DEFAULT_SETTINGS, ROUND_LABELS, ROUND_ORDER } from "../shared/config.ts";
+import {
+  DEFAULT_SETTINGS,
+  isHandledEffect,
+  ROUND_LABELS,
+  ROUND_ORDER,
+  type HandledEffectKey,
+} from "../shared/config.ts";
 import { matchCategory, matchItem, normalize } from "../engine/matcher.ts";
 import { cacheAvatar } from "./avatars.ts";
 import { saveLiveConfig, type LiveConfig } from "./liveConfig.ts";
+import { loadManifest } from "./manifest.ts";
 import type { LiveClient } from "./live.ts";
-import { castChatVote, castGiftVote, resolveWinner, type Rng } from "../engine/match.ts";
+import {
+  addVotes,
+  castChatVote,
+  castGiftVote,
+  resolveWinner,
+  shiftVotes,
+  sideOf,
+  type Rng,
+} from "../engine/match.ts";
 import { completeMatch, createTournament, currentMatch } from "../engine/tournament.ts";
 import { fakeViewer, pickSide } from "../engine/simulate.ts";
 import { loadCategories, loadSession, saveCategory, deleteCategory, saveSessionDebounced } from "./store.ts";
@@ -30,6 +47,30 @@ let idCounter = 0;
 function nextId(prefix: string): string {
   idCounter += 1;
   return `${prefix}-${Date.now().toString(36)}-${idCounter}`;
+}
+
+/** Effect payloads arrive from the hub as JSON, so every value may be a string. */
+type Payload = Record<string, unknown>;
+
+function pText(p: Payload, key: string): string {
+  const v = p[key];
+  if (typeof v === "string") return v.trim();
+  if (typeof v === "number" || typeof v === "boolean") return String(v);
+  return "";
+}
+
+function pNum(p: Payload, key: string, fallback: number, min: number, max: number): number {
+  const raw = p[key];
+  const n = typeof raw === "number" ? raw : typeof raw === "string" ? Number(raw.trim()) : NaN;
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+}
+
+function pSide(p: Payload): "a" | "b" | null {
+  const v = pText(p, "side").toLowerCase();
+  if (v === "left" || v === "a") return "a";
+  if (v === "right" || v === "b") return "b";
+  return null;
 }
 
 export class Session {
@@ -46,6 +87,8 @@ export class Session {
   private supporters = new Map<string, Supporter>();
   private showRound: Match["round"] | null = null;
   private showFallbackCategory: string | null = null;
+  private holdTimer: NodeJS.Timeout | null = null;
+  private sideEffectTimer: NodeJS.Timeout | null = null;
 
   private constructor(state: SessionState) {
     this.state = state;
@@ -79,6 +122,7 @@ export class Session {
       queueIndex: typeof saved?.queueIndex === "number" ? saved.queueIndex : 0,
       tournament: null,
       matchEndsAt: null,
+      matchHold: null,
       stageView: "match",
       show: {
         active: false,
@@ -102,6 +146,7 @@ export class Session {
       },
       simulated: false,
       categories,
+      sideEffects: [],
       log: [],
     };
     return new Session(state);
@@ -242,6 +287,8 @@ export class Session {
   stopShow(): void {
     this.clearShowTimer();
     this.stopTimer();
+    this.releaseHold();
+    this.clearSideEffects();
     this.state.show.active = false;
     this.state.show.paused = false;
     this.state.show.phase = "idle";
@@ -441,6 +488,8 @@ export class Session {
     if (!t || !match) return;
 
     match.status = "live";
+    this.releaseHold();
+    this.clearSideEffects();
     const seconds = this.currentRoundSeconds();
     this.remainingMs = seconds * 1000;
     this.state.matchEndsAt = Date.now() + this.remainingMs;
@@ -475,6 +524,8 @@ export class Session {
     const endsAt = this.state.matchEndsAt;
     this.remainingMs = endsAt ? Math.max(0, endsAt - Date.now()) : this.remainingMs;
     this.stopTimer();
+    this.clearHoldTimer();
+    this.state.matchHold = { until: null, remainingMs: this.remainingMs };
     this.state.status = "paused";
     this.log("info", "Match paused.");
     this.emit();
@@ -483,6 +534,7 @@ export class Session {
   resumeMatch(): void {
     if (this.state.status !== "paused") return;
     this.state.status = "running";
+    this.releaseHold();
     this.state.matchEndsAt = Date.now() + this.remainingMs;
     const match = this.state.tournament ? currentMatch(this.state.tournament) : null;
     if (match) match.endsAt = this.state.matchEndsAt;
@@ -492,11 +544,7 @@ export class Session {
   }
 
   extendMatch(seconds: number): void {
-    if (this.state.status !== "running") return;
-    this.remainingMs += seconds * 1000;
-    this.state.matchEndsAt = Date.now() + this.remainingMs;
-    this.schedule(this.remainingMs);
-    this.emit();
+    this.addTime(seconds);
   }
 
   skipMatch(): void {
@@ -508,6 +556,8 @@ export class Session {
     const match = t ? currentMatch(t) : null;
     if (!t || !match) return;
     this.stopTimer();
+    this.releaseHold();
+    this.clearSideEffects();
     if (this.state.settings.autoStageView) this.state.stageView = "bracket";
 
     const winner = forced ? (match.votesA >= match.votesB ? match.a : match.b) : resolveWinner(match, this.state.settings, this.rng);
@@ -642,8 +692,15 @@ export class Session {
     if (match && event.giftName) {
       const itemId = this.giftSideByName(event.giftName);
       if (itemId) {
+        if (this.isBlocked(match, itemId)) {
+          this.log("vote", `${event.name}'s ${event.giftName} was blocked.`);
+          return;
+        }
         const result = castGiftVote(match, itemId, event.userId || event.name, this.state.settings, event.count ?? 1);
-        if (result.ok) this.log("vote", `${event.name} gifted ${event.giftName} → ${this.item(itemId)?.name ?? itemId}`);
+        if (result.ok) {
+          this.applyBoost(match, itemId, this.state.settings.giftWeight * Math.max(1, event.count ?? 1));
+          this.log("vote", `${event.name} gifted ${event.giftName} → ${this.item(itemId)?.name ?? itemId}`);
+        }
       }
     }
   }
@@ -712,38 +769,334 @@ export class Session {
     });
   }
 
-  handleLiveEffect(effect: string, _payload: unknown): boolean {
-    switch (effect) {
-      case "show_start":
-        this.startShow();
-        return true;
-      case "show_stop":
-        this.stopShow();
-        return true;
-      case "show_pause":
-        this.pauseShow();
-        return true;
-      case "show_resume":
-        this.resumeShow();
-        return true;
-      case "show_skip":
-        this.skipShowPhase();
-        return true;
-      case "force_left":
-        this.forceWinner("a");
-        return true;
-      case "force_right":
-        this.forceWinner("b");
-        return true;
-      case "skip_match":
-        this.skipMatch();
-        return true;
-      case "next_category":
-        this.nextTournament();
-        return true;
-      default:
-        return false;
+  /** Handles an effect routed by the Tikora hub. Only declared keys are allowed. */
+  handleLiveEffect(effect: string, rawPayload: unknown): boolean {
+    if (!loadManifest().effects.some((entry) => entry.key === effect)) {
+      this.log("error", `Hub sent "${effect}", which is not declared in tikora.manifest.json`);
+      this.emit();
+      return false;
     }
+    const payload = (rawPayload && typeof rawPayload === "object" ? rawPayload : {}) as Payload;
+    if (!isHandledEffect(effect)) {
+      this.log("error", `Effect "${effect}" is declared in the manifest but not implemented.`);
+      this.emit();
+      return false;
+    }
+    let ok = false;
+    try {
+      ok = this.runEffect(effect, payload);
+    } catch (error) {
+      this.log("error", `Effect "${effect}" failed: ${(error as Error).message}`);
+    }
+    if (!ok) this.log("error", `Effect "${effect}" did not run — needs a live match, or check its params.`);
+    this.emit();
+    return ok;
+  }
+
+  private runEffect(key: HandledEffectKey, p: Payload): boolean {
+    switch (key) {
+      // --- viewer power-ups: votes ----------------------------------------
+      case "add_vote": {
+        const side = pSide(p);
+        const match = this.liveMatch();
+        if (!side || !match) return false;
+        const amount = pNum(p, "amount", Math.max(1, this.state.settings.giftWeight), 1, 1000);
+        if (!addVotes(match, side, amount)) return false;
+        const name = this.item(side === "a" ? match.a : match.b)?.name ?? side;
+        this.log("vote", `${pText(p, "viewer") || "Hub"} added ${amount} votes for ${name}`);
+        return true;
+      }
+      case "steal_votes": {
+        const match = this.liveMatch();
+        if (!match) return false;
+        const diff = match.votesA - match.votesB;
+        if (diff === 0) return false;
+        const target: "a" | "b" = diff > 0 ? "b" : "a";
+        if (this.activeSideEffect("block", target)) {
+          this.log("info", "Steal refused — that side is blocked.");
+          return false;
+        }
+        const amount = pNum(p, "amount", Math.max(1, this.state.settings.giftWeight), 1, 1000);
+        const moved = shiftVotes(match, amount);
+        if (!moved) return false;
+        const name = this.item(moved === "a" ? match.a : match.b)?.name ?? moved;
+        this.log("vote", `Stolen votes went to ${name}`);
+        return true;
+      }
+      case "boost_side": {
+        const match = this.liveMatch();
+        const side = pSide(p);
+        if (!side || !match) return false;
+        const multiplier = pNum(p, "multiplier", 2, 1, 10);
+        const seconds = pNum(p, "seconds", 30, 1, 600);
+        this.armSideEffect({ kind: "boost", side, multiplier, until: Date.now() + seconds * 1000 });
+        const name = this.item(side === "a" ? match.a : match.b)?.name ?? side;
+        this.log("info", `${name} votes count ×${multiplier} for ${seconds}s`);
+        return true;
+      }
+      case "block_side": {
+        const match = this.liveMatch();
+        const side = pSide(p);
+        if (!side || !match) return false;
+        const seconds = pNum(p, "seconds", 10, 1, 300);
+        this.armSideEffect({ kind: "block", side, until: Date.now() + seconds * 1000 });
+        const name = this.item(side === "a" ? match.a : match.b)?.name ?? side;
+        this.log("info", `${name} scores nothing for ${seconds}s.`);
+        return true;
+      }
+
+      // --- viewer power-ups: the clock ------------------------------------
+      case "add_time":
+        return this.addTime(pNum(p, "seconds", 10, 1, 600));
+      case "rush_timer":
+        return this.rushTimer(pNum(p, "seconds", 10, 1, 3600));
+      case "freeze_timer":
+        return this.freezeCountdown(pNum(p, "seconds", 5, 1, 300));
+      // --- gifts bound to a side ------------------------------------------
+      case "set_side_gift": {
+        const side = pSide(p);
+        const giftName = pText(p, "gift");
+        if (!side || !giftName) return false;
+        if (!this.bindSideGift(side, giftName, pText(p, "icon"))) return false;
+        const amount = pNum(p, "amount", 0, 0, 1000);
+        const match = this.liveMatch();
+        if (amount > 0 && match && addVotes(match, side, amount)) {
+          this.log("vote", `+${amount} votes for ${giftName}`);
+        }
+        this.log("info", `${giftName} now votes for the ${side === "a" ? "left" : "right"} side.`);
+        return true;
+      }
+      case "swap_sides":
+        return this.swapSides();
+
+      // --- flow ------------------------------------------------------------
+      case "category_vote": {
+        const name = pText(p, "category");
+        if (!name || !matchCategory(name, this.state.categories)) return false;
+        this.chatVote(name, pText(p, "viewer") || "viewer");
+        return true;
+      }
+      default: {
+        const unreachable: never = key;
+        return unreachable;
+      }
+    }
+  }
+
+  /**
+   * Activates a timed side effect (boost / block) and publishes it, so the
+   * broadcast can show a badge with a live countdown.
+   */
+  private armSideEffect(effect: SideEffect): void {
+    const now = Date.now();
+    const kept = this.state.sideEffects.filter(
+      (e) => e.until > now && !(e.kind === effect.kind && e.side === effect.side),
+    );
+    kept.push(effect);
+    this.state.sideEffects = kept;
+    this.armSideEffectTimer();
+  }
+
+  private activeSideEffect(kind: SideEffect["kind"], side: "a" | "b"): SideEffect | undefined {
+    const now = Date.now();
+    return this.state.sideEffects.find((e) => e.kind === kind && e.side === side && e.until > now);
+  }
+
+  /** One timer for the soonest expiry, so badges drop off without polling. */
+  private armSideEffectTimer(): void {
+    this.clearSideEffectTimer();
+    let soonest: number | null = null;
+    for (const effect of this.state.sideEffects) {
+      if (soonest === null || effect.until < soonest) soonest = effect.until;
+    }
+    if (soonest === null) return;
+    this.sideEffectTimer = setTimeout(
+      () => {
+        this.sideEffectTimer = null;
+        const now = Date.now();
+        const kept = this.state.sideEffects.filter((e) => e.until > now);
+        if (kept.length !== this.state.sideEffects.length) {
+          this.state.sideEffects = kept;
+          this.emit();
+        }
+        if (kept.length > 0) this.armSideEffectTimer();
+      },
+      Math.max(0, soonest - Date.now()),
+    );
+  }
+
+  private clearSideEffectTimer(): void {
+    if (this.sideEffectTimer) clearTimeout(this.sideEffectTimer);
+    this.sideEffectTimer = null;
+  }
+
+  /** Drops every active boost/block — used whenever a match starts or ends. */
+  private clearSideEffects(): void {
+    this.clearSideEffectTimer();
+    if (this.state.sideEffects.length > 0) this.state.sideEffects = [];
+  }
+
+  /**
+   * Swaps the two competitors: photos, votes, voters, gift bindings and any
+   * active boost/block all follow them, so everything stays consistent.
+   */
+  private swapSides(): boolean {
+    const tournament = this.state.tournament;
+    const match = tournament ? currentMatch(tournament) : null;
+    if (!tournament || !match || !match.a || !match.b) return false;
+
+    const leftName = this.item(match.a)?.name ?? "";
+    const rightName = this.item(match.b)?.name ?? "";
+
+    const a = match.a;
+    match.a = match.b;
+    match.b = a;
+
+    const votesA = match.votesA;
+    match.votesA = match.votesB;
+    match.votesB = votesA;
+
+    const votersA = match.votersA;
+    match.votersA = match.votersB;
+    match.votersB = votersA;
+
+    const category = this.currentCategory();
+    if (category?.giftPair) {
+      const pair = category.giftPair;
+      category.giftPair = [pair[1], pair[0]];
+    }
+
+    this.state.sideEffects = this.state.sideEffects.map((effect) => ({
+      ...effect,
+      side: effect.side === "a" ? "b" : "a",
+    }));
+
+    this.log("info", `Sides swapped — ${leftName} ↔ ${rightName}`);
+    this.emit();
+    return true;
+  }
+
+  /** Adds seconds to the running (or paused) match clock. */
+  addTime(seconds: number): boolean {
+    if (this.state.status !== "running" && this.state.status !== "paused") return false;
+    if (this.state.status === "running" && this.state.matchEndsAt) {
+      this.remainingMs = Math.max(0, this.state.matchEndsAt - Date.now());
+    }
+    this.remainingMs += seconds * 1000;
+    if (this.state.status === "running") {
+      this.state.matchEndsAt = Date.now() + this.remainingMs;
+      const match = this.state.tournament ? currentMatch(this.state.tournament) : null;
+      if (match) match.endsAt = this.state.matchEndsAt;
+      this.schedule(this.remainingMs);
+    }
+    this.log("info", `+${seconds}s on the clock.`);
+    this.emit();
+    return true;
+  }
+
+  /** Cuts the countdown down to `seconds` (never adds time). */
+  rushTimer(seconds: number): boolean {
+    if (this.state.status !== "running" || !this.state.matchEndsAt) return false;
+    const now = Date.now();
+    const left = Math.max(0, this.state.matchEndsAt - now);
+    const target = seconds * 1000;
+    if (target >= left) return false;
+    this.releaseHold();
+    this.remainingMs = target;
+    this.state.matchEndsAt = now + target;
+    const match = this.state.tournament ? currentMatch(this.state.tournament) : null;
+    if (match) match.endsAt = this.state.matchEndsAt;
+    this.schedule(target);
+    this.log("info", `Clock rushed down to ${seconds}s.`);
+    this.emit();
+    return true;
+  }
+
+  /**
+   * Holds the countdown for `seconds` without pausing the match: votes keep
+   * coming in, the show keeps running, and the number on screen stops dead
+   * where it is until the freeze expires.
+   */
+  freezeCountdown(seconds: number): boolean {
+    if (this.state.status !== "running" || !this.state.matchEndsAt) return false;
+    const now = Date.now();
+    const step = Math.round(Math.max(1, seconds) * 1000);
+    const held = this.state.matchHold;
+    if (held && held.until !== null && held.until > now) {
+      held.until = Math.max(held.until, now) + step;
+    } else {
+      this.state.matchHold = { until: now + step, remainingMs: Math.max(0, this.state.matchEndsAt - now) };
+    }
+    this.pushClock(step, now);
+    this.armHoldTimer();
+    this.log("info", `Clock frozen for ${seconds}s.`);
+    this.emit();
+    return true;
+  }
+
+  /** Shoves the real deadline out by `ms` so the freeze time isn't spent. */
+  private pushClock(ms: number, now: number): void {
+    if (!this.state.matchEndsAt) return;
+    this.state.matchEndsAt += ms;
+    this.remainingMs = Math.max(0, this.state.matchEndsAt - now);
+    const match = this.state.tournament ? currentMatch(this.state.tournament) : null;
+    if (match) match.endsAt = this.state.matchEndsAt;
+    this.schedule(this.remainingMs);
+  }
+
+  private armHoldTimer(): void {
+    this.clearHoldTimer();
+    const hold = this.state.matchHold;
+    if (!hold || hold.until === null) return;
+    const until = hold.until;
+    this.holdTimer = setTimeout(() => {
+      this.holdTimer = null;
+      if (this.state.matchHold?.until === until) {
+        this.state.matchHold = null;
+        this.emit();
+      }
+    }, Math.max(0, until - Date.now()));
+  }
+
+  private clearHoldTimer(): void {
+    if (this.holdTimer) clearTimeout(this.holdTimer);
+    this.holdTimer = null;
+  }
+
+  /** Drops any freeze/pause hold — used whenever the clock itself is reset. */
+  private releaseHold(): void {
+    this.clearHoldTimer();
+    if (this.state.matchHold) this.state.matchHold = null;
+  }
+
+  /** Points a side's gift at a new gift; the broadcast icon follows the state. */
+  private bindSideGift(side: "a" | "b", giftName: string, icon: string): boolean {
+    const category = this.currentCategory();
+    const [left, right] = this.currentItems();
+    const item = side === "a" ? left : right;
+    const hasPair = Boolean(category?.giftPair);
+    if (!item && !hasPair) return false;
+    const gift: Gift = { id: normalize(giftName).replace(/\s+/g, "-") || "gift", name: giftName, icon };
+    if (item) item.gift = gift;
+    if (category?.giftPair) category.giftPair[side === "a" ? 0 : 1] = gift;
+    return true;
+  }
+
+  /** Applies the temporary vote multiplier started by the `boost_side` effect. */
+  private applyBoost(match: Match, itemId: string, points: number): void {
+    const side = sideOf(match, itemId);
+    if (!side) return;
+    const boost = this.activeSideEffect("boost", side);
+    const multiplier = boost?.multiplier ?? 1;
+    if (multiplier <= 1) return;
+    const extra = Math.floor(points * (multiplier - 1));
+    if (extra > 0) addVotes(match, side, extra);
+  }
+
+  /** True while a hub effect has silenced this side of the current match. */
+  private isBlocked(match: Match, itemId: string): boolean {
+    const side = sideOf(match, itemId);
+    return Boolean(side && this.activeSideEffect("block", side));
   }
 
   async updateLiveConfig(patch: { url?: string; slug?: string; key?: string }): Promise<void> {
@@ -789,8 +1142,13 @@ export class Session {
     if (!match) return;
     const itemId = matchItem(text, this.currentItems());
     if (!itemId) return;
+    if (this.isBlocked(match, itemId)) {
+      this.log("vote", `${viewer}'s vote was blocked.`);
+      return;
+    }
     const result = castChatVote(match, itemId, viewer, this.state.settings);
     if (result.ok) {
+      this.applyBoost(match, itemId, this.state.settings.chatWeight);
       this.log("vote", `${viewer} voted for ${this.item(itemId)?.name ?? itemId}`);
       this.emit();
     }
@@ -801,8 +1159,13 @@ export class Session {
     if (!match) return;
     const itemId = this.giftSide(giftId);
     if (!itemId) return;
+    if (this.isBlocked(match, itemId)) {
+      this.log("vote", `${viewer}'s gift was blocked.`);
+      return;
+    }
     const result = castGiftVote(match, itemId, viewer, this.state.settings, count);
     if (result.ok) {
+      this.applyBoost(match, itemId, this.state.settings.giftWeight * Math.max(1, count));
       this.log("vote", `${viewer} gifted → ${this.item(itemId)?.name ?? itemId}`);
       this.emit();
     }
@@ -946,6 +1309,8 @@ export class Session {
   reset(): void {
     this.stopTimer();
     this.clearShowTimer();
+    this.releaseHold();
+    this.clearSideEffects();
     this.setSimulated(false);
     this.state.tournament = null;
     this.state.matchEndsAt = null;

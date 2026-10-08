@@ -61,6 +61,40 @@ export function Select({ className = "", children, ...props }: SelectHTMLAttribu
   );
 }
 
+export function Slider({
+  label,
+  value,
+  onChange,
+  min = 0,
+  max = 1,
+  step = 0.01,
+  display,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  display?: (v: number) => string;
+}): ReactNode {
+  return (
+    <label className="flex items-center gap-2 text-xs">
+      <span className="w-20 shrink-0 text-white/50">{label}</span>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="h-1 flex-1 cursor-pointer accent-brand"
+      />
+      {display ? <span className="w-10 shrink-0 text-end text-white/60">{display(value)}</span> : null}
+    </label>
+  );
+}
+
 export function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }): ReactNode {
   return (
     <button

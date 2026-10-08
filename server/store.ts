@@ -64,7 +64,7 @@ let saveTimer: NodeJS.Timeout | null = null;
 export function saveSessionDebounced(state: SessionState): void {
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    const { categories: _categories, ...persisted } = state;
+        const { categories: _categories, matchHold: _hold, sideEffects: _side, ...persisted } = state;
     fs.writeFile(SESSION_FILE, `${JSON.stringify(persisted, null, 2)}\n`, "utf8").catch((error) => {
       console.warn("[store] failed to persist session:", (error as Error).message);
     });

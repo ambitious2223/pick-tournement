@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Category, Gift, Item, SessionState } from "../../shared/types.ts";
+import type { Category, Gift, Item, SessionState, SideEffect } from "../../shared/types.ts";
 import { activeCategory, activeItems, activeMatch, categoryName, getItem, itemName } from "../lib/selectors.ts";
 import { useI18n } from "../i18n/index.tsx";
 import { ItemCard } from "../overlay/ItemCard.tsx";
@@ -12,8 +12,8 @@ type Variant = "overlay" | "control";
 interface Preset {
   visual: string;
   emoji: string;
-  name: string;
-  vote: string;
+  namePx: number;
+  votePx: number;
   vs: string;
   bar: string;
   gap: string;
@@ -24,8 +24,8 @@ const PRESETS: Record<Variant, Preset> = {
   overlay: {
     visual: "h-[37vh] w-[37vh] min-h-[120px] min-w-[120px] max-h-[480px] max-w-[480px]",
     emoji: "text-[8vh]",
-    name: "text-5xl",
-    vote: "text-7xl",
+    namePx: 48,
+    votePx: 72,
     vs: "text-7xl",
     bar: "h-12",
     gap: "gap-12",
@@ -34,14 +34,19 @@ const PRESETS: Record<Variant, Preset> = {
   control: {
     visual: "h-[clamp(9rem,16vw,14rem)] w-[clamp(9rem,16vw,14rem)]",
     emoji: "text-[clamp(2.75rem,5.5vw,4.25rem)]",
-    name: "text-2xl",
-    vote: "text-4xl",
+    namePx: 24,
+    votePx: 36,
     vs: "text-3xl",
     bar: "h-9",
     gap: "gap-6",
     barMax: "max-w-4xl",
   },
 };
+
+function clampScale(value: number | undefined): number {
+  if (!Number.isFinite(value)) return 1;
+  return Math.min(3, Math.max(0.6, value as number));
+}
 
 function giftFor(item: Item | null, category: Category | null, side: "a" | "b"): Gift | null {
   if (item?.gift) return item.gift;
@@ -91,6 +96,8 @@ export function Stage({
   const leadingB = match.votesB > match.votesA;
   const done = match.status === "done";
   const roundMatches = state.tournament.bracket.rounds[match.round];
+  const effectFor = (side: "a" | "b"): SideEffect | null =>
+    state.sideEffects.find((e) => e.side === side && e.until > Date.now()) ?? null;
 
   const stateFor = (itemId: string | null, leading: boolean): "normal" | "leading" | "winner" | "losing" => {
     if (done && match.winner) return match.winner === itemId ? "winner" : "losing";
@@ -101,17 +108,42 @@ export function Stage({
   const seconds = totalSeconds ?? state.settings.roundSeconds;
 
   const big = variant === "overlay";
-  const instrTitle = big ? "text-lg sm:text-2xl" : "text-sm";
-  const instrText = big ? "text-sm sm:text-base" : "text-xs";
-  const instrChip = big ? "chip chip-lg" : "chip text-xs";
+  const userScale = clampScale(state.settings.stageTextScale);
+  /** Scale a control base size (px) by the variant and the host's text-size setting. */
+  const fs = (controlPx: number, overlayPx = controlPx): { fontSize: number } => ({
+    fontSize: (big ? overlayPx : controlPx) * userScale,
+  });
+  const headerChipStyle = fs(12, 13);
+  const instrTitleStyle = fs(14, 32);
+  const instrTextStyle = fs(12, 21);
+  const instrChipStyle = fs(12, 26);
+  const titleClass = big
+    ? "font-black uppercase tracking-widest text-brand shadow-text"
+    : "font-black uppercase tracking-widest text-brand text-sm";
+  const freeClass = big
+    ? "rounded-full bg-brand px-5 py-2 font-black uppercase tracking-wide text-ink shadow-lg"
+    : "chip text-xs text-brand";
+  const giftClass = big
+    ? "rounded-full bg-lime px-5 py-2 font-black uppercase tracking-wide text-ink shadow-lg"
+    : "chip text-xs text-brand-2";
+  const ruleClass = big ? "max-w-3xl font-bold leading-snug text-white shadow-text" : "max-w-3xl leading-relaxed text-white/60 text-xs";
+  const vsClass = big ? "font-black text-white/60" : "font-black text-white/30";
+  const sideAClass = big
+    ? "rounded-full border-2 border-brand bg-brand/15 px-4 py-1.5 font-black text-brand shadow-text"
+    : "chip text-xs border-brand/60 text-brand";
+  const sideBClass = big
+    ? "rounded-full border-2 border-brand-2 bg-brand-2/15 px-4 py-1.5 font-black text-brand-2 shadow-text"
+    : "chip text-xs border-brand-2/60 text-brand-2";
+  const barPctPx = 14 * userScale;
+  const barLabelPx = 12 * userScale;
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-between gap-4">
       {showHeader ? (
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <span className="chip text-brand">{round(match.round)}</span>
-          <span className="chip text-white/60">{t("stage.matchOf", { n: match.index + 1, total: roundMatches.length })}</span>
-          <span className="chip text-white/60">{categoryName(category, lang)}</span>
+          <span className="chip text-brand" style={headerChipStyle}>{round(match.round)}</span>
+          <span className="chip text-white/60" style={headerChipStyle}>{t("stage.matchOf", { n: match.index + 1, total: roundMatches.length })}</span>
+          <span className="chip text-white/60" style={headerChipStyle}>{categoryName(category, lang)}</span>
         </div>
       ) : null}
 
@@ -119,6 +151,7 @@ export function Stage({
         <div className={`grid w-full grid-cols-[1fr_auto_1fr] items-center ${p.gap}`}>
           <div className="flex justify-center">
             <ItemCard
+              key={match.a ?? "a"}
               item={a}
               votes={match.votesA}
               gift={giftFor(a, category, "a")}
@@ -126,16 +159,24 @@ export function Stage({
               state={stateFor(match.a, leadingA)}
               size={p.visual}
               emojiClass={p.emoji}
-              nameClass={p.name}
-              voteClass={p.vote}
+              namePx={p.namePx * userScale}
+              votePx={p.votePx * userScale}
+              effect={effectFor("a")}
             />
           </div>
           <div className="flex flex-col items-center gap-2">
             <div className={`font-black text-white/30 ${p.vs}`}>VS</div>
-            <RoundTimer endsAt={match.endsAt} status={state.status} totalSeconds={seconds} scale={big ? 1.25 : 1} />
+                <RoundTimer
+                  endsAt={match.endsAt}
+                  status={state.status}
+                  totalSeconds={seconds}
+                  hold={state.matchHold}
+                  scale={big ? 1.25 : 1}
+                />
           </div>
           <div className="flex justify-center">
             <ItemCard
+              key={match.b ?? "b"}
               item={b}
               votes={match.votesB}
               gift={giftFor(b, category, "b")}
@@ -143,8 +184,9 @@ export function Stage({
               state={stateFor(match.b, leadingB)}
               size={p.visual}
               emojiClass={p.emoji}
-              nameClass={p.name}
-              voteClass={p.vote}
+              namePx={p.namePx * userScale}
+              votePx={p.votePx * userScale}
+              effect={effectFor("b")}
             />
           </div>
         </div>
@@ -156,25 +198,33 @@ export function Stage({
             votersA={match.votersA.length}
             votersB={match.votersB.length}
             heightClass={p.bar}
+            pctPx={barPctPx}
+            labelPx={barLabelPx}
           />
         </div>
       </div>
 
       {state.settings.showVoteHint && !done ? (
-        <section className="flex w-full max-w-4xl flex-col items-center gap-2 rounded-2xl border border-brand/40 bg-brand/5 px-5 py-4 text-center shadow-[0_0_50px_-24px_rgba(34,211,238,0.9)]">
-          <span className={`font-black uppercase tracking-widest text-brand ${instrTitle}`}>{t("vote.howTo")}</span>
+        <section
+          className={`flex w-full max-w-4xl flex-col items-center gap-3 rounded-2xl text-center ${
+            big
+              ? "border-2 border-brand bg-ink/95 px-6 py-5 shadow-[0_0_60px_-16px_rgba(34,211,238,0.95)]"
+              : "gap-2 border border-brand/40 bg-brand/5 px-5 py-4 shadow-[0_0_50px_-24px_rgba(34,211,238,0.9)]"
+          }`}
+        >
+          <span className={titleClass} style={instrTitleStyle}>{t("vote.howTo")}</span>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <span className={`${instrChip} text-brand`}>{t("vote.freeChip", { weight: state.settings.chatWeight })}</span>
-            <span className={`${instrChip} text-brand-2`}>{t("vote.giftChip", { weight: state.settings.giftWeight })}</span>
+            <span className={freeClass} style={instrChipStyle}>{t("vote.freeChip", { weight: state.settings.chatWeight })}</span>
+            <span className={giftClass} style={instrChipStyle}>{t("vote.giftChip", { weight: state.settings.giftWeight })}</span>
           </div>
-          <p className={`max-w-3xl leading-relaxed text-white/60 ${instrText}`}>{t("vote.instruction")}</p>
+          <p className={ruleClass} style={instrTextStyle}>{t("vote.instruction")}</p>
           <div className="mt-1 flex flex-wrap items-center justify-center gap-3">
-            <span className={`${instrChip} border-brand/60 text-brand`}>
+            <span className={sideAClass} style={instrChipStyle}>
               {a?.gift ? `${a.gift.icon} ` : ""}
               {itemName(a, lang) || "—"}
             </span>
-            <span className="font-black text-white/30">VS</span>
-            <span className={`${instrChip} border-brand-2/60 text-brand-2`}>
+            <span className={vsClass} style={instrChipStyle}>VS</span>
+            <span className={sideBClass} style={instrChipStyle}>
               {b?.gift ? `${b.gift.icon} ` : ""}
               {itemName(b, lang) || "—"}
             </span>

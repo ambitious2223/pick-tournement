@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import type { Item, Match, Settings } from "../shared/types.ts";
 import { DEFAULT_SETTINGS } from "../shared/config.ts";
 import { matchItem, normalize } from "./matcher.ts";
-import { castChatVote, castGiftVote, resolveWinner } from "./match.ts";
+import { addVotes, castChatVote, castGiftVote, resolveWinner, shiftVotes } from "./match.ts";
 
 function liveMatch(): Match {
   return {
@@ -72,4 +72,53 @@ test("clear winners are returned regardless of tie rule", () => {
   castGiftVote(m, "ronaldo", "x", DEFAULT_SETTINGS);
   castChatVote(m, "messi", "y", { ...DEFAULT_SETTINGS, chatWeight: 500 });
   assert.equal(resolveWinner(m, DEFAULT_SETTINGS, () => 0.5), "messi");
+});
+
+test("hub power-ups add raw votes to one side", () => {
+  const m = liveMatch();
+  assert.equal(addVotes(m, "a", 10), true);
+  assert.equal(m.votesA, 10);
+  assert.equal(addVotes(m, "b", 4.7), true);
+  assert.equal(m.votesB, 4);
+  assert.equal(addVotes(m, "a", 0), false);
+  assert.equal(addVotes(m, "a", -5), false);
+  assert.equal(addVotes(m, "a", Number.NaN), false);
+  assert.equal(m.votesA, 10);
+});
+
+test("stealing votes never flips the lead and never invents votes", () => {
+  const m = liveMatch();
+  m.votesA = 10;
+  const total = m.votesA + m.votesB;
+
+  assert.equal(shiftVotes(m, 6), "b");
+  assert.ok(m.votesA >= m.votesB, `leader must stay ahead or tied, got ${m.votesA}-${m.votesB}`);
+  assert.equal(m.votesA + m.votesB, total, "votes must be moved, not created");
+
+  m.votesA = 10;
+  m.votesB = 0;
+  assert.equal(shiftVotes(m, 100), "b");
+  assert.ok(m.votesA >= m.votesB, `leader must stay ahead or tied, got ${m.votesA}-${m.votesB}`);
+  assert.equal(m.votesA + m.votesB, total);
+});
+
+test("stealing is refused when the gap is a single vote", () => {
+  const m = liveMatch();
+  m.votesA = 1;
+  assert.equal(shiftVotes(m, 5), null);
+  assert.equal(m.votesA, 1);
+  assert.equal(m.votesB, 0);
+});
+
+test("shifting votes is refused on a tie, on a finished match, or with no amount", () => {
+  const m = liveMatch();
+  m.votesA = 5;
+  m.votesB = 5;
+  assert.equal(shiftVotes(m, 3), null);
+
+  m.votesB = 9;
+  assert.equal(shiftVotes(m, 0), null);
+  m.status = "done";
+  assert.equal(shiftVotes(m, 3), null);
+  assert.equal(addVotes(m, "a", 3), false);
 });

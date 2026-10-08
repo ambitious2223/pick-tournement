@@ -1,6 +1,7 @@
 import type { SoundSettings } from "../../shared/types.ts";
 import { engine } from "./engine.ts";
 import { playCue, type CueOptions } from "./cues.ts";
+import { AUTO_TRACK, MUSIC_BY_ID, MusicPlayer, resolveTrack } from "./music.ts";
 
 /** Minimum gap between repeats of the same cue (ms). */
 const MIN_INTERVAL: Record<string, number> = {
@@ -8,23 +9,6 @@ const MIN_INTERVAL: Record<string, number> = {
   "live.like": 120,
   "live.member": 80,
 };
-
-interface MusicTrack {
-  freqs: number[];
-  level: number;
-}
-
-/** Procedural ambient beds (chord tones). Overridable by files in data/sounds. */
-export const MUSIC_TRACKS: Record<string, MusicTrack> = {
-  "music.category": { freqs: [220, 277.18, 329.63], level: 0.5 },
-  "music.match.r16": { freqs: [196, 246.94, 293.66], level: 0.5 },
-  "music.match.qf": { freqs: [207.65, 261.63, 311.13], level: 0.55 },
-  "music.match.sf": { freqs: [220, 277.18, 329.63], level: 0.6 },
-  "music.match.final": { freqs: [233.08, 293.66, 349.23], level: 0.7 },
-  "music.champion": { freqs: [261.63, 329.63, 392, 523.25], level: 0.85 },
-};
-
-export const MUSIC_IDS = Object.keys(MUSIC_TRACKS);
 
 class SoundManager {
   /** Set by the broadcast provider; forwards cues to the server for Tikora mapping. */
@@ -34,10 +18,12 @@ class SoundManager {
   private overrides = new Set<string>();
   private buffers = new Map<string, AudioBuffer>();
   private overridesLoaded = false;
-  private musicGain: GainNode | null = null;
-  private musicNodes: OscillatorNode[] = [];
+
+  private player = new MusicPlayer();
+  private desiredSlot: string | null = null;
   private currentTrack: string | null = null;
-  private desiredTrack: string | null = null;
+
+  // Live counters.
   private prevCounts: Record<string, number> = {};
   private prevLeader = "";
 
@@ -128,59 +114,54 @@ class SoundManager {
     return null;
   }
 
-  /** Remember the desired track and (re)apply it once audio is available. */
-  setMusic(track: string | null): void {
-    this.desiredTrack = track;
+  // ---- music ----------------------------------------------------------------
+
+  /**
+   * Remember the desired slot (a show slot like `music.match.qf`, or a library
+   * track id from a preview) and (re)apply it once audio is available.
+   */
+  setMusic(slot: string | null): void {
+    this.desiredSlot = slot;
     this.applyMusic();
   }
 
-  /** Crossfade the background music to the desired track (null stops it). */
+  /**
+   * Resolve the desired slot through the picked background track, then start /
+   * stop / re-level the bed. Runs again whenever the sound settings change, so
+   * picking a different track or moving the volume slider takes effect live.
+   */
   private applyMusic(): void {
     if (!engine.ctx || !engine.running) return;
-    const enabled = this.config ? this.config.musicEnabled && !this.config.muted : false;
-    const target = enabled ? this.desiredTrack : null;
-    if (target === this.currentTrack) return;
+    const cfg = this.config;
+    const enabled = cfg ? cfg.musicEnabled && !cfg.muted : false;
+    const target =
+      enabled && this.desiredSlot
+        ? resolveTrack(this.desiredSlot, cfg ? cfg.musicTrack ?? AUTO_TRACK : AUTO_TRACK)
+        : null;
 
-    if (this.musicGain && engine.ctx) {
-      const g = this.musicGain;
-      const t = engine.now();
-      g.gain.cancelScheduledValues(t);
-      g.gain.setValueAtTime(g.gain.value, t);
-      g.gain.linearRampToValueAtTime(0.0001, t + 0.6);
-      const nodes = this.musicNodes;
-      setTimeout(() => nodes.forEach((n) => { try { n.stop(); } catch { /* ignore */ } }), 800);
-      this.musicNodes = [];
-      this.musicGain = null;
+    if (target !== this.currentTrack) {
+      this.currentTrack = target;
+      if (!target) {
+        this.player.stop();
+        return;
+      }
+      const def = MUSIC_BY_ID[target];
+      const out = engine.bus("music");
+      if (!def || !out) {
+        this.player.stop();
+        return;
+      }
+      this.player.start(def, out, this.levelFor(target));
+      return;
     }
-    this.currentTrack = target;
-    if (!target) return;
+    if (target) this.player.setLevel(this.levelFor(target));
+  }
 
-    const def = MUSIC_TRACKS[target];
-    const out = engine.bus("music");
-    if (!def || !out || !engine.ctx) return;
-    const ctx = engine.ctx;
-    const t = engine.now();
-    const gain = ctx.createGain();
-    const level = (def.level ?? 0.5) * (this.config?.trackVolume?.[target] ?? 1);
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.linearRampToValueAtTime(level, t + 1.5);
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 900;
-    filter.connect(gain);
-    gain.connect(out);
-    engine.send(gain, 0.5);
-
-    for (const f of def.freqs) {
-      const osc = ctx.createOscillator();
-      osc.type = "sine";
-      osc.frequency.value = f;
-      osc.detune.value = (Math.random() - 0.5) * 8;
-      osc.connect(filter);
-      osc.start(t);
-      this.musicNodes.push(osc);
-    }
-    this.musicGain = gain;
+  private levelFor(id: string): number {
+    const def = MUSIC_BY_ID[id];
+    if (!def) return 0;
+    const trim = this.config && this.config.trackVolume[id] !== undefined ? this.config.trackVolume[id] : 1;
+    return def.level * trim;
   }
 
   /** Detect vote leader changes and fire the lead cue. */

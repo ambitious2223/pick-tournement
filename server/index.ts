@@ -9,7 +9,8 @@ import { ensureSeeded, seedCategories } from "./seed.ts";
 import { fetchPhotos, photoCoverage } from "./photos.ts";
 import { DIST_DIR, UPLOADS_DIR, SOUNDS_DIR, ensureDirs, clearUploads, countUploads } from "./store.ts";
 import { AVATARS_DIR } from "./avatars.ts";
-import { loadLiveConfig } from "./liveConfig.ts";
+import { resolveLiveConfig, saveLiveConfig } from "./liveConfig.ts";
+import { findOrRegisterKey } from "./tikoraKey.ts";
 import { LiveClient } from "./live.ts";
 
 const IMAGE_TYPES: Record<string, string> = {
@@ -99,16 +100,53 @@ async function main(): Promise<void> {
   await ensureSeeded();
   const session = await Session.create();
 
-  const liveConfig = await loadLiveConfig();
+  const resolved = await resolveLiveConfig();
+  const liveConfig = resolved.config;
+  if (resolved.changed) await saveLiveConfig(liveConfig);
+  if (liveConfig.key) console.log("[live] game key resolved — nobody has to paste one");
+  else console.log("[live] no game key yet, waiting for Tikora…");
+
+  let authWarned = false;
   const live = new LiveClient({
     config: liveConfig,
     onEvent: (event) => session.handleLiveEvent(event),
     onEffect: (effect, payload) => session.handleLiveEffect(effect, payload),
     onStatus: (connected) => session.setLiveStatus(connected),
     onLog: (line) => console.log(`[live] ${line}`),
+    onAuthError: () => {
+      if (authWarned) return;
+      void findOrRegisterKey(liveConfig.slug).then((key) => {
+        if (key && key !== live.config.key) {
+          console.log("[live] refreshing the game key from Tikora");
+          void session.updateLiveConfig({ key });
+        } else {
+          authWarned = true;
+          console.log("[live] Tikora rejected the key — regenerate it in Stream Deck → Game Hub.");
+        }
+      });
+    },
   });
   session.attachLive(live, liveConfig);
   live.start();
+
+  // Started before Tikora? Keep looking until its database appears.
+  if (!liveConfig.key) {
+    let attempts = 0;
+    const poll = setInterval(() => {
+      attempts += 1;
+      if (attempts > 60) {
+        clearInterval(poll);
+        console.log("[live] Tikora never showed up — start Tikora, then restart this app.");
+        return;
+      }
+      void findOrRegisterKey(liveConfig.slug).then((key) => {
+        if (!key) return;
+        clearInterval(poll);
+        console.log("[live] game key picked up from Tikora");
+        void session.updateLiveConfig({ key });
+      });
+    }, 10_000);
+  }
 
   const clients = new Set<http.ServerResponse>();
 
@@ -216,6 +254,15 @@ async function main(): Promise<void> {
       const message = error instanceof Error ? error.message : "server error";
       json(res, 500, { error: message });
     }
+  });
+
+  server.on("error", (error: NodeJS.ErrnoException) => {
+    if (error.code === "EADDRINUSE") {
+      console.error(`[pick-league] Port ${SERVER_PORT} is already in use.`);
+      console.error("[pick-league] Another Pick League server is still running. Close it and try again.");
+      process.exit(1);
+    }
+    throw error;
   });
 
   server.listen(SERVER_PORT, "127.0.0.1", () => {

@@ -1,7 +1,7 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { SessionState } from "../../shared/types.ts";
-import { Toggle } from "../ui/primitives.tsx";
-import { Collapsible } from "../ui/Collapsible.tsx";
+import { Toggle, Panel } from "../ui/primitives.tsx";
+import { Tabs, type TabItem } from "../ui/Tabs.tsx";
 import { send } from "../lib/live.ts";
 import { MatchControls } from "./MatchControls.tsx";
 import { ShowControls } from "./ShowControls.tsx";
@@ -17,8 +17,32 @@ function isTyping(target: EventTarget | null): boolean {
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
 }
 
+type ControlTab = "run" | "show" | "sound" | "settings" | "queue" | "sim";
+
+const CONTROL_TABS: readonly ControlTab[] = ["run", "show", "sound", "settings", "queue", "sim"];
+
+function readTab(): ControlTab {
+  try {
+    const saved = window.localStorage.getItem("pl.control.tab");
+    if (saved && (CONTROL_TABS as readonly string[]).includes(saved)) return saved as ControlTab;
+  } catch {
+    // ignore storage errors (private mode, etc.)
+  }
+  return "run";
+}
+
 export function Control({ state }: { state: SessionState | null }): ReactNode {
   const { t } = useI18n();
+  const [tab, setTab] = useState<ControlTab>(readTab);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("pl.control.tab", tab);
+    } catch {
+      // ignore storage errors
+    }
+  }, [tab]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (isTyping(e.target)) return;
@@ -53,34 +77,55 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
 
   if (!state) return <p className="text-white/50">{t("common.connecting")}</p>;
 
+  const tabs: TabItem<ControlTab>[] = [
+    { id: "run", label: t("control.run") },
+    { id: "show", label: t("control.show") },
+    { id: "sound", label: t("control.sound") },
+    { id: "settings", label: t("control.settings") },
+    { id: "queue", label: t("control.queue"), hint: state.queue.length ? String(state.queue.length) : undefined },
+    { id: "sim", label: t("control.simulator"), hint: state.simulated ? "•" : undefined },
+  ];
+
   return (
     <div className="grid gap-4 xl:h-full xl:min-h-0 xl:grid-cols-[1fr_19rem]">
       <section className="panel flex min-h-[420px] flex-col overflow-hidden xl:min-h-0">
         <MatchStage state={state} variant="control" />
       </section>
 
-      <aside className="scroll-thin flex flex-col gap-3 xl:min-h-0 xl:overflow-y-auto xl:pe-1">
+      <aside className="flex min-h-0 flex-col gap-3">
         <div className="flex items-center gap-2 px-1 text-[0.65rem] text-white/45">
           <span className={`h-2 w-2 rounded-full ${state.live.connected ? "bg-lime" : "bg-hot"}`} />
           <span>{t("live.title")}: {state.live.connected ? t("live.connected") : t("live.disconnected")}</span>
         </div>
-        <MatchControls state={state} />
-        <ShowControls state={state} />
-        <SoundControls state={state} />
-        <Collapsible title={t("control.settings")}>
-          <SettingsPanel settings={state.settings} />
-        </Collapsible>
-        <Collapsible title={t("control.queue")} hint={state.queue.length ? String(state.queue.length) : undefined}>
-          <QueueEditor state={state} />
-        </Collapsible>
-        <Collapsible title={t("control.simulator")} hint={state.simulated ? t("control.simHintOn") : undefined}>
-          <Toggle
-            label={t("control.simulatorToggle")}
-            checked={state.simulated}
-            onChange={(on) => void send("sim:set", { on })}
-          />
-          <p className="mt-2 text-xs text-white/50">{t("control.simulatorHelp")}</p>
-        </Collapsible>
+
+        <Tabs tabs={tabs} value={tab} onChange={setTab} />
+
+        <div className="scroll-thin max-h-[65vh] min-h-0 flex-1 overflow-y-auto pe-1 xl:max-h-none">
+          {tab === "run" ? <MatchControls state={state} /> : null}
+          {tab === "show" ? <ShowControls state={state} /> : null}
+          {tab === "sound" ? <SoundControls state={state} /> : null}
+          {tab === "settings" ? (
+            <Panel title={t("control.settings")}>
+              <SettingsPanel settings={state.settings} />
+            </Panel>
+          ) : null}
+          {tab === "queue" ? (
+            <Panel title={t("control.queue")}>
+              <QueueEditor state={state} />
+            </Panel>
+          ) : null}
+          {tab === "sim" ? (
+            <Panel title={t("control.simulator")}>
+              <Toggle
+                label={t("control.simulatorToggle")}
+                checked={state.simulated}
+                onChange={(on) => void send("sim:set", { on })}
+              />
+              <p className="mt-2 text-xs text-white/50">{t("control.simulatorHelp")}</p>
+            </Panel>
+          ) : null}
+        </div>
+
         <p className="px-1 text-[0.65rem] leading-relaxed text-white/35">{t("control.shortcuts")}</p>
       </aside>
     </div>

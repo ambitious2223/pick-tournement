@@ -1,19 +1,6 @@
 import type { LiveEvent, LiveEventType } from "../shared/types.ts";
-import { MUSIC_TRACK_IDS, SOUND_CUE_IDS } from "../shared/config.ts";
+import { loadManifest } from "./manifest.ts";
 import type { LiveConfig } from "./liveConfig.ts";
-
-/** Effects Pick League accepts from the Tikora hub (mapped to session commands). */
-export const LIVE_EFFECTS = [
-  "show_start",
-  "show_stop",
-  "show_pause",
-  "show_resume",
-  "show_skip",
-  "force_left",
-  "force_right",
-  "skip_match",
-  "next_category",
-] as const;
 
 interface LiveClientOptions {
   config: LiveConfig;
@@ -21,6 +8,8 @@ interface LiveClientOptions {
   onEffect: (effect: string, payload: unknown) => boolean;
   onStatus: (connected: boolean) => void;
   onLog?: (line: string) => void;
+  /** The hub rejected our key — re-read it from Tikora and reconnect. */
+  onAuthError?: () => void;
 }
 
 function toType(raw: string): LiveEventType | null {
@@ -185,18 +174,13 @@ export class LiveClient {
     this.retry = 0;
     this.opts.onStatus(true);
     this.opts.onLog?.("connected to Tikora hub");
-    this.send({
-      type: "capabilities",
-      data: {
-        effects: LIVE_EFFECTS.map((key) => ({ key, label: key.replace(/_/g, " ") })),
-        events: [
-          { key: "chat", label: "Chat" },
-          { key: "gift", label: "Gift" },
-          ...SOUND_CUE_IDS.map((id) => ({ key: `pl.cue.${id}`, label: `cue: ${id}` })),
-          ...MUSIC_TRACK_IDS.map((id) => ({ key: `pl.music.${id}`, label: `music: ${id}` })),
-        ],
-      },
-    });
+    this.sendCapabilities();
+  }
+
+  /** Declare the manifest's effects/events so the hub can list them for mapping. */
+  private sendCapabilities(): void {
+    const manifest = loadManifest();
+    this.send({ type: "capabilities", data: { effects: manifest.effects, events: manifest.events } });
   }
 
   /** Forward a sound/music cue to the hub so Tikora can map a real sound to it. */
@@ -213,6 +197,17 @@ export class LiveClient {
     }
     if (!msg || typeof msg !== "object") return;
 
+    if (msg.type === "welcome") {
+      this.sendCapabilities();
+      return;
+    }
+    if (msg.type === "error") {
+      const data = (msg.data ?? {}) as { error?: string; message?: string };
+      const detail = `${data.error ?? ""} ${data.message ?? ""}`.trim();
+      this.opts.onLog?.(detail ? `hub error: ${detail}` : "hub error");
+      if (data.error === "unauthorized") this.opts.onAuthError?.();
+      return;
+    }
     if (msg.type === "event") {
       const live = normalizeEvent(msg.data);
       if (live) this.opts.onEvent(live);

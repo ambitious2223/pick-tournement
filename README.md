@@ -81,15 +81,37 @@ which owns the TikTok connection (and can optionally bridge TikFinity). Pick Lea
 hub at `ws://127.0.0.1:27016/` automatically and reconnects on its own.
 
 1. Start **Tikora** (it connects to TikTok / TikFinity).
-2. In Tikora, create/find the **Pick League** game and copy its **slug + key**.
-3. In Pick League open **Debug → Live connection**, paste the **Relay URL**, **slug** and **key**,
-   then **Save** (it connects automatically). The status dot turns green.
-4. Chat messages vote, gifts vote by gift name, and likes/follows/shares build the **top
+2. Start Pick League. It finds Tikora on its own and picks up the **game key automatically** — on a
+   brand-new machine it registers the game in Tikora's Game Hub and generates the key for you. There
+   is **nothing to copy and paste**. The status dot in **Debug → Live connection** turns green when
+   the link is up; that panel is still there if you ever need to point at a different hub.
+3. Chat messages vote, gifts vote by gift name, and likes/follows/shares build the **top
    supporters** shown in the final. Avatars are fetched once and cached locally.
 
-Pick League also ships a **`tikora.manifest.json`** and declares every sound cue / music track as
-events (e.g. `pl.cue.champion.win`), forwarding each cue to Tikora so you can map high-quality sounds
-and voice lines there.
+Pick League also ships **`tikora.manifest.json`** — the single source of truth for every effect the
+hub can trigger here. Tikora reads that file straight from this folder, so the effect list shows up in
+**Stream Deck → Game Hub** even before Pick League connects, and Pick League re-sends the same list as
+its `capabilities` every time it connects.
+
+Map **any** viewer interaction (gift, gift tier, coin amount, comment keyword, like every N, follow,
+share, subscribe, member — with a who-filter, cooldown and delay) to any of the **ten viewer
+power-ups** Pick League exposes:
+
+- **Votes** — add votes to a side, steal from the leader (capped so the lead can never flip), boost
+  one side ×2 for N seconds, or block a side from scoring for N seconds.
+- **The clock** — buy extra seconds, rush the countdown, or freeze it (the number stops dead while
+  the match keeps running).
+- **The board** — bind a gift to the left/right side (the broadcast's gift icon follows on its own),
+  swap the two competitors mid-match, or vote for the next category.
+
+Amounts accept `{coins}` and `{count}`, so a mapping can award votes equal to the gift's value.
+Nothing cosmetic, nothing sound/music and nothing a host can already do from the Control room is
+declared — the list is gameplay only.
+
+The list is built by `scripts/manifest.ts`; change it there and run **`npm run manifest`** to rewrite
+the file. One test fails if the file, the effect list and the server handlers ever disagree; another
+fails if a sound, music, cosmetic or host effect sneaks back in; `npm run smoke` proves each of the
+ten actually changes the match the way it claims.
 
 No Tikora? Use the built-in **Simulator** or the Debug vote injector to rehearse.
 
@@ -139,7 +161,7 @@ the selected category.
 | Script | Purpose |
 | --- | --- |
 | `Tournament.bat` | Build + serve on one port and open the Control Room |
-| `npm run serve` | Serve the built app on `:8787` (add `-- --open` to open a browser) |
+| `npm run serve` | Serve the built app on `:8787` (add `-- --open` to open a browser; restarts a running instance automatically) |
 | `npm run dev` | Dev: server `:8787` + Vite `:5173` with hot reload |
 | `npm run build` | Build the app to `dist/` |
 | `npm start` | Serve `server/index.ts` only (no browser) |

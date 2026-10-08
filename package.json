@@ -18,7 +18,9 @@
     "serve": "node scripts/serve.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
-    "test": "node --test \"engine/**/*.test.ts\"",
+    "test": "node --test \"engine/**/*.test.ts\" \"scripts/**/*.test.ts\"",
+    "manifest": "node scripts/gen-manifest.ts",
+    "smoke": "node scripts/smoke-key.ts && node scripts/smoke-hub.ts",
     "seed": "node server/seed.ts",
     "demo": "node scripts/demo.ts",
     "seed:photos": "node scripts/fetch-photos.ts"

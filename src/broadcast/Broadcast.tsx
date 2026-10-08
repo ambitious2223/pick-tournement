@@ -95,6 +95,7 @@ function ResultSide({
  * show sequence: category vote -> bracket -> match -> bracket -> result -> ...
  * Designed to sit in the middle band of a vertical canvas over the camera.
  */
+
 export function Broadcast({ state }: { state: SessionState | null }): ReactNode {
   const { t, lang, round } = useI18n();
   const show = state?.show;
@@ -110,7 +111,14 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
     );
   }
 
-  const dark = state.settings.showBackground === "dark";
+  // In OBS the overlay stays transparent; in a normal browser tab we add a dark
+  // backdrop so the white text is visible while previewing. `?transparent=1` forces
+  // the OBS look (transparent) anywhere.
+  const inObs = typeof window !== "undefined" && "obsstudio" in window;
+  const forceTransparent = new URLSearchParams(window.location.search).get("transparent") === "1";
+  const userDark = state.settings.showBackground === "dark";
+  const preview = !inObs && !forceTransparent && !userDark;
+  const dark = userDark || preview;
   const countdown = show.phaseEndsAt ? Math.max(0, Math.ceil((show.phaseEndsAt - now) / 1000)) : 0;
   const category = activeCategory(state);
   const match = activeMatch(state);
@@ -126,7 +134,7 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
     body = (
       <PhaseFrame animKey="category">
         <h1 className="text-center text-4xl font-black text-brand">{t("show.categoryTitle")}</h1>
-        <p className="text-center text-white/60">{t("show.categoryHint")}</p>
+        <p className="text-center text-lg font-bold text-white/85">{t("show.categoryHint")}</p>
         <div className="grid w-full max-w-3xl gap-2 sm:grid-cols-2">
           {sorted.map((c) => (
             <div key={c.id} className="panel flex items-center justify-between px-4 py-2">
@@ -135,7 +143,7 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
             </div>
           ))}
         </div>
-        <div className="text-xl font-black text-white/70">
+        <div className="text-xl font-black text-white/90">
           {countdown} {t("show.seconds")}
         </div>
       </PhaseFrame>
@@ -201,11 +209,21 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
         <TopSupporters supporters={state.live.supporters} />
       </div>
     );
+  } else if (banner && match) {
+    // Show isn't running, but a match is live: mirror the Control room view so the
+    // overlay is useful without starting the automatic show.
+    body = (
+      <div key="live" className="flex h-full w-full items-center justify-center p-4">
+        <div className="animate-match-in mx-auto flex h-full w-full max-w-5xl flex-col rounded-2xl border border-line bg-ink/75 p-5 shadow-2xl backdrop-blur-md">
+          <Stage state={state} variant="overlay" />
+        </div>
+      </div>
+    );
   } else {
     body = (
       <PhaseFrame animKey="idle">
-        <h1 className="text-3xl font-black text-white/80">{t("show.idleTitle")}</h1>
-        <p className="text-white/50">{t("show.idleHint")}</p>
+        <h1 className="text-3xl font-black text-white/90">{t("show.idleTitle")}</h1>
+        <p className="text-lg font-bold text-white/75">{t("show.idleHint")}</p>
       </PhaseFrame>
     );
   }
@@ -219,6 +237,11 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
     >
       {body}
       <SoundUnlock />
+      {preview ? (
+        <div className="pointer-events-none absolute bottom-4 end-4 rounded-full border border-line bg-ink/80 px-3 py-1 text-xs text-white/45 backdrop-blur">
+          {t("show.preview")}
+        </div>
+      ) : null}
       {phaseChip ? (
         <div className="pointer-events-none absolute end-4 top-4 flex items-center gap-2">
           {show.paused ? <span className="chip border-hot text-hot">{t("show.paused")}</span> : null}

@@ -4,7 +4,8 @@ import { Toggle } from "../ui/primitives.tsx";
 import { send } from "../lib/live.ts";
 import { useI18n } from "../i18n/index.tsx";
 import { CUE_IDS } from "../sound/cues.ts";
-import { MUSIC_IDS, sound } from "../sound/manager.ts";
+import { sound } from "../sound/manager.ts";
+import { MusicLibrary } from "../sound/MusicLibrary.tsx";
 
 const patch = (p: Partial<SoundSettings>): void => void send("sound:update", p);
 
@@ -44,12 +45,6 @@ export function SoundPanel({ state }: { state: SessionState }): ReactNode {
       CUE_IDS.forEach((id, i) => window.setTimeout(() => sound.play(id), i * 550));
     });
   };
-  const previewMusic = (id: string) => {
-    void sound.unlock().then(() => {
-      sound.setConfig(s);
-      sound.setMusic(id);
-    });
-  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -59,7 +54,6 @@ export function SoundPanel({ state }: { state: SessionState }): ReactNode {
       <Slider label={t("sound.sfx")} value={s.sfx} onChange={(v) => patch({ sfx: v })} />
       <Slider label={t("sound.voice")} value={s.voice} onChange={(v) => patch({ voice: v })} />
       <Toggle label={t("sound.musicEnabled")} checked={s.musicEnabled} onChange={(v) => patch({ musicEnabled: v })} />
-      <Toggle label={t("sound.escalation")} checked={s.escalation} onChange={(v) => patch({ escalation: v })} />
 
       <div className="flex items-center justify-between">
         <span className="text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("sound.cues")}</span>
@@ -83,27 +77,7 @@ export function SoundPanel({ state }: { state: SessionState }): ReactNode {
         })}
       </div>
 
-      <div className="text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("sound.tracks")}</div>
-      <div className="flex flex-col gap-1">
-        {MUSIC_IDS.map((id) => (
-          <div key={id} className="rounded-md border border-line bg-ink-2 px-2 py-1">
-            <div className="flex items-center gap-2 text-[0.65rem]">
-              <span className="min-w-0 flex-1 truncate">{id}</span>
-              <button type="button" onClick={() => previewMusic(id)} className="text-white/50 hover:text-brand" title={t("sound.preview")}>
-                ▶
-              </button>
-            </div>
-            <Slider
-              label="vol"
-              value={s.trackVolume[id] ?? 1}
-              onChange={(v) => patch({ trackVolume: { ...s.trackVolume, [id]: v } })}
-            />
-          </div>
-        ))}
-        <button type="button" onClick={() => sound.setMusic(null)} className="self-start rounded-md border border-line px-2 py-0.5 text-[0.65rem] text-white/60 hover:border-brand">
-          {t("sound.stop")}
-        </button>
-      </div>
+      <MusicLibrary settings={s} showVolume />
 
       <p className="text-[0.7rem] leading-relaxed text-white/40">{t("sound.hint")}</p>
     </div>

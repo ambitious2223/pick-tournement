@@ -1,44 +1,193 @@
 {
   "slug": "pick-league",
   "effects": [
-    { "key": "show_start", "label": "Show start" },
-    { "key": "show_stop", "label": "Show stop" },
-    { "key": "show_pause", "label": "Show pause" },
-    { "key": "show_resume", "label": "Show resume" },
-    { "key": "show_skip", "label": "Skip phase" },
-    { "key": "force_left", "label": "Force left winner" },
-    { "key": "force_right", "label": "Force right winner" },
-    { "key": "skip_match", "label": "Skip match" },
-    { "key": "next_category", "label": "Next category" }
+    {
+      "key": "add_vote",
+      "label": "Votes · add to a side",
+      "kind": "powerup",
+      "params": [
+        {
+          "key": "side",
+          "label": "Side",
+          "type": "side"
+        },
+        {
+          "key": "amount",
+          "label": "Votes",
+          "type": "votes"
+        },
+        {
+          "key": "viewer",
+          "label": "Voter name (optional)",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "key": "boost_side",
+      "label": "Votes · boost a side",
+      "kind": "powerup",
+      "params": [
+        {
+          "key": "side",
+          "label": "Side",
+          "type": "side"
+        },
+        {
+          "key": "multiplier",
+          "label": "Multiplier",
+          "type": "mult"
+        },
+        {
+          "key": "seconds",
+          "label": "Seconds",
+          "type": "secs"
+        }
+      ]
+    },
+    {
+      "key": "steal_votes",
+      "label": "Votes · steal from the leader",
+      "kind": "powerup",
+      "params": [
+        {
+          "key": "amount",
+          "label": "Votes to move",
+          "type": "votes"
+        }
+      ]
+    },
+    {
+      "key": "block_side",
+      "label": "Votes · block a side from scoring",
+      "kind": "powerup",
+      "params": [
+        {
+          "key": "side",
+          "label": "Side to block",
+          "type": "side"
+        },
+        {
+          "key": "seconds",
+          "label": "Seconds",
+          "type": "secs"
+        }
+      ]
+    },
+    {
+      "key": "add_time",
+      "label": "Time · buy extra seconds",
+      "kind": "powerup",
+      "params": [
+        {
+          "key": "seconds",
+          "label": "Seconds to add",
+          "type": "secs"
+        }
+      ]
+    },
+    {
+      "key": "rush_timer",
+      "label": "Time · rush the clock",
+      "kind": "powerup",
+      "params": [
+        {
+          "key": "seconds",
+          "label": "New time left",
+          "type": "secs"
+        }
+      ]
+    },
+    {
+      "key": "freeze_timer",
+      "label": "Time · freeze the clock",
+      "kind": "powerup",
+      "params": [
+        {
+          "key": "seconds",
+          "label": "Seconds to hold",
+          "type": "secs"
+        }
+      ]
+    },
+    {
+      "key": "set_side_gift",
+      "label": "Gifts · bind a gift to a side",
+      "kind": "powerup",
+      "params": [
+        {
+          "key": "side",
+          "label": "Side",
+          "type": "side"
+        },
+        {
+          "key": "gift",
+          "label": "Gift name",
+          "type": "string"
+        },
+        {
+          "key": "icon",
+          "label": "Gift icon (emoji)",
+          "type": "string"
+        },
+        {
+          "key": "amount",
+          "label": "Votes now (leave blank for none)",
+          "type": "votes"
+        }
+      ]
+    },
+    {
+      "key": "swap_sides",
+      "label": "Match · swap the two competitors",
+      "kind": "powerup"
+    },
+    {
+      "key": "category_vote",
+      "label": "Next · vote for the next category",
+      "kind": "powerup",
+      "params": [
+        {
+          "key": "category",
+          "label": "Category name",
+          "type": "string"
+        },
+        {
+          "key": "viewer",
+          "label": "Voter name (optional)",
+          "type": "string"
+        }
+      ]
+    }
   ],
   "events": [
-    { "key": "chat", "label": "Chat" },
-    { "key": "gift", "label": "Gift" },
-    { "key": "pl.cue.category.start", "label": "Sound: category start" },
-    { "key": "pl.cue.category.winner", "label": "Sound: category winner" },
-    { "key": "pl.cue.round.intro", "label": "Sound: round intro" },
-    { "key": "pl.cue.bracket.intro", "label": "Sound: bracket intro" },
-    { "key": "pl.cue.bracket.focus", "label": "Sound: bracket focus" },
-    { "key": "pl.cue.bracket.outro", "label": "Sound: bracket outro" },
-    { "key": "pl.cue.bracket.winner", "label": "Sound: bracket winner" },
-    { "key": "pl.cue.match.start", "label": "Sound: match start" },
-    { "key": "pl.cue.match.suddenDeath", "label": "Sound: sudden death" },
-    { "key": "pl.cue.match.end", "label": "Sound: match end" },
-    { "key": "pl.cue.vote.gift.small", "label": "Sound: small gift" },
-    { "key": "pl.cue.vote.gift.medium", "label": "Sound: medium gift" },
-    { "key": "pl.cue.vote.gift.large", "label": "Sound: large gift" },
-    { "key": "pl.cue.vote.lead", "label": "Sound: lead change" },
-    { "key": "pl.cue.result.win", "label": "Sound: result win" },
-    { "key": "pl.cue.result.lose", "label": "Sound: result lose" },
-    { "key": "pl.cue.champion.win", "label": "Sound: champion win" },
-    { "key": "pl.cue.champion.reveal", "label": "Sound: champion reveal" },
-    { "key": "pl.cue.champion.supporter", "label": "Sound: top supporter" },
-    { "key": "pl.cue.live.subscribe", "label": "Sound: subscribe" },
-    { "key": "pl.music.category", "label": "Music: category" },
-    { "key": "pl.music.match.r16", "label": "Music: round of 16" },
-    { "key": "pl.music.match.qf", "label": "Music: quarterfinals" },
-    { "key": "pl.music.match.sf", "label": "Music: semifinals" },
-    { "key": "pl.music.match.final", "label": "Music: grand final" },
-    { "key": "pl.music.champion", "label": "Music: champion" }
+    {
+      "key": "chat",
+      "label": "Chat comment"
+    },
+    {
+      "key": "gift",
+      "label": "Gift"
+    },
+    {
+      "key": "like",
+      "label": "Like"
+    },
+    {
+      "key": "follow",
+      "label": "Follow"
+    },
+    {
+      "key": "share",
+      "label": "Share"
+    },
+    {
+      "key": "subscribe",
+      "label": "Subscribe"
+    },
+    {
+      "key": "member",
+      "label": "New member"
+    }
   ]
 }
