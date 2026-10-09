@@ -22,7 +22,7 @@ interface Preset {
 
 const PRESETS: Record<Variant, Preset> = {
   overlay: {
-    visual: "h-[37vh] w-[37vh] min-h-[120px] min-w-[120px] max-h-[480px] max-w-[480px]",
+    visual: "aspect-square w-full max-w-[480px] min-w-[120px]",
     emoji: "text-[8vh]",
     namePx: 48,
     votePx: 72,
@@ -114,9 +114,9 @@ export function Stage({
     fontSize: (big ? overlayPx : controlPx) * userScale,
   });
   const headerChipStyle = fs(12, 13);
-  const instrTitleStyle = fs(14, 32);
-  const instrTextStyle = fs(12, 21);
-  const instrChipStyle = fs(12, 26);
+  const instrTitleStyle = fs(16, 44);
+  const instrTextStyle = fs(14, 32);
+  const instrChipStyle = fs(14, 40);
   const titleClass = big
     ? "font-black uppercase tracking-widest text-brand shadow-text"
     : "font-black uppercase tracking-widest text-brand text-sm";
@@ -126,7 +126,7 @@ export function Stage({
   const giftClass = big
     ? "rounded-full bg-lime px-5 py-2 font-black uppercase tracking-wide text-ink shadow-lg"
     : "chip text-xs text-brand-2";
-  const ruleClass = big ? "max-w-3xl font-bold leading-snug text-white shadow-text" : "max-w-3xl leading-relaxed text-white/60 text-xs";
+  const ruleClass = big ? "max-w-[46ch] font-bold leading-snug text-white shadow-text" : "max-w-3xl leading-relaxed text-white/60 text-xs";
   const vsClass = big ? "font-black text-white/60" : "font-black text-white/30";
   const sideAClass = big
     ? "rounded-full border-2 border-brand bg-brand/15 px-4 py-1.5 font-black text-brand shadow-text"
@@ -206,10 +206,10 @@ export function Stage({
 
       {state.settings.showVoteHint && !done ? (
         <section
-          className={`flex w-full max-w-4xl flex-col items-center gap-3 rounded-2xl text-center ${
+          className={`flex flex-col items-center text-center ${
             big
-              ? "border-2 border-brand bg-ink/95 px-6 py-5 shadow-[0_0_60px_-16px_rgba(34,211,238,0.95)]"
-              : "gap-2 border border-brand/40 bg-brand/5 px-5 py-4 shadow-[0_0_50px_-24px_rgba(34,211,238,0.9)]"
+              ? "mx-auto w-fit max-w-full gap-4 rounded-3xl border-[3px] border-brand bg-ink px-8 py-6 shadow-[0_0_0_3px_#070a14,0_0_0_7px_rgba(34,211,238,0.6),0_0_80px_-12px_rgba(34,211,238,1)]"
+              : "gap-2 rounded-2xl border border-brand/40 bg-brand/5 px-5 py-4 shadow-[0_0_50px_-24px_rgba(34,211,238,0.9)]"
           }`}
         >
           <span className={titleClass} style={instrTitleStyle}>{t("vote.howTo")}</span>
@@ -220,12 +220,24 @@ export function Stage({
           <p className={ruleClass} style={instrTextStyle}>{t("vote.instruction")}</p>
           <div className="mt-1 flex flex-wrap items-center justify-center gap-3">
             <span className={sideAClass} style={instrChipStyle}>
-              {a?.gift ? `${a.gift.icon} ` : ""}
+              {a?.gift ? (
+                a.gift.img ? (
+                  <img src={a.gift.img} alt="" className="me-1 inline-block h-[1.3em] w-[1.3em] rounded-full object-contain align-[-0.2em]" />
+                ) : (
+                  <span className="me-1">{a.gift.icon}</span>
+                )
+              ) : null}
               {itemName(a, lang) || "—"}
             </span>
             <span className={vsClass} style={instrChipStyle}>VS</span>
             <span className={sideBClass} style={instrChipStyle}>
-              {b?.gift ? `${b.gift.icon} ` : ""}
+              {b?.gift ? (
+                b.gift.img ? (
+                  <img src={b.gift.img} alt="" className="me-1 inline-block h-[1.3em] w-[1.3em] rounded-full object-contain align-[-0.2em]" />
+                ) : (
+                  <span className="me-1">{b.gift.icon}</span>
+                )
+              ) : null}
               {itemName(b, lang) || "—"}
             </span>
           </div>

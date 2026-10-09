@@ -9,6 +9,7 @@ import { ensureSeeded, seedCategories } from "./seed.ts";
 import { fetchPhotos, photoCoverage } from "./photos.ts";
 import { DIST_DIR, UPLOADS_DIR, SOUNDS_DIR, ensureDirs, clearUploads, countUploads } from "./store.ts";
 import { AVATARS_DIR } from "./avatars.ts";
+import { GIFTS_DIR } from "./giftArt.ts";
 import { resolveLiveConfig, saveLiveConfig } from "./liveConfig.ts";
 import { findOrRegisterKey } from "./tikoraKey.ts";
 import { LiveClient } from "./live.ts";
@@ -234,8 +235,12 @@ async function main(): Promise<void> {
       }
 
       if (pathname.startsWith("/avatars/")) {
-        return serveStatic(res, pathname.replace("/avatars", ""), AVATARS_DIR, false);
-      }
+            return serveStatic(res, pathname.replace("/avatars", ""), AVATARS_DIR, false);
+          }
+
+          if (pathname.startsWith("/gifts/")) {
+            return serveStatic(res, pathname.replace("/gifts", ""), GIFTS_DIR, false);
+          }
 
       if (pathname === "/api/sounds" && method === "GET") {
         const names = await fs

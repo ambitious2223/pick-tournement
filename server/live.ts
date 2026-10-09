@@ -1,4 +1,4 @@
-import type { LiveEvent, LiveEventType } from "../shared/types.ts";
+import type { HubGift, LiveEvent, LiveEventType } from "../shared/types.ts";
 import { loadManifest } from "./manifest.ts";
 import type { LiveConfig } from "./liveConfig.ts";
 
@@ -8,7 +8,7 @@ interface LiveClientOptions {
   onEffect: (effect: string, payload: unknown) => boolean;
   onStatus: (connected: boolean) => void;
   onLog?: (line: string) => void;
-  /** The hub rejected our key — re-read it from Tikora and reconnect. */
+  /** The hub rejected our key â€” re-read it from Tikora and reconnect. */
   onAuthError?: () => void;
 }
 
@@ -74,7 +74,7 @@ function normalizeEvent(raw: unknown): LiveEvent | null {
 /**
  * Connects to the Tikora hub relay (ws://127.0.0.1:27016/ by default), which
  * already aggregates TikTok (and optionally TikFinity). Receives the broadcast
- * normalized event feed, and — once a game slug + key are set — registers for
+ * normalized event feed, and â€” once a game slug + key are set â€” registers for
  * routed effects. No TikTok credentials live here.
  */
 export class LiveClient {
@@ -154,7 +154,7 @@ export class LiveClient {
   private open(): void {
     if (this.stopped) return;
     const url = this.url();
-    this.opts.onLog?.(`connecting ${url.replace(/key=[^&]*/, "key=…")}`);
+    this.opts.onLog?.(`connecting ${url.replace(/key=[^&]*/, "key=â€¦")}`);
     try {
       const ws = new WebSocket(url);
       this.ws = ws;
@@ -188,15 +188,54 @@ export class LiveClient {
     this.send({ type: "emit", data: { kind: "cue", id: `pl.cue.${id}`, at: Date.now() } });
   }
 
+  /** The hub's gift catalogue, filled on connect so effects can resolve a gift by name. */
+  private gifts: HubGift[] = [];
+
+  get catalogue(): HubGift[] {
+    return this.gifts;
+  }
+
+  setCatalogue(raw: unknown): void {
+    if (!Array.isArray(raw)) return;
+    const gifts: HubGift[] = [];
+    for (const entry of raw) {
+      if (!entry || typeof entry !== "object") continue;
+      const g = entry as Record<string, unknown>;
+      const id = g.id ?? g.gift_id;
+      const name = typeof g.name === "string" ? g.name : "";
+      if (!name || id == null) continue;
+      gifts.push({
+        id: typeof id === "number" ? id : String(id),
+        name,
+        coins: typeof g.coins === "number" ? g.coins : undefined,
+        tier: typeof g.tier === "string" ? g.tier : undefined,
+        img: typeof g.img === "string" ? g.img : undefined,
+      });
+    }
+    if (gifts.length > 0) this.gifts = gifts;
+  }
+
   private onMessage(event: MessageEvent): void {
-    let msg: { type?: string; data?: unknown };
+    let msg: { type?: string; data?: unknown; catalog?: unknown };
     try {
-      msg = JSON.parse(String(event.data)) as { type?: string; data?: unknown };
+      msg = JSON.parse(String(event.data)) as { type?: string; data?: unknown; catalog?: unknown };
     } catch {
       return;
     }
     if (!msg || typeof msg !== "object") return;
 
+    if (msg.type === "hello") {
+      this.setCatalogue(msg.catalog);
+      return;
+    }
+    if (msg.type === "catalog") {
+      this.setCatalogue(msg.data);
+      return;
+    }
+    if (msg.type === "catalog_updated") {
+      this.send({ type: "get-catalog" });
+      return;
+    }
     if (msg.type === "welcome") {
       this.sendCapabilities();
       return;
@@ -237,3 +276,4 @@ export class LiveClient {
     }, delay);
   }
 }
+

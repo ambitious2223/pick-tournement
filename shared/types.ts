@@ -73,6 +73,17 @@ export interface Gift {
   id: string;
   name: string;
   icon: string;
+  /** Locally cached artwork (`/gifts/...`), resolved from the hub catalogue. */
+  img?: string;
+}
+
+/** A gift as the Tikora hub reports it in its catalogue. */
+export interface HubGift {
+  id: number | string;
+  name: string;
+  coins?: number;
+  tier?: string;
+  img?: string;
 }
 
 export interface Item {

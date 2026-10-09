@@ -66,7 +66,7 @@ test("amount params use the vote presets, never Tikora's number input", () => {
 });
 
 test("only param types the hub knows how to render", () => {
-  const known = new Set(["string", "number", "side", "secs", "mult", "votes", "lane", "target", "team", "card"]);
+  const known = new Set(["string", "number", "side", "secs", "mult", "votes", "gift", "lane", "target", "team", "card"]);
   for (const effect of onDisk.effects) {
     for (const param of effect.params ?? []) {
       assert.ok(param.type && known.has(param.type), `${effect.key}.${param.key}: unknown type "${param.type}"`);

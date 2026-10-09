@@ -22,13 +22,15 @@ command line that downloaded and wrote a file. That must never happen again.
    Wikimedia hosts, validates every response is a real image type, caps size, and logs every URL to
    `data/photos.log`. Run it on demand only — never at app runtime.
 3. **Prefer package managers.** Dependencies come from `npm install`, never from a raw URL.
-   - One approved exception to the "no downloads" rule: `server/avatars.ts` (`cacheAvatar`) fetches
-     individual TikTok viewer avatars from URLs delivered by the local Tikora hub, verifies each is a
-     real image type, caps the size, and caches it under `data/avatars/` (gitignored) so the overlay
-     stays local. It is the only extra fetch path besides `scripts/fetch-photos.ts`.
+   - One approved exception to the "no downloads" rule: `server/imageCache.ts` (`cacheImage`) fetches
+     **one image at a time** from a URL delivered by the local Tikora hub — a viewer avatar or a gift
+     picture — checks the bytes really are an image, caps the size, and caches it under `data/`
+     (gitignored) so the overlay stays local. `server/avatars.ts` and `server/giftArt.ts` are the thin
+     wrappers over it. It is the only extra fetch path besides `scripts/fetch-photos.ts`.
 4. **Never commit non-free media.** The fetcher rejects `/wikipedia/en/` (fair-use) images. Uploaded
-   photos live in `data/uploads/`, cached avatars in `data/avatars/`, and host-provided sounds in
-   `data/sounds/` — all **gitignored** to stay copyright-safe.
+   photos live in `data/uploads/`, cached avatars in `data/avatars/`, cached gift artwork in
+   `data/gifts/`, and host-provided sounds in `data/sounds/` — all **gitignored** to stay
+   copyright-safe.
 5. **Never touch antivirus.** If Defender flags anything, stop and report it — do not retry.
 
 ## Non-negotiable: never claim something works without proving it
@@ -55,7 +57,7 @@ untested.
 - **Sound** is client-side Web Audio (`src/sound/`); only the broadcast page plays audio.
 - **Live events** come from the Tikora hub relay via `server/live.ts`; no TikTok credentials live here.
 - All runtime asset handling is **local**; the only external fetch paths are `scripts/fetch-photos.ts`
-  and `server/avatars.ts` (a single avatar, cached).
+  and `server/imageCache.ts` (one avatar or one gift picture at a time, verified and cached).
 
 ## Architecture map
 
@@ -71,7 +73,9 @@ untested.
 - `server/manifest.ts` — loads `tikora.manifest.json` (the declared effect list) for the hub connection.
 - `server/tikoraKey.ts` — resolves the Tikora game key with **no manual step**: environment Tikora
   injects → saved `data/live.json` → Tikora's own database (registering the game + key if missing).
-- `server/avatars.ts` — caches one viewer avatar locally (the one extra fetch path).
+- `server/imageCache.ts` — the one shared external fetch (a single image, verified, size-capped,
+  cached under `data/`); `server/avatars.ts` and `server/giftArt.ts` wrap it for viewer avatars and
+  gift artwork. `server/giftArt.ts` also serves `/gifts/`.
 - `server/seed.ts` — the ten built-in Middle East categories; runs on first boot.
 - `server/photos.ts` — the sanctioned photo downloader (English + Arabic Wikipedia, then Commons).
 - `scripts/serve.mjs` — single-port launcher (build + serve on `:8787`); `scripts/dev.mjs` — dev.

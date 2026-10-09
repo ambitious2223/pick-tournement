@@ -1,8 +1,15 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, readdir, writeFile } from "node:fs/promises";
+import { createServer, type Server } from "node:http";
 import { Session } from "../server/session.ts";
+import { LiveClient } from "../server/live.ts";
 import { buildManifest } from "./manifest.ts";
 
 const SESSION_FILE = new URL("../data/session.json", import.meta.url);
+const CATEGORY_DIR = new URL("../data/categories/", import.meta.url);
+const PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
+  "base64",
+);
 
 const results: { what: string; ok: boolean; expected: boolean; note: string }[] = [];
 function check(what: string, ok: boolean, expected = true, note = ""): void {
@@ -12,8 +19,27 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
 const sign = (n: number): number => (n > 0 ? 1 : n < 0 ? -1 : 0);
 
 const original = await readFile(SESSION_FILE, "utf8").catch(() => null);
+const categoryFiles = (await readdir(CATEGORY_DIR)).filter((name) => name.endsWith(".json"));
+const categoryBackup = new Map<string, string>();
+for (const name of categoryFiles) categoryBackup.set(name, await readFile(new URL(name, CATEGORY_DIR), "utf8"));
+
+let imageServer: Server | null = null;
 
 try {
+  const image = createServer((req, res) => {
+    if (req.url === "/rose.png") {
+      res.writeHead(200, { "content-type": "image/png" });
+      res.end(PNG);
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  });
+  imageServer = image;
+  await new Promise<void>((resolve) => image.listen(0, "127.0.0.1", () => resolve()));
+  const address = image.address();
+  const imageBase = address && typeof address === "object" ? `http://127.0.0.1:${address.port}` : "";
+
   const session = await Session.create();
   const declared = buildManifest().effects.map((e) => e.key);
   check("manifest declares exactly 10 effects", declared.length === 10, true, declared.join(","));
@@ -112,17 +138,38 @@ try {
   check("  hold released when the freeze ends", session.state.matchHold === null, true, JSON.stringify(session.state.matchHold));
 
   // --- gift binding ---------------------------------------------------------
+  const hub = new LiveClient({
+    config: { url: "", slug: "pick-league", key: "" },
+    onEvent: () => undefined,
+    onEffect: () => false,
+    onStatus: () => undefined,
+  });
+  hub.setCatalogue([
+    { id: 1, name: "Rose", coins: 1, tier: "small", img: `${imageBase}/rose.png` },
+    { id: 2, name: "TikTok", coins: 1, tier: "small" },
+    { id: 3, name: "Heart", coins: 10, tier: "medium" },
+  ]);
+  session.attachLive(hub, { url: "", slug: "pick-league", key: "" });
+
+  const beforeBindVote = m?.votesA ?? 0;
   check(
-    "set_side_gift binds a gift to a side",
-    session.handleLiveEffect("set_side_gift", { side: "left", gift: "Rose", icon: "🌹", amount: "4" }),
+    "set_side_gift takes only a gift name — no icon to type",
+    session.handleLiveEffect("set_side_gift", { side: "left", gift: "Rose", amount: "4" }),
     true,
   );
+  await sleep(600);
   const leftItem = category()?.items.find((i) => i.id === (m?.a ?? ""));
   const rightItem = category()?.items.find((i) => i.id === (m?.b ?? ""));
-  check("  icon shown on that card", leftItem?.gift?.icon === "🌹", true, leftItem?.gift?.icon ?? "none");
+  check("  gift id resolved from the hub catalogue", leftItem?.gift?.id === "1", true, leftItem?.gift?.id ?? "none");
+  check(
+    "  real artwork cached locally",
+    (leftItem?.gift?.img ?? "").startsWith("/gifts/"),
+    true,
+    leftItem?.gift?.img ?? "none",
+  );
+  check("  name kept exactly so vote routing still matches", leftItem?.gift?.name === "Rose", true, leftItem?.gift?.name);
   check("  the other side is untouched", rightItem?.gift?.name !== "Rose", true, rightItem?.gift?.name ?? "none");
-  const beforeBindVote = m?.votesA ?? 0;
-  check("  binding also cast its votes", (m?.votesA ?? 0) === beforeBindVote, true, `a=${m?.votesA}`);
+  check("  binding also cast its votes", (m?.votesA ?? 0) === beforeBindVote + 4, true, `${beforeBindVote} -> ${m?.votesA}`);
 
   // --- swap -----------------------------------------------------------------
   const beforeSwap = {
@@ -198,6 +245,21 @@ try {
   );
   session.stopShow();
 
+  // --- binding before any tournament exists --------------------------------
+  const pairsBefore = session.state.categories.map((c) => c.giftPair?.[1]?.name ?? "");
+  check(
+    "set_side_gift works before a tournament exists",
+    session.handleLiveEffect("set_side_gift", { side: "right", gift: "Heart" }),
+    true,
+  );
+  const pairsAfter = session.state.categories.map((c) => c.giftPair?.[1]?.name ?? "");
+  check(
+    "  it bound the queued/first category",
+    pairsAfter.filter((name) => name === "Heart").length === 1 && !pairsBefore.includes("Heart"),
+    true,
+    pairsAfter.join(","),
+  );
+
   // --- only declared effects get through ------------------------------------
   check("a host/ops effect is no longer declared", session.handleLiveEffect("show_start", {}), false);
   check("a sound effect is no longer declared", session.handleLiveEffect("cue.match.start", {}), false);
@@ -205,7 +267,15 @@ try {
   check("a cosmetic effect is no longer declared", session.handleLiveEffect("confetti", {}), false);
   check("an unknown effect is refused", session.handleLiveEffect("spawn_dragon", {}), false);
 } finally {
+  // Category bindings are persisted fire-and-forget; let those writes land
+  // before putting the originals back, or they would clobber the restore.
+  await sleep(600);
   if (original !== null) await writeFile(SESSION_FILE, original, "utf8");
+  for (const [name, text] of categoryBackup) await writeFile(new URL(name, CATEGORY_DIR), text);
+  if (imageServer) {
+    await new Promise<void>((resolve) => imageServer?.close(() => resolve()));
+    imageServer = null;
+  }
 }
 
 let failed = 0;

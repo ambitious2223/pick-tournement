@@ -15,6 +15,7 @@ const choice = (key: string, label: string, type: string): ManifestParam => ({ k
  *   `secs`   → 3 · 5 · 10 · 15 · 30 · 60 · 120 · 300
  *   `mult`   → 2 · 3 · 4 · 5
  *   `votes`  → 1 · 5 · 10 · 25 · 50 · 100 · {coins} · {count}
+ *   `gift`   → the hub's own gift catalogue, searched and picked from a grid
  *
  * These types deliberately stay out of Tikora's `number` branch: that branch
  * runs `Number()` on the value, which turns `{coins}` into null before it ever
@@ -73,8 +74,7 @@ const CORE: ManifestEffect[] = [
     kind: "powerup",
     params: [
       choice("side", "Side", "side"),
-      str("gift", "Gift name"),
-      str("icon", "Gift icon (emoji)"),
+      choice("gift", "Gift", "gift"),
       choice("amount", "Votes now (leave blank for none)", "votes"),
     ],
   },

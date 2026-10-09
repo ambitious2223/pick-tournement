@@ -1,187 +1,134 @@
 # Pick League
 
-A local web app for **TikTok Live** bracket tournaments. Sixteen items enter a category,
-viewers vote, and one champion comes out — then the next category in the queue begins
-automatically.
+A local web app for **TikTok Live** bracket tournaments. Competitors enter a category, viewers
+vote, one champion comes out — then the next category in the queue begins automatically.
 
-Arabic-first interface (right-to-left) with an English toggle. Designed to be added to **OBS as a
+Arabic-first interface (right-to-left) with an English toggle, designed to be added to **OBS as a
 Browser Source**. It runs with a built-in simulator, or with **real TikTok events** through your
 local **Tikora** hub — no TikTok login inside this app.
 
 ## What it does
 
-- **16-item single elimination** per category: Round of 16 → Quarterfinals → Semifinals → Grand Final.
-- **Arabic-first UI (RTL)** with an English toggle; the built-in categories carry **Arabic and
-  English** names and aliases.
-- **Two ways to vote**
-  - **Chat:** a viewer types the on-screen name (or an alias) — it must match one of the two options.
-    Names can be typed in **Arabic or English**.
-  - **Gifts:** each side shows a gift; sending that gift counts for that side (weighted).
-- **Automatic broadcast flow:** category vote → round intro → bracket → match → bracket → result →
-  next match → … → champion, then chains to the next category. Start / Pause / Resume / Skip from
-  the Control Room, with manual overrides.
-- **Per-round color themes** escalating **cyan → blue → purple → gold**; the Grand Final gets golden
-  framing with the **top supporters** (avatar, nickname, points).
-- **Detailed sound system** (Web Audio): cues for every phase and animation, gift tiers, sudden
-  death, countdown and last-10 ticks, a champion / top-pickers reveal, and per-round **music beds** —
-  all tunable.
-- **Live TikTok via Tikora:** chat votes, gifts vote by gift name, and likes/follows/shares build the
-  supporter leaderboard (with cached avatars).
-- **Configurable round timer**, a category queue, auto-advance, and tie rules.
-- **Content Studio** — create categories, edit 16 items, add aliases, and upload photos.
-- **Debug console** — inject votes, simulate a crowd, force outcomes, jump rounds, the **Live
-  connection** panel, the **Sound & Music** mixer, and raw state.
-- **Ten Middle East categories seeded**, each with English **and Arabic** aliases.
+- **Single-elimination brackets**, up to 16 competitors per category
+  (Round of 16 → Quarterfinals → Semifinals → Grand Final). Fewer than 16 is fine — empty slots are
+  byes.
+- **Two ways to vote:** chat (type the on-screen name in Arabic or English) and gifts (each side
+  shows a gift; sending it counts for that side).
+- **Automatic broadcast flow** with per-round colours escalating cyan → blue → purple → gold, and a
+  golden final showing the top supporters.
+- **Content Studio and a Content tab** to create categories, add or remove competitors, and upload
+  photos; a **Debug console** for injecting votes, simulating a crowd, the Live connection and the
+  Sound & Music mixer.
+- Categories live in `data/categories/`, each with English **and** Arabic names and aliases.
 
 ## Quick start
 
-**Easiest (Windows):** double-click **`Tournament.bat`**. It installs dependencies on the first
-run, seeds the categories, downloads free photos once, builds the app, starts **one server on one
-port** (`127.0.0.1:8787`) and opens the Control Room in a new tab (your other tabs are never
-touched). Skip the browser with `PL_NO_BROWSER=1`, or the one-time photo fetch with `PL_NO_PHOTOS=1`.
+**Easiest (Windows):** double-click **`Tournament.bat`**. It installs dependencies on the first run,
+seeds the categories, downloads free photos once, builds the app, starts **one server on one port**
+(`127.0.0.1:8787`) and opens the Control room in a new tab. Skip the browser with `PL_NO_BROWSER=1`,
+or the one-time photo fetch with `PL_NO_PHOTOS=1`.
 
-**First time?** Open the in-app **Setup guide** at `http://127.0.0.1:8787/setup` — it walks through
-connecting TikTok and adding the OBS source.
+**First time?** Open the in-app guide at `http://127.0.0.1:8787/setup`.
 
-Or run the steps manually:
+Or by hand:
 
 ```bash
 npm install
-npm run seed          # writes the ten built-in categories (auto-runs on first serve too)
-npm run seed:photos   # optional: fetch free Wikimedia photos for the items
-npm run build         # build the app
+npm run seed          # write the built-in categories (also runs on first serve)
+npm run seed:photos   # optional: free Wikimedia photos
+npm run build
 npm run serve         # one server on http://127.0.0.1:8787
 ```
 
-Open:
-
-- Setup guide → http://127.0.0.1:8787/setup
-- Control room → http://127.0.0.1:8787/control
-- Broadcast (for OBS) → http://127.0.0.1:8787/overlay (alias: `/show`)
-- Content studio → http://127.0.0.1:8787/studio
-- Debug console → http://127.0.0.1:8787/debug
+- Setup guide → `/setup` · Control room → `/control` · Broadcast for OBS → `/overlay` (alias `/show`)
+- Content Studio → `/studio` · Debug console → `/debug`
 
 ## The broadcast page
 
-`/overlay` is the single broadcast page (also at `/show`). It runs the whole show automatically and
-is the only page that plays sound, so the host can work in Control with no double audio.
-
-- **Transparent by default** so it sits over your camera in OBS; switch to a dark scene in Settings.
-- **Safe-area margins** (top/bottom %) plus responsive sizing so it fits the middle band of a
-  vertical canvas between your camera and the comments.
-- Per-round colors escalate **cyan → blue → purple → gold**; the final shows the top supporters.
+`/overlay` (also `/show`) runs the whole show and is the only page that plays sound, so the Control
+room never doubles the audio. Transparent by default so it sits over your camera — switch to a dark
+scene in Settings; safe-area margins let it fit the middle band of a vertical canvas.
 
 In OBS: **Add → Browser Source**, URL `http://127.0.0.1:8787/overlay`, size it to the middle band,
-keep the **transparent background**. Then **Control → Show → Start**.
+keep the **transparent background**, then **Control → Show → Start**.
 
 ## Connecting to TikTok Live (via Tikora)
 
-Pick League does **not** log into TikTok itself — it reads events from your local **Tikora** hub,
-which owns the TikTok connection (and can optionally bridge TikFinity). Pick League connects to the
-hub at `ws://127.0.0.1:27016/` automatically and reconnects on its own.
+Pick League does **not** log into TikTok — it reads events from your local **Tikora** hub, which
+owns the TikTok connection (and can bridge TikFinity). It connects to `ws://127.0.0.1:27016/` and
+reconnects on its own.
 
-1. Start **Tikora** (it connects to TikTok / TikFinity).
-2. Start Pick League. It finds Tikora on its own and picks up the **game key automatically** — on a
-   brand-new machine it registers the game in Tikora's Game Hub and generates the key for you. There
-   is **nothing to copy and paste**. The status dot in **Debug → Live connection** turns green when
-   the link is up; that panel is still there if you ever need to point at a different hub.
-3. Chat messages vote, gifts vote by gift name, and likes/follows/shares build the **top
-   supporters** shown in the final. Avatars are fetched once and cached locally.
+1. Start **Tikora**.
+2. Start Pick League. It finds Tikora and picks up the **game key automatically** — on a brand-new
+   machine it registers the game in Tikora's Game Hub and generates the key itself. Nothing to copy
+   and paste. The dot in **Debug → Live connection** turns green when the link is up.
+3. Chat votes, gifts vote by gift name, and likes/follows/shares build the **top supporters** shown
+   in the final. Avatars are cached locally.
 
-Pick League also ships **`tikora.manifest.json`** — the single source of truth for every effect the
-hub can trigger here. Tikora reads that file straight from this folder, so the effect list shows up in
-**Stream Deck → Game Hub** even before Pick League connects, and Pick League re-sends the same list as
-its `capabilities` every time it connects.
+`tikora.manifest.json` is the single source of truth for the effects the hub can trigger here.
+Tikora reads it from this folder — so the list appears in **Stream Deck → Game Hub** before Pick
+League connects — and Pick League re-sends it as its `capabilities` on every connect.
 
-Map **any** viewer interaction (gift, gift tier, coin amount, comment keyword, like every N, follow,
-share, subscribe, member — with a who-filter, cooldown and delay) to any of the **ten viewer
-power-ups** Pick League exposes:
+Map **any** viewer interaction (gift, tier, coin amount, comment keyword, like every N, follow,
+share, subscribe, member — with a who-filter, cooldown and delay) to the **ten viewer power-ups**:
 
-- **Votes** — add votes to a side, steal from the leader (capped so the lead can never flip), boost
-  one side ×2 for N seconds, or block a side from scoring for N seconds.
-- **The clock** — buy extra seconds, rush the countdown, or freeze it (the number stops dead while
-  the match keeps running).
-- **The board** — bind a gift to the left/right side (the broadcast's gift icon follows on its own),
-  swap the two competitors mid-match, or vote for the next category.
+- **Votes** — add to a side · steal from the leader (capped so the lead can never flip) · boost one
+  side ×N for N seconds · block a side from scoring.
+- **The clock** — buy seconds · rush the countdown · freeze it (the number stops, the match runs on).
+- **The board** — bind a gift to the left/right side · swap the two competitors · vote for the next
+  category.
 
 Amounts accept `{coins}` and `{count}`, so a mapping can award votes equal to the gift's value.
-Nothing cosmetic, nothing sound/music and nothing a host can already do from the Control room is
-declared — the list is gameplay only.
+Nothing cosmetic, sound or host-side is declared — gameplay only. Build the list in
+`scripts/manifest.ts` and run **`npm run manifest`**; tests fail if the file, the effect list and
+the handlers disagree, and `npm run smoke` proves each effect changes the match as claimed.
 
-The list is built by `scripts/manifest.ts`; change it there and run **`npm run manifest`** to rewrite
-the file. One test fails if the file, the effect list and the server handlers ever disagree; another
-fails if a sound, music, cosmetic or host effect sneaks back in; `npm run smoke` proves each of the
-ten actually changes the match the way it claims.
-
-No Tikora? Use the built-in **Simulator** or the Debug vote injector to rehearse.
+No Tikora? Use the **Simulator** or the Debug vote injector to rehearse.
 
 ## Sound & music
 
-The sound system is a Web Audio mixer with **Master / Music / SFX / Voice** buses, a reverb send, and
-procedurally generated cues (cinematic, not chiptune).
+Web Audio mixer with **Master / Music / SFX / Voice** buses, a reverb send, procedural cues and a
+**10-track music library**.
 
-- Cues for every phase and animation: category, round intro (escalating per round), bracket
-  zoom/focus, match start, last-10-second ticks, sudden death, gift tiers, lead change, result,
-  champion and top-pickers reveal.
-- **Music beds per phase** that shift with the round theme.
-- Tune it all in **Debug → Sound & Music**: bus sliders, mute, per-cue on/off, per-track volume, and
-  **Preview**. Settings apply live to the broadcast and persist across restarts.
-- Drop files in **`data/sounds/<cue>.mp3|ogg|wav|webm`** (gitignored, served at `/sounds/…`) to
-  replace the built-in synth for any cue — turn the synth cue off per-cue to avoid doubles.
-- Broadcast-only audio; enable it on the broadcast page with the **🔊 Tap to enable sound** button
-  the first time (OBS does this automatically).
+- Tune it in **Debug → Sound & Music** (bus sliders, per-cue on/off, per-track volume, Preview) or
+  pick the background track in **Control → Sound**. Settings apply live and persist.
+- Replace any built-in cue with **`data/sounds/<cue>.mp3|ogg|wav|webm`** (gitignored, served at
+  `/sounds/…`).
+- Broadcast page only — press **🔊 Tap to enable sound** once (OBS does this automatically).
 
 ## How voting resolves
 
-1. A chat message is normalized (case, accents, punctuation; **Arabic is preserved**) and matched
-   against the two on-screen items' names and aliases. No match → ignored.
-2. A gift is matched to the item whose gift **name** (or the category's gift pair) it is. Gifts are
-   weighted heavier than chat votes.
-3. When the round timer ends, the higher total advances. Ties follow the configured tie rule
-   (default: sudden death). With auto-advance on, the next match starts immediately.
-
-Picking a category in the Control dropdown only **selects** it; pressing **Start / restart** launches
-the selected category.
+Chat text is normalized (case, accents, punctuation, Arabic spelling variants) and matched against
+the two on-screen names/aliases: whole name → first word → three-letter prefix → then close
+misspellings. No match is ignored, and two equally close matches are ignored rather than guessed.
+A gift matches the item whose gift **name** it is (or the category's gift pair) and counts heavier
+than a chat vote. When the timer ends the higher total advances; ties follow the tie rule (default:
+sudden death). Picking a category in the dropdown only **selects** it — **Start / restart** launches
+it.
 
 ## Photos, avatars & safety
 
-- The app makes **no external network calls at runtime**, with one approved exception: viewer
-  avatars. `server/avatars.ts` fetches each TikTok avatar from a URL delivered by the local Tikora
-  hub, verifies it is a real image type, caps the size, and caches it under `data/avatars/`
-  (gitignored) so the overlay still loads images locally.
-- `npm run seed:photos` (or the Studio **Fetch photos** button) is the only other downloader.
-  It queries **English and Arabic Wikipedia**, then Wikimedia Commons. It talks **only** to an
-  allowlist of Wikimedia hosts, accepts only real image types, caps file size, retries on
-  rate-limits, rejects non-free (fair-use) images, and logs every URL to `data/photos.log`.
-- Downloaded/uploaded photos live in `data/uploads/` and are gitignored, keeping the repo
-  copyright-safe. Items without a photo fall back to a styled emoji/initial tile.
+No external network calls at runtime, with two approved exceptions: `server/imageCache.ts` fetches a
+single viewer avatar or gift picture from a URL the local hub delivered (verified, size-capped,
+cached under `data/`), and `npm run seed:photos` queries English and Arabic Wikipedia then Commons —
+allowlisted hosts only, real image types only, fair-use rejected, every URL logged to
+`data/photos.log`. Everything lands in gitignored `data/uploads/`, `data/avatars/` and `data/gifts/`.
+Items without a photo fall back to their emoji or an initial tile.
 
 ## Scripts
 
 | Script | Purpose |
 | --- | --- |
-| `Tournament.bat` | Build + serve on one port and open the Control Room |
-| `npm run serve` | Serve the built app on `:8787` (add `-- --open` to open a browser; restarts a running instance automatically) |
+| `Tournament.bat` | Build + serve on one port and open the Control room |
+| `npm run serve` | Serve the built app on `:8787` (`-- --open` opens a browser; restarts a running instance) |
 | `npm run dev` | Dev: server `:8787` + Vite `:5173` with hot reload |
-| `npm run build` | Build the app to `dist/` |
-| `npm start` | Serve `server/index.ts` only (no browser) |
-| `npm run demo` | Play every category's full bracket instantly in the terminal (add `-- --category=ID`) |
-| `npm run seed` | Write the ten built-in categories (`--force` to overwrite) |
-| `npm run seed:photos` | Fetch free photos (options: `--category=id`, `--limit=N`, `--force`) |
+| `npm run build` | Build to `dist/` |
+| `npm start` | Serve without rebuilding |
+| `npm run demo` | Play every category's bracket in the terminal (`-- --category=ID`) |
+| `npm run seed` | Write the built-in categories (`--force` to overwrite) |
+| `npm run seed:photos` | Fetch free photos (`--category=id`, `--limit=N`, `--force`) |
+| `npm run manifest` | Regenerate `tikora.manifest.json` from `scripts/manifest.ts` |
+| `npm run smoke` | Prove the auto game key and every declared effect end to end |
 | `npm run typecheck` / `lint` / `test` | Quality gates |
 
-## Project layout
-
-```
-shared/   domain types + defaults (settings incl. sound)
-engine/   pure tournament logic (shared by server and UI)
-server/   authoritative session + HTTP/SSE, seed data, photos.ts, avatars.ts, live.ts (Tikora hub)
-scripts/  serve.mjs (single-port launcher), dev.mjs, browser.mjs, fetch-photos.ts CLI
-src/      React UI: broadcast (OBS), control, studio, debug, setup, page shells
-src/sound Web Audio engine, cue catalog, manager, hook
-src/i18n  Arabic/English strings + RTL
-data/     categories (tracked); uploads, avatars, sounds, session, live.json (ignored)
-tikora.manifest.json  declared effects/events for the Tikora hub
-```
-
-See `AGENTS.md` for contributor conventions and the safety rules.
+See `AGENTS.md` for contributor conventions, the project layout and the safety rules.

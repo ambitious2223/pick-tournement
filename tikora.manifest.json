@@ -122,13 +122,8 @@
         },
         {
           "key": "gift",
-          "label": "Gift name",
-          "type": "string"
-        },
-        {
-          "key": "icon",
-          "label": "Gift icon (emoji)",
-          "type": "string"
+          "label": "Gift",
+          "type": "gift"
         },
         {
           "key": "amount",

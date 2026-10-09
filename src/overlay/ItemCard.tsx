@@ -43,6 +43,7 @@ export function ItemCard({
   const prevVotes = useRef(votes);
   const popId = useRef(0);
   const [pop, setPop] = useState<{ id: number; delta: number } | null>(null);
+  const giftPx = Math.round(namePx * 0.5);
   useEffect(() => {
     const delta = votes - prevVotes.current;
     prevVotes.current = votes;
@@ -73,13 +74,20 @@ export function ItemCard({
             </span>
           </div>
         ) : null}
-        {gift ? (
-          <div className="absolute -bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1 rounded-full border border-line bg-ink px-2 py-0.5 text-xs">
-            <span>{gift.icon}</span>
-            <span className="text-white/70">{gift.name}</span>
-          </div>
-        ) : null}
       </div>
+      {gift ? (
+        <div
+          className="flex max-w-full items-center gap-2 rounded-full border border-line bg-ink/95 px-3 py-1 shadow-lg"
+          style={{ fontSize: giftPx }}
+        >
+          {gift.img ? (
+            <img src={gift.img} alt="" className="h-[1.5em] w-[1.5em] shrink-0 rounded-full object-contain" />
+          ) : (
+            <span className="leading-none">{gift.icon}</span>
+          )}
+          <span className="min-w-0 truncate font-semibold text-white/85">{gift.name}</span>
+        </div>
+      ) : null}
       <div className="shadow-text mt-2 max-w-[16rem] truncate text-center font-black" style={{ fontSize: namePx }}>
         {item ? itemName(item, lang) : t("common.tbd")}
       </div>

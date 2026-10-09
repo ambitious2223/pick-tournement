@@ -25,6 +25,7 @@ import { matchCategory, matchItem, normalize } from "../engine/matcher.ts";
 import { cacheAvatar } from "./avatars.ts";
 import { saveLiveConfig, type LiveConfig } from "./liveConfig.ts";
 import { loadManifest } from "./manifest.ts";
+import { cacheGiftArt } from "./giftArt.ts";
 import type { LiveClient } from "./live.ts";
 import {
   addVotes,
@@ -857,7 +858,7 @@ export class Session {
         const side = pSide(p);
         const giftName = pText(p, "gift");
         if (!side || !giftName) return false;
-        if (!this.bindSideGift(side, giftName, pText(p, "icon"))) return false;
+        if (!this.bindSideGift(side, giftName)) return false;
         const amount = pNum(p, "amount", 0, 0, 1000);
         const match = this.liveMatch();
         if (amount > 0 && match && addVotes(match, side, amount)) {
@@ -1069,17 +1070,62 @@ export class Session {
     if (this.state.matchHold) this.state.matchHold = null;
   }
 
-  /** Points a side's gift at a new gift; the broadcast icon follows the state. */
-  private bindSideGift(side: "a" | "b", giftName: string, icon: string): boolean {
-    const category = this.currentCategory();
-    const [left, right] = this.currentItems();
-    const item = side === "a" ? left : right;
-    const hasPair = Boolean(category?.giftPair);
-    if (!item && !hasPair) return false;
-    const gift: Gift = { id: normalize(giftName).replace(/\s+/g, "-") || "gift", name: giftName, icon };
+  /**
+   * Points a side's gift at a new gift, resolved against the catalogue the hub
+   * sent us, so the broadcast icon follows the state. Works before a tournament
+   * exists too — it then binds the category that is queued up next.
+   */
+  private bindSideGift(side: "a" | "b", giftName: string): boolean {
+    const target = this.giftTargetCategory();
+    if (!target) return false;
+
+    const item = this.state.tournament ? (side === "a" ? this.currentItems()[0] : this.currentItems()[1]) : null;
+    if (!item && !target.giftPair) return false;
+
+    const catalogue = this.live?.catalogue ?? [];
+    const key = normalize(giftName);
+    const hub =
+      catalogue.find((g) => normalize(g.name) === key) ??
+      catalogue.find((g) => String(g.id) === giftName.trim()) ??
+      null;
+
+    const gift: Gift = {
+      id: hub ? String(hub.id) : key.replace(/\s+/g, "-") || "gift",
+      name: hub?.name ?? giftName,
+      icon: "🎁",
+    };
     if (item) item.gift = gift;
-    if (category?.giftPair) category.giftPair[side === "a" ? 0 : 1] = gift;
+    if (target.giftPair) target.giftPair[side === "a" ? 0 : 1] = gift;
+    this.emit();
+
+    // The artwork is the slow part: bind first so routing works immediately.
+    if (hub?.img) {
+      void cacheGiftArt(hub.img)
+        .then((local) => {
+          if (local) {
+            gift.img = local;
+            this.emit();
+          }
+        })
+        .finally(() => this.persistGiftBinding(target));
+    } else {
+      this.persistGiftBinding(target);
+    }
     return true;
+  }
+
+  /** The category a binding applies to: the one in play, else the queued one. */
+  private giftTargetCategory(): Category | null {
+    const current = this.currentCategory();
+    if (current) return current;
+    const queued = this.state.queue[this.state.queueIndex]?.categoryId;
+    return (queued ? this.category(queued) : null) ?? this.state.categories[0] ?? null;
+  }
+
+  private persistGiftBinding(category: Category): void {
+    void saveCategory(category).catch((error) => {
+      this.log("error", `Could not save the gift binding: ${(error as Error).message}`);
+    });
   }
 
   /** Applies the temporary vote multiplier started by the `boost_side` effect. */
