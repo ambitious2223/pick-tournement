@@ -146,44 +146,57 @@ async function commonsImage(query: string): Promise<string | null> {
   }
   return null;
 }
-
 async function findImage(name: string, aliases: string[]): Promise<{ url: string; via: string } | null> {
   const candidates = [name, ...aliases].slice(0, 4);
+  // Fair-use hits are skipped rather than accepted, so discovery keeps going
+  // and can still land on a free image in Arabic Wikipedia or Commons.
   for (const lang of ["en", "ar"]) {
     for (const candidate of candidates) {
       const url = await summaryThumb(lang, candidate);
-      if (url) return { url, via: `${lang}-summary` };
+      if (url && isFreeUrl(url)) return { url, via: `${lang}-summary` };
     }
   }
   for (const lang of ["en", "ar"]) {
     for (const title of await searchTitles(lang, name)) {
       const url = await pageImage(lang, title);
-      if (url) return { url, via: `${lang}-search` };
+      if (url && isFreeUrl(url)) return { url, via: `${lang}-search` };
     }
   }
-  const commons = await commonsImage(name);
-  if (commons) return { url: commons, via: "commons" };
+  for (const query of [name, ...aliases.slice(0, 2)]) {
+    const url = await commonsImage(query);
+    if (url && isFreeUrl(url)) return { url, via: "commons" };
+  }
   return null;
 }
 
-async function downloadImage(url: string): Promise<string | null> {
+async function downloadImage(url: string, label: string): Promise<string | null> {
   if (!isFreeUrl(url)) {
     await logUrl(`REJECT ${url} (non-free / fair-use)`);
     return null;
   }
   const res = await safeFetch(url);
-  if (!res.ok) return null;
+  if (!res.ok) {
+    await logUrl(`FAIL ${label} HTTP ${res.status} ${url}`);
+    return null;
+  }
+
   const contentType = (res.headers.get("content-type") ?? "").split(";")[0]?.trim() ?? "";
   const ext = IMAGE_EXT[contentType];
-  if (!ext) return null;
+  if (!ext) {
+    await logUrl(`FAIL ${label} not an image (${contentType || "no content-type"}) ${url}`);
+    return null;
+  }
+
   const buffer = Buffer.from(await res.arrayBuffer());
-  if (buffer.length === 0 || buffer.length > MAX_BYTES) return null;
+  if (buffer.length === 0 || buffer.length > MAX_BYTES) {
+    await logUrl(`FAIL ${label} empty or oversized (${buffer.length} bytes) ${url}`);
+    return null;
+  }
   const file = `${crypto.randomBytes(6).toString("hex")}${ext}`;
   await fs.writeFile(path.join(UPLOADS_DIR, file), buffer);
   await logUrl(`OK ${url} -> uploads/${file} (${buffer.length} bytes)`);
   return `/uploads/${file}`;
 }
-
 async function processItem(item: Item, force: boolean, log: (line: string) => void): Promise<boolean> {
   if (item.image && !force) return false;
   const found = await findImage(item.name, item.aliases);
@@ -191,7 +204,7 @@ async function processItem(item: Item, force: boolean, log: (line: string) => vo
     await logUrl(`SKIP ${item.name} (no free image)`);
     return false;
   }
-  const local = await downloadImage(found.url);
+  const local = await downloadImage(found.url, item.name);
   if (!local) {
     await logUrl(`FAIL ${item.name} ${found.url}`);
     return false;

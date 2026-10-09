@@ -12,9 +12,7 @@ function blankItems(): Item[] {
 }
 
 function normalize(category: Category): Category {
-  const items = [...category.items];
-  while (items.length < 16) items.push({ id: `item-${items.length + 1}`, name: "", aliases: [] });
-  return { ...category, items: items.slice(0, 16) };
+  return { ...category, items: [...category.items].slice(0, 16) };
 }
 
 export function Studio({ state }: { state: SessionState | null }): ReactNode {

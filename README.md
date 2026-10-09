@@ -16,9 +16,10 @@ local **Tikora** hub — no TikTok login inside this app.
   shows a gift; sending it counts for that side).
 - **Automatic broadcast flow** with per-round colours escalating cyan → blue → purple → gold, and a
   golden final showing the top supporters.
-- **Content Studio and a Content tab** to create categories, add or remove competitors, and upload
-  photos; a **Debug console** for injecting votes, simulating a crowd, the Live connection and the
-  Sound & Music mixer.
+- **Content Studio and a Content tab** — create and edit categories in the Studio; browse them in
+  Control → Content with per-category photo coverage, a Fetch photos button, and removal of a whole
+  category or of individual competitors. A **Debug console** covers injecting votes, simulating a
+  crowd, the Live connection and the Sound & Music mixer.
 - Categories live in `data/categories/`, each with English **and** Arabic names and aliases.
 
 ## Quick start

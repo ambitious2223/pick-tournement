@@ -76,7 +76,8 @@ untested.
 - `server/imageCache.ts` — the one shared external fetch (a single image, verified, size-capped,
   cached under `data/`); `server/avatars.ts` and `server/giftArt.ts` wrap it for viewer avatars and
   gift artwork. `server/giftArt.ts` also serves `/gifts/`.
-- `server/seed.ts` — the ten built-in Middle East categories; runs on first boot.
+- `server/seed.ts` — the built-in Middle East categories; re-creates any that are missing on first
+  boot (so deleting one means also removing it from `SEED`).
 - `server/photos.ts` — the sanctioned photo downloader (English + Arabic Wikipedia, then Commons).
 - `scripts/serve.mjs` — single-port launcher (build + serve on `:8787`); `scripts/dev.mjs` — dev.
 - `scripts/manifest.ts` — builds the hub manifest; `scripts/gen-manifest.ts` writes it (`npm run manifest`);

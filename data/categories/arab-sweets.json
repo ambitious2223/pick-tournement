@@ -89,7 +89,8 @@
       "aliases": [
         "شاي مغربي"
       ],
-      "emoji": "🍵"
+      "emoji": "🍵",
+      "image": "/uploads/cdb1e67e0d31.jpg"
     },
     {
       "id": "karkade",
@@ -142,7 +143,8 @@
       "aliases": [
         "تمر هندي"
       ],
-      "emoji": "🥤"
+      "emoji": "🥤",
+      "image": "/uploads/8027412a292f.jpg"
     }
   ],
   "giftPair": [

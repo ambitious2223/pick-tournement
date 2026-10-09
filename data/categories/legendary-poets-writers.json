@@ -1,0 +1,164 @@
+{
+  "id": "legendary-poets-writers",
+  "name": "Legendary Poets & Writers",
+  "items": [
+    {
+      "id": "al-mutanabbi",
+      "name": "Al-Mutanabbi",
+      "aliases": [
+        "المتنبي"
+      ],
+      "emoji": "📜",
+      "image": "/uploads/e14492122df5.png"
+    },
+    {
+      "id": "mahmoud-darwish",
+      "name": "Mahmoud Darwish",
+      "aliases": [
+        "محمود درويش"
+      ],
+      "emoji": "🕊️",
+      "image": "/uploads/bf1a66d6fb11.jpg"
+    },
+    {
+      "id": "nizar-qabbani",
+      "name": "Nizar Qabbani",
+      "aliases": [
+        "نزار قباني"
+      ],
+      "emoji": "💌",
+      "image": "/uploads/d97be5a78ce7.jpg"
+    },
+    {
+      "id": "ahmed-shawqi",
+      "name": "Ahmed Shawqi",
+      "aliases": [
+        "أحمد شوقي"
+      ],
+      "emoji": "🏛️",
+      "image": "/uploads/8a0ee6bfa64d.jpg"
+    },
+    {
+      "id": "gibran-khalil-gibran",
+      "name": "Gibran Khalil Gibran",
+      "aliases": [
+        "جبران خليل جبران",
+        "جبران"
+      ],
+      "emoji": "📖",
+      "image": "/uploads/a8603424a5ad.jpg"
+    },
+    {
+      "id": "antarah-ibn-shaddad",
+      "name": "Antarah ibn Shaddad",
+      "aliases": [
+        "عنترة بن شداد"
+      ],
+      "emoji": "⚔️",
+      "image": "/uploads/ece0d79a2bf0.jpg"
+    },
+    {
+      "id": "imru-al-qais",
+      "name": "Imru' al-Qais",
+      "aliases": [
+        "امرؤ القيس"
+      ],
+      "emoji": "🐪",
+      "image": "/uploads/0802860b2385.png"
+    },
+    {
+      "id": "taha-hussein",
+      "name": "Taha Hussein",
+      "aliases": [
+        "طه حسين"
+      ],
+      "emoji": "📚",
+      "image": "/uploads/bc1d00fdd1f5.jpg"
+    },
+    {
+      "id": "naguib-mahfouz",
+      "name": "Naguib Mahfouz",
+      "aliases": [
+        "نجيب محفوظ"
+      ],
+      "emoji": "🖋️",
+      "image": "/uploads/01b4101e4dbd.jpg"
+    },
+    {
+      "id": "elia-abu-madi",
+      "name": "Elia Abu Madi",
+      "aliases": [
+        "إيليا أبو ماضي"
+      ],
+      "emoji": "🌿",
+      "image": "/uploads/40f8569e9616.jpg"
+    },
+    {
+      "id": "al-maarri",
+      "name": "Al-Ma'arri",
+      "aliases": [
+        "المعري"
+      ],
+      "emoji": "👁️",
+      "image": "/uploads/c36dd82db281.png"
+    },
+    {
+      "id": "hafez-ibrahim",
+      "name": "Hafez Ibrahim",
+      "aliases": [
+        "حافظ إبراهيم"
+      ],
+      "emoji": "🌊",
+      "image": "/uploads/05fe783af632.jpg"
+    },
+    {
+      "id": "ghassan-kanafani",
+      "name": "Ghassan Kanafani",
+      "aliases": [
+        "غسان كنفاني"
+      ],
+      "emoji": "✍️",
+      "image": "/uploads/602f26c6300a.jpg"
+    },
+    {
+      "id": "al-jahiz",
+      "name": "Al-Jahiz",
+      "aliases": [
+        "الجاحظ"
+      ],
+      "emoji": "📜",
+      "image": "/uploads/1d59c4279372.jpg"
+    },
+    {
+      "id": "badr-shakir-al-sayyab",
+      "name": "Badr Shakir al-Sayyab",
+      "aliases": [
+        "بدر شاكر السياب"
+      ],
+      "emoji": "🌧️",
+      "image": "/uploads/557831e6c6f0.jpg"
+    },
+    {
+      "id": "al-asmai",
+      "name": "Al-Asma'i",
+      "aliases": [
+        "الأصمعي"
+      ],
+      "emoji": "🐪",
+      "image": "/uploads/02e12cb3771d.png"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "nameAr": "شعراء وأدباء أسطوريون"
+}

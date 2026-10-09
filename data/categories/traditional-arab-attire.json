@@ -1,0 +1,167 @@
+{
+  "id": "traditional-arab-attire",
+  "name": "Traditional Arab Attire",
+  "items": [
+    {
+      "id": "keffiyeh-ghutra",
+      "name": "Keffiyeh (Ghutra)",
+      "aliases": [
+        "كوفية",
+        "غترة"
+      ],
+      "emoji": "🧣",
+      "image": "/uploads/1fecc3b26838.jpg"
+    },
+    {
+      "id": "thobe-dishdasha",
+      "name": "Thobe (Dishdasha)",
+      "aliases": [
+        "ثوب",
+        "دشداشة"
+      ],
+      "emoji": "👘",
+      "image": "/uploads/d137ae7bb19b.jpg"
+    },
+    {
+      "id": "abaya",
+      "name": "Abaya",
+      "aliases": [
+        "عباءة"
+      ],
+      "emoji": "🧥",
+      "image": "/uploads/f5c516909786.jpg"
+    },
+    {
+      "id": "agal",
+      "name": "Agal",
+      "aliases": [
+        "عقال"
+      ],
+      "emoji": "🪢",
+      "image": "/uploads/fd51b7ab37ad.jpg"
+    },
+    {
+      "id": "tarboush-fez",
+      "name": "Tarboush (Fez)",
+      "aliases": [
+        "طربوش",
+        "فيس"
+      ],
+      "emoji": "🎩",
+      "image": "/uploads/ad6ce6be7db6.jpg"
+    },
+    {
+      "id": "kaftan",
+      "name": "Kaftan",
+      "aliases": [
+        "قفطان"
+      ],
+      "emoji": "👗",
+      "image": "/uploads/3f8f99b2f719.png"
+    },
+    {
+      "id": "bisht",
+      "name": "Bisht",
+      "aliases": [
+        "بشت"
+      ],
+      "emoji": "🧥",
+      "image": "/uploads/f28cbb054b98.jpg"
+    },
+    {
+      "id": "jalabiya",
+      "name": "Jalabiya",
+      "aliases": [
+        "جلابية"
+      ],
+      "emoji": "👘",
+      "image": "/uploads/8fcbd66e217a.jpg"
+    },
+    {
+      "id": "sirwal",
+      "name": "Sirwal",
+      "aliases": [
+        "سروال"
+      ],
+      "emoji": "👖",
+      "image": "/uploads/4b4966b13ff8.jpg"
+    },
+    {
+      "id": "jellaba",
+      "name": "Jellaba",
+      "aliases": [
+        "جلابة"
+      ],
+      "emoji": "🧥",
+      "image": "/uploads/ffde75107f38.jpg"
+    },
+    {
+      "id": "takchita",
+      "name": "Takchita",
+      "aliases": [
+        "تكشيطة"
+      ],
+      "emoji": "👗",
+      "image": "/uploads/40e967c10c78.jpg"
+    },
+    {
+      "id": "burnous",
+      "name": "Burnous",
+      "aliases": [
+        "برنوس"
+      ],
+      "emoji": "🧥",
+      "image": "/uploads/460fc3302670.jpg"
+    },
+    {
+      "id": "kufi-taqiyah",
+      "name": "Kufi (Taqiyah)",
+      "aliases": [
+        "طاقية",
+        "كوفي"
+      ],
+      "emoji": "🧢",
+      "image": "/uploads/630a633222e2.jpg"
+    },
+    {
+      "id": "karakou",
+      "name": "Karakou",
+      "aliases": [
+        "كاراكو"
+      ],
+      "emoji": "👚",
+      "image": "/uploads/bc1b9fdb99e2.jpg"
+    },
+    {
+      "id": "sherwal",
+      "name": "Sherwal",
+      "aliases": [
+        "شروال"
+      ],
+      "emoji": "👖",
+      "image": "/uploads/427e7d9bfd9a.jpg"
+    },
+    {
+      "id": "jibba",
+      "name": "Jibba",
+      "aliases": [
+        "جبة"
+      ],
+      "emoji": "👘",
+      "image": "/uploads/eb3096e8786a.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "nameAr": "أزياء تقليدية عربية"
+}

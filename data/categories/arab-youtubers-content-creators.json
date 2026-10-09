@@ -1,0 +1,148 @@
+{
+  "id": "arab-youtubers-content-creators",
+  "name": "Arab YouTubers & Content Creators",
+  "items": [
+    {
+      "id": "aboflah",
+      "name": "AboFlah",
+      "aliases": [
+        "أبو فلة"
+      ],
+      "image": "/uploads/72411c83eec8.jpg"
+    },
+    {
+      "id": "ahmed-al-shugairi",
+      "name": "Ahmed Al-Shugairi",
+      "aliases": [
+        "أحمد الشقيري",
+        "الشقيري"
+      ],
+      "image": "/uploads/6865311bb9d6.jpg"
+    },
+    {
+      "id": "joe-hattab",
+      "name": "Joe Hattab",
+      "aliases": [
+        "جو حطاب"
+      ]
+    },
+    {
+      "id": "banderitax",
+      "name": "BanderitaX",
+      "aliases": [
+        "بندريتا"
+      ],
+      "image": "/uploads/417bb084c43b.jpg"
+    },
+    {
+      "id": "noor-stars",
+      "name": "Noor Stars",
+      "aliases": [
+        "نور ستارز"
+      ],
+      "image": "/uploads/772cf80633af.jpg"
+    },
+    {
+      "id": "omar-farooq",
+      "name": "Omar Farooq",
+      "aliases": [
+        "عمر فاروق"
+      ],
+      "image": "/uploads/939f9398f5b2.png"
+    },
+    {
+      "id": "ghaith-marwan",
+      "name": "Ghaith Marwan",
+      "aliases": [
+        "غيث مروان"
+      ],
+      "image": "/uploads/8e368bf98b03.png"
+    },
+    {
+      "id": "anasala-family",
+      "name": "Anasala Family",
+      "aliases": [
+        "عائلة أنس وأصالة",
+        "أنسلا"
+      ],
+      "image": "/uploads/084fe804ce9b.jpg"
+    },
+    {
+      "id": "mohamed-adnan",
+      "name": "Mohamed Adnan",
+      "aliases": [
+        "محمد عدنان"
+      ],
+      "image": "/uploads/9813c3e2fb5c.jpg"
+    },
+    {
+      "id": "ibn-hattuta",
+      "name": "Ibn Hattuta",
+      "aliases": [
+        "ابن حتوتة"
+      ]
+    },
+    {
+      "id": "thunayyan-khalid",
+      "name": "Thunayyan Khalid",
+      "aliases": [
+        "ثنيان خالد"
+      ],
+      "image": "/uploads/aea8d3255f0a.jpg"
+    },
+    {
+      "id": "dawood-savage",
+      "name": "Dawood Savage",
+      "aliases": [
+        "داود سافيدج"
+      ],
+      "image": "/uploads/628793f625ef.jpg"
+    },
+    {
+      "id": "laila-mourad",
+      "name": "Laila Mourad",
+      "aliases": [
+        "ليلى مراد"
+      ],
+      "image": "/uploads/fdbc4c32e91d.jpg"
+    },
+    {
+      "id": "rashed-zshowz",
+      "name": "Rashed (Zshowz)",
+      "aliases": [
+        "راشد",
+        "زد شو زد",
+        "zshowz"
+      ]
+    },
+    {
+      "id": "ossion",
+      "name": "Ossion",
+      "aliases": [
+        "أوسمز"
+      ],
+      "image": "/uploads/7cea89b9be0d.jpg"
+    },
+    {
+      "id": "basel-el-hajj",
+      "name": "Basel El Hajj",
+      "aliases": [
+        "باسل الحاج"
+      ],
+      "image": "/uploads/ce418e4605e8.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "nameAr": "صناع المحتوى العرب"
+}

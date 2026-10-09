@@ -495,9 +495,15 @@ export class Session {
     this.remainingMs = seconds * 1000;
     this.state.matchEndsAt = Date.now() + this.remainingMs;
     match.endsAt = this.state.matchEndsAt;
-    this.schedule(this.remainingMs);
+    const bye = match.a === null || match.b === null;
+    this.schedule(bye ? 400 : this.remainingMs);
     if (this.state.settings.autoStageView) this.state.stageView = "match";
-    this.log("round", `${ROUND_LABELS[match.round]} — match ${match.index + 1} live (${seconds}s)`);
+    this.log(
+      "round",
+      bye
+        ? `${ROUND_LABELS[match.round]} — bye, match ${match.index + 1}`
+        : `${ROUND_LABELS[match.round]} — match ${match.index + 1} live (${seconds}s)`,
+    );
     this.emit();
   }
 
@@ -561,9 +567,14 @@ export class Session {
     this.clearSideEffects();
     if (this.state.settings.autoStageView) this.state.stageView = "bracket";
 
-    const winner = forced ? (match.votesA >= match.votesB ? match.a : match.b) : resolveWinner(match, this.state.settings, this.rng);
+    const empty = match.a === null && match.b === null;
+    const winner: string = empty
+      ? ""
+      : forced
+        ? (match.votesA >= match.votesB ? match.a : match.b) ?? ""
+        : resolveWinner(match, this.state.settings, this.rng) ?? "";
 
-    if (!winner) {
+    if (!empty && !winner) {
       this.remainingMs = this.state.settings.suddenDeathSeconds * 1000;
       this.state.matchEndsAt = Date.now() + this.remainingMs;
       this.schedule(this.remainingMs);
@@ -572,12 +583,20 @@ export class Session {
       return;
     }
 
-    const name = this.item(winner)?.name ?? winner;
+    const name = empty ? "—" : this.item(winner)?.name ?? winner;
     const wasTie = match.votesA === match.votesB;
-    const progress = completeMatch(t, winner);
-    this.log("round", `${name} wins ${match.votesA + (wasTie ? 0 : 0)}-${match.votesB}`);
+    const progress = completeMatch(t, empty ? null : winner);
+    this.log("round", empty ? "Skipped an empty bracket slot." : `${name} wins ${match.votesA + (wasTie ? 0 : 0)}-${match.votesB}`);
 
     if (this.state.show.active) {
+      if (empty) {
+        if (progress.tournamentComplete) {
+          this.stopShow();
+          return;
+        }
+        this.beginBracketIntro();
+        return;
+      }
       this.captureShowResult(match, winner);
       if (progress.tournamentComplete) {
         this.state.show.champion = winner;
@@ -1305,8 +1324,31 @@ export class Session {
   }
 
   async deleteCategoryAndRefresh(id: string): Promise<void> {
+    // A tournament still running this category would point at nothing.
+    if (this.state.tournament?.categoryId === id) {
+      if (this.state.show.active) this.stopShow();
+      this.stopTimer();
+      this.clearShowTimer();
+      this.releaseHold();
+      this.clearSideEffects();
+      this.state.tournament = null;
+      this.state.matchEndsAt = null;
+      this.state.status = "idle";
+      this.log("info", "Stopped: the category being run was deleted.");
+    }
+
+    // Keep the queue pointing at the same entry when earlier ones disappear.
+    const currentId = this.state.queue[this.state.queueIndex]?.categoryId;
+    const nextQueue = this.state.queue.filter((entry) => entry.categoryId !== id);
+    if (nextQueue.length !== this.state.queue.length) {
+      this.state.queue = nextQueue;
+      const at = currentId ? nextQueue.findIndex((entry) => entry.categoryId === currentId) : -1;
+      this.state.queueIndex = at >= 0 ? at : 0;
+    }
+
     await deleteCategory(id);
     await this.refreshWait();
+    this.persist();
   }
 
   private async refreshWait(): Promise<void> {

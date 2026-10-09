@@ -1,0 +1,145 @@
+{
+  "id": "classic-arab-plays",
+  "name": "Classic Arab Plays",
+  "items": [
+    {
+      "id": "madraset-el-moshaghbeen",
+      "name": "Madraset El Moshaghbeen",
+      "aliases": [
+        "مدرسة المشاغبين"
+      ],
+      "image": "/uploads/7853357d6e5a.jpg"
+    },
+    {
+      "id": "el-eyal-kebret",
+      "name": "El Eyal Kebret",
+      "aliases": [
+        "العيال كبرت"
+      ],
+      "image": "/uploads/32a69b09c02e.jpg"
+    },
+    {
+      "id": "al-zaeem",
+      "name": "Al Zaeem",
+      "aliases": [
+        "الزعيم"
+      ],
+      "image": "/uploads/e4796eaf68fe.jpg"
+    },
+    {
+      "id": "shahid-mashafsh-haga",
+      "name": "Shahid Mashafsh Haga",
+      "aliases": [
+        "شاهد ما شافش حاجة"
+      ],
+      "image": "/uploads/ec178e4f5503.jpg"
+    },
+    {
+      "id": "el-wad-sayed-el-shaghal",
+      "name": "El Wad Sayed El Shaghal",
+      "aliases": [
+        "الواد سيد الشغال"
+      ],
+      "image": "/uploads/a4ef5465acd8.jpg"
+    },
+    {
+      "id": "sok-ala-banatak",
+      "name": "Sok Ala Banatak",
+      "aliases": [
+        "سك على بناتك"
+      ],
+      "image": "/uploads/f7aeedd8f61c.jpg"
+    },
+    {
+      "id": "keda-ok",
+      "name": "Keda Ok",
+      "aliases": [
+        "كده أوكيه"
+      ],
+      "image": "/uploads/c5fd8b585afd.png"
+    },
+    {
+      "id": "al-motazawegoon",
+      "name": "Al-Motazawegoon",
+      "aliases": [
+        "المتزوجون"
+      ],
+      "image": "/uploads/4e29d4ebf65b.jpg"
+    },
+    {
+      "id": "bye-bye-london",
+      "name": "Bye Bye London",
+      "aliases": [
+        "باي باي لندن"
+      ],
+      "image": "/uploads/688a7a4893f5.jpg"
+    },
+    {
+      "id": "saif-al-arab",
+      "name": "Saif Al-Arab",
+      "aliases": [
+        "سيف العرب"
+      ],
+      "image": "/uploads/5cda475b6595.jpg"
+    },
+    {
+      "id": "sah-el-nom",
+      "name": "Sah El Nom",
+      "aliases": [
+        "صح النوم"
+      ],
+      "image": "/uploads/b527523401a5.jpg"
+    },
+    {
+      "id": "mais-el-reem",
+      "name": "Mais El Reem",
+      "aliases": [
+        "ميس الريم"
+      ],
+      "image": "/uploads/04b92dff1c31.jpg"
+    },
+    {
+      "id": "enta-fein-w-ena-fein",
+      "name": "Enta Fein W Ena Fein",
+      "aliases": [
+        "إنت فين وأنا فين"
+      ]
+    },
+    {
+      "id": "al-kharaz",
+      "name": "Al-Kharaz",
+      "aliases": [
+        "الخراز"
+      ],
+      "image": "/uploads/1c0a135939d4.jpg"
+    },
+    {
+      "id": "afrotto",
+      "name": "Afrotto",
+      "aliases": [
+        "عفروتو"
+      ],
+      "image": "/uploads/de7509198533.jpg"
+    },
+    {
+      "id": "hamiha-haramiha",
+      "name": "Hamiha Haramiha",
+      "aliases": [
+        "حاميها حراميها"
+      ]
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "nameAr": "مسرحيات عربية أيقونية"
+}

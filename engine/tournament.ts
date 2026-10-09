@@ -27,10 +27,19 @@ export interface ProgressResult {
   tournamentComplete: boolean;
 }
 
-export function completeMatch(tournament: Tournament, winnerId: string): ProgressResult {
+export function completeMatch(tournament: Tournament, winnerId: string | null): ProgressResult {
   const round = tournament.bracket.rounds[tournament.currentRound];
   const match = round[tournament.currentMatchIndex];
-  if (match) advanceWinner(tournament.bracket, match, winnerId);
+  if (match) {
+    if (winnerId === null) {
+      // Nobody is in this slot: close it out and push nothing forward, so the
+      // next round keeps its empty slot and the bye propagates.
+      match.status = "done";
+      match.winner = "";
+    } else {
+      advanceWinner(tournament.bracket, match, winnerId);
+    }
+  }
 
   const nextIndex = round.findIndex((m) => m.winner === null);
   if (nextIndex !== -1) {

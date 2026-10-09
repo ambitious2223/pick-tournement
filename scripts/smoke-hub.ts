@@ -1,4 +1,4 @@
-import { readFile, readdir, writeFile } from "node:fs/promises";
+import { readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { createServer, type Server } from "node:http";
 import { Session } from "../server/session.ts";
 import { LiveClient } from "../server/live.ts";
@@ -18,10 +18,37 @@ function check(what: string, ok: boolean, expected = true, note = ""): void {
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 const sign = (n: number): number => (n > 0 ? 1 : n < 0 ? -1 : 0);
 
+const BYE_FILE = new URL("../data/categories/smoke-bye.json", import.meta.url);
+
 const original = await readFile(SESSION_FILE, "utf8").catch(() => null);
 const categoryFiles = (await readdir(CATEGORY_DIR)).filter((name) => name.endsWith(".json"));
 const categoryBackup = new Map<string, string>();
 for (const name of categoryFiles) categoryBackup.set(name, await readFile(new URL(name, CATEGORY_DIR), "utf8"));
+
+// A three-person category, written before the session loads, so the bracket
+// has empty slots to prove byes resolve on their own.
+await writeFile(
+  BYE_FILE,
+  `${JSON.stringify(
+    {
+      id: "smoke-bye",
+      name: "Smoke Bye",
+      nameAr: "اختبار",
+      items: [
+        { id: "alpha", name: "Alpha", aliases: ["ألفا"] },
+        { id: "bravo", name: "Bravo", aliases: ["برافو"] },
+        { id: "charlie", name: "Charlie", aliases: ["تشارلي"] },
+      ],
+      giftPair: [
+        { id: "rose", name: "Rose", icon: "🌹" },
+        { id: "tiktok", name: "TikTok", icon: "🎵" },
+      ],
+    },
+    null,
+    2,
+  )}\n`,
+  "utf8",
+);
 
 let imageServer: Server | null = null;
 
@@ -234,8 +261,9 @@ try {
   session.startShow();
   check("show is in the category phase", session.state.show.active && session.state.show.phase === "category", true, session.state.show.phase);
   check("add_vote with no live match is refused", session.handleLiveEffect("add_vote", { side: "left", amount: "5" }), false);
-  const target = "Arab Football Stars";
-  const targetId = session.state.categories.find((c) => c.name === target)?.id ?? "";
+  const targetCategory = session.state.categories[0];
+  const target = targetCategory?.name ?? "";
+  const targetId = targetCategory?.id ?? "";
   check("category_vote runs", session.handleLiveEffect("category_vote", { category: target, viewer: "voter-x" }), true);
   check(
     "  the category gained a vote",
@@ -266,12 +294,44 @@ try {
   check("a music effect is no longer declared", session.handleLiveEffect("track.arena-pump", {}), false);
   check("a cosmetic effect is no longer declared", session.handleLiveEffect("confetti", {}), false);
   check("an unknown effect is refused", session.handleLiveEffect("spawn_dragon", {}), false);
+
+  // --- byes: a bracket smaller than 16 must still finish --------------------
+  session.startTournament("smoke-bye");
+  check(
+    "a 3-person bracket starts",
+    session.state.tournament?.categoryId === "smoke-bye",
+    true,
+    session.state.tournament?.categoryId ?? "none",
+  );
+  const firstMatch = match();
+  check("  its first slot has two competitors", Boolean(firstMatch?.a && firstMatch?.b), true, `${firstMatch?.a}/${firstMatch?.b}`);
+  const emptySlot = session.state.tournament?.bracket.rounds.r16[3];
+  check("  later slots are empty", Boolean(emptySlot && emptySlot.a === null && emptySlot.b === null), true, JSON.stringify(emptySlot));
+
+  session.skipMatch();
+  session.skipMatch();
+  const nowPlaying = session.state.tournament?.bracket.rounds.r16[2];
+  check("  an empty slot is now the live match", Boolean(nowPlaying && nowPlaying.a === null && nowPlaying.b === null), true, JSON.stringify(nowPlaying));
+  await sleep(4500);
+  check(
+    "  empty slots resolved on their own",
+    session.state.tournament?.currentRound === "qf",
+    true,
+    `round=${session.state.tournament?.currentRound} index=${session.state.tournament?.currentMatchIndex}`,
+  );
+  check(
+    "  the bye did not invent a winner",
+    session.state.tournament?.bracket.rounds.r16[3]?.winner !== undefined,
+    true,
+    `winner=${JSON.stringify(session.state.tournament?.bracket.rounds.r16[3]?.winner)}`,
+  );
 } finally {
   // Category bindings are persisted fire-and-forget; let those writes land
   // before putting the originals back, or they would clobber the restore.
   await sleep(600);
   if (original !== null) await writeFile(SESSION_FILE, original, "utf8");
   for (const [name, text] of categoryBackup) await writeFile(new URL(name, CATEGORY_DIR), text);
+  await rm(BYE_FILE, { force: true });
   if (imageServer) {
     await new Promise<void>((resolve) => imageServer?.close(() => resolve()));
     imageServer = null;

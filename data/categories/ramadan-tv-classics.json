@@ -1,0 +1,164 @@
+{
+  "id": "ramadan-tv-classics",
+  "name": "Ramadan TV Classics",
+  "items": [
+    {
+      "id": "tash-ma-tash",
+      "name": "Tash ma Tash",
+      "aliases": [
+        "طاش ما طاش",
+        "طاش"
+      ],
+      "emoji": "📺",
+      "image": "/uploads/e666130751f2.jpg"
+    },
+    {
+      "id": "bab-al-hara",
+      "name": "Bab Al-Hara",
+      "aliases": [
+        "باب الحارة"
+      ],
+      "emoji": "🚪",
+      "image": "/uploads/4b247a189d6c.png"
+    },
+    {
+      "id": "layali-el-helmeya",
+      "name": "Layali El Helmeya",
+      "aliases": [
+        "ليالي الحلمية"
+      ],
+      "emoji": "🌃",
+      "image": "/uploads/9bcfa6ce614a.jpg"
+    },
+    {
+      "id": "raafat-al-hagan",
+      "name": "Raafat Al-Hagan",
+      "aliases": [
+        "رأفت الهجان"
+      ],
+      "emoji": "🕵️",
+      "image": "/uploads/05cc0102f081.jpg"
+    },
+    {
+      "id": "al-zir-salem",
+      "name": "Al-Zir Salem",
+      "aliases": [
+        "الزير سالم"
+      ],
+      "emoji": "⚔️",
+      "image": "/uploads/ae4d9acd6733.jpg"
+    },
+    {
+      "id": "dayaa-dayaa",
+      "name": "Dayaa Dayaa",
+      "aliases": [
+        "ضيعة ضايعة"
+      ],
+      "emoji": "🏡",
+      "image": "/uploads/855374ff65bb.jpg"
+    },
+    {
+      "id": "maraya",
+      "name": "Maraya",
+      "aliases": [
+        "مرايا"
+      ],
+      "emoji": "🪞",
+      "image": "/uploads/20b499c82647.jpg"
+    },
+    {
+      "id": "al-fousoul-al-arbaa",
+      "name": "Al-Fousoul Al-Arbaa",
+      "aliases": [
+        "الفصول الأربعة"
+      ],
+      "emoji": "🍂",
+      "image": "/uploads/68e97be9a152.jpg"
+    },
+    {
+      "id": "el-mal-we-el-banon",
+      "name": "El Mal We El Banon",
+      "aliases": [
+        "المال والبنون"
+      ],
+      "emoji": "💰",
+      "image": "/uploads/39ed98e57b79.png"
+    },
+    {
+      "id": "zizinia",
+      "name": "Zizinia",
+      "aliases": [
+        "زيزينيا"
+      ],
+      "emoji": "🏛️",
+      "image": "/uploads/4320bb10592a.jpg"
+    },
+    {
+      "id": "al-asouf",
+      "name": "Al-Asouf",
+      "aliases": [
+        "العاصوف"
+      ],
+      "emoji": "🌪️",
+      "image": "/uploads/877d23e7c492.jpg"
+    },
+    {
+      "id": "al-haj-metwalli",
+      "name": "Al-Haj Metwalli",
+      "aliases": [
+        "الحاج متولي"
+      ],
+      "emoji": "👳"
+    },
+    {
+      "id": "al-kabir-awy",
+      "name": "Al-Kabir Awy",
+      "aliases": [
+        "الكبير أوي"
+      ],
+      "emoji": "👨‍🌾",
+      "image": "/uploads/3eeb235806f1.jpg"
+    },
+    {
+      "id": "khawater",
+      "name": "Khawater",
+      "aliases": [
+        "خواطر"
+      ],
+      "emoji": "💡",
+      "image": "/uploads/b7d0ef4ebd37.png"
+    },
+    {
+      "id": "omar",
+      "name": "Omar",
+      "aliases": [
+        "مسلسل عمر",
+        "عمر"
+      ],
+      "emoji": "🌙",
+      "image": "/uploads/57d93adbcdc7.jpg"
+    },
+    {
+      "id": "al-ikhtiyar",
+      "name": "Al-Ikhtiyar",
+      "aliases": [
+        "الاختيار"
+      ],
+      "emoji": "🎖️",
+      "image": "/uploads/6c7407a302a0.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "nameAr": "كلاسيكيات مسلسلات رمضان"
+}

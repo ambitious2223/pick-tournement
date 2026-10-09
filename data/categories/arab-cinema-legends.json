@@ -1,0 +1,147 @@
+{
+  "id": "arab-cinema-legends",
+  "name": "Arab Cinema Legends",
+  "items": [
+    {
+      "id": "omar-sharif",
+      "name": "Omar Sharif",
+      "aliases": [
+        "عمر الشريف"
+      ],
+      "image": "/uploads/c18d52b37bb7.jpg"
+    },
+    {
+      "id": "faten-hamama",
+      "name": "Faten Hamama",
+      "aliases": [
+        "فاتن حمامة"
+      ],
+      "image": "/uploads/98e82432081e.jpg"
+    },
+    {
+      "id": "rushdy-abaza",
+      "name": "Rushdy Abaza",
+      "aliases": [
+        "رشدي أباظة"
+      ],
+      "image": "/uploads/769fddb22fde.jpg"
+    },
+    {
+      "id": "souad-hosny",
+      "name": "Souad Hosny",
+      "aliases": [
+        "سعاد حسني"
+      ],
+      "image": "/uploads/5dcfb2ffec78.jpg"
+    },
+    {
+      "id": "ahmed-zaki",
+      "name": "Ahmed Zaki",
+      "aliases": [
+        "أحمد زكي"
+      ],
+      "image": "/uploads/2cc4d99c72a3.jpg"
+    },
+    {
+      "id": "mahmoud-abdel-aziz",
+      "name": "Mahmoud Abdel Aziz",
+      "aliases": [
+        "محمود عبد العزيز"
+      ],
+      "image": "/uploads/1989a878a513.jpg"
+    },
+    {
+      "id": "nour-el-sherif",
+      "name": "Nour El-Sherif",
+      "aliases": [
+        "نور الشريف"
+      ],
+      "image": "/uploads/895c27c0a285.jpg"
+    },
+    {
+      "id": "farid-shawqi",
+      "name": "Farid Shawqi",
+      "aliases": [
+        "فريد شوقي"
+      ],
+      "image": "/uploads/2daa177a98fe.jpg"
+    },
+    {
+      "id": "shadia",
+      "name": "Shadia",
+      "aliases": [
+        "شادية"
+      ],
+      "image": "/uploads/bebedb02e818.jpg"
+    },
+    {
+      "id": "sabah",
+      "name": "Sabah",
+      "aliases": [
+        "صباح"
+      ],
+      "image": "/uploads/5e660ffee899.png"
+    },
+    {
+      "id": "abdel-halim-hafez",
+      "name": "Abdel Halim Hafez",
+      "aliases": [
+        "عبد الحليم حافظ"
+      ],
+      "image": "/uploads/7e6da1a10cfd.jpg"
+    },
+    {
+      "id": "ismail-yassine",
+      "name": "Ismail Yassine",
+      "aliases": [
+        "إسماعيل ياسين"
+      ],
+      "image": "/uploads/545a36167857.jpg"
+    },
+    {
+      "id": "youssef-chahine",
+      "name": "Youssef Chahine",
+      "aliases": [
+        "يوسف شاهين"
+      ],
+      "image": "/uploads/752a73d80bd7.jpg"
+    },
+    {
+      "id": "hind-rostom",
+      "name": "Hind Rostom",
+      "aliases": [
+        "هند رستم"
+      ],
+      "image": "/uploads/7388724b6939.jpg"
+    },
+    {
+      "id": "nadia-lutfi",
+      "name": "Nadia Lutfi",
+      "aliases": [
+        "نادية لطفي"
+      ],
+      "image": "/uploads/5e7fc03ca4a4.jpg"
+    },
+    {
+      "id": "fouad-el-mohandes",
+      "name": "Fouad El-Mohandes",
+      "aliases": [
+        "فؤاد المهندس"
+      ],
+      "image": "/uploads/3e9784f87121.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "nameAr": "أساطير السينما العربية"
+}

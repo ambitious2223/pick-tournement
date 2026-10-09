@@ -8,6 +8,7 @@ import { ShowControls } from "./ShowControls.tsx";
 import { SoundControls } from "./SoundControls.tsx";
 import { SettingsPanel } from "./SettingsPanel.tsx";
 import { QueueEditor } from "./QueueEditor.tsx";
+import { ContentPanel } from "./ContentPanel.tsx";
 import { MatchStage } from "../bracket/MatchStage.tsx";
 import { useI18n } from "../i18n/index.tsx";
 
@@ -17,9 +18,9 @@ function isTyping(target: EventTarget | null): boolean {
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
 }
 
-type ControlTab = "run" | "show" | "sound" | "settings" | "queue" | "sim";
+type ControlTab = "run" | "show" | "sound" | "settings" | "queue" | "sim" | "content";
 
-const CONTROL_TABS: readonly ControlTab[] = ["run", "show", "sound", "settings", "queue", "sim"];
+const CONTROL_TABS: readonly ControlTab[] = ["run", "show", "sound", "settings", "queue", "sim", "content"];
 
 function readTab(): ControlTab {
   try {
@@ -84,6 +85,7 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
     { id: "settings", label: t("control.settings") },
     { id: "queue", label: t("control.queue"), hint: state.queue.length ? String(state.queue.length) : undefined },
     { id: "sim", label: t("control.simulator"), hint: state.simulated ? "•" : undefined },
+    { id: "content", label: t("control.content") },
   ];
 
   return (
@@ -104,6 +106,7 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
           {tab === "run" ? <MatchControls state={state} /> : null}
           {tab === "show" ? <ShowControls state={state} /> : null}
           {tab === "sound" ? <SoundControls state={state} /> : null}
+          {tab === "content" ? <ContentPanel state={state} /> : null}
           {tab === "settings" ? (
             <Panel title={t("control.settings")}>
               <SettingsPanel settings={state.settings} />

@@ -1,0 +1,166 @@
+{
+  "id": "folklore-mythical-characters",
+  "name": "Folklore & Mythical Characters",
+  "items": [
+    {
+      "id": "sinbad-the-sailor",
+      "name": "Sinbad the Sailor",
+      "aliases": [
+        "السندباد",
+        "السندباد البحري"
+      ],
+      "emoji": "⛵",
+      "image": "/uploads/b0ab193bb629.jpg"
+    },
+    {
+      "id": "aladdin",
+      "name": "Aladdin",
+      "aliases": [
+        "علاء الدين"
+      ],
+      "emoji": "🧞",
+      "image": "/uploads/02ba4a06afe5.jpg"
+    },
+    {
+      "id": "ali-baba",
+      "name": "Ali Baba",
+      "aliases": [
+        "علي بابا"
+      ],
+      "emoji": "💰",
+      "image": "/uploads/586b2be1d9ef.jpg"
+    },
+    {
+      "id": "juha-nasreddin",
+      "name": "Juha (Nasreddin)",
+      "aliases": [
+        "جحا",
+        "الجحص"
+      ],
+      "emoji": "🫏",
+      "image": "/uploads/d2892d842f07.jpg"
+    },
+    {
+      "id": "scheherazade",
+      "name": "Scheherazade",
+      "aliases": [
+        "شهرزاد"
+      ],
+      "emoji": "📖",
+      "image": "/uploads/acfb7f66d9cb.jpg"
+    },
+    {
+      "id": "shahryar",
+      "name": "Shahryar",
+      "aliases": [
+        "شهريار"
+      ],
+      "emoji": "👑"
+    },
+    {
+      "id": "abu-zayd-al-hilali",
+      "name": "Abu Zayd al-Hilali",
+      "aliases": [
+        "أبو زيد الهلالي"
+      ],
+      "emoji": "⚔️",
+      "image": "/uploads/bb5981ae30a1.jpg"
+    },
+    {
+      "id": "zarqa-al-yamama",
+      "name": "Zarqa al-Yamama",
+      "aliases": [
+        "زرقاء اليمامة"
+      ],
+      "emoji": "👁️",
+      "image": "/uploads/2d41a5345695.jpg"
+    },
+    {
+      "id": "antarah-folklore",
+      "name": "Antarah (Folklore)",
+      "aliases": [
+        "عنترة بن شداد",
+        "الأسطورة"
+      ],
+      "emoji": "🏇",
+      "image": "/uploads/daff6f58da48.jpg"
+    },
+    {
+      "id": "al-shater-hassan",
+      "name": "Al-Shater Hassan",
+      "aliases": [
+        "الشاطر حسن"
+      ],
+      "emoji": "🦸",
+      "image": "/uploads/6078cbabae5f.jpg"
+    },
+    {
+      "id": "qais-and-layla",
+      "name": "Qais and Layla",
+      "aliases": [
+        "قيس وليلى",
+        "ليلى"
+      ],
+      "emoji": "💕",
+      "image": "/uploads/98f5a7f4e83e.jpg"
+    },
+    {
+      "id": "saif-ibn-dhi-yazan",
+      "name": "Saif ibn Dhi Yazan",
+      "aliases": [
+        "سيف بن ذي يزن"
+      ],
+      "emoji": "🗡️",
+      "image": "/uploads/320f79148afe.jpg"
+    },
+    {
+      "id": "ghoul",
+      "name": "Ghoul",
+      "aliases": [
+        "الغول"
+      ],
+      "emoji": "👹",
+      "image": "/uploads/168776932b9c.jpg"
+    },
+    {
+      "id": "roc-legendary-bird",
+      "name": "Roc (Legendary Bird)",
+      "aliases": [
+        "طائر الرخ"
+      ],
+      "emoji": "🦅",
+      "image": "/uploads/b52cf63a8360.jpg"
+    },
+    {
+      "id": "jinn-genie",
+      "name": "Jinn (Genie)",
+      "aliases": [
+        "الجني",
+        "العملاق"
+      ],
+      "emoji": "🧞",
+      "image": "/uploads/0725ee725123.jpg"
+    },
+    {
+      "id": "al-naddaha",
+      "name": "Al-Naddaha",
+      "aliases": [
+        "النداهة"
+      ],
+      "emoji": "👻"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "nameAr": "شخصيات تراثية وأسطورية"
+}

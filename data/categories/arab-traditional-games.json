@@ -1,0 +1,166 @@
+{
+  "id": "arab-traditional-games",
+  "name": "Arab Traditional Games",
+  "items": [
+    {
+      "id": "baloot",
+      "name": "Baloot",
+      "aliases": [
+        "بلوت"
+      ],
+      "emoji": "🃏",
+      "image": "/uploads/1baeec3d27e6.jpg"
+    },
+    {
+      "id": "tawla-backgammon",
+      "name": "Tawla (Backgammon)",
+      "aliases": [
+        "طاولة",
+        "الطاولة"
+      ],
+      "emoji": "🎲",
+      "image": "/uploads/9ddd0f42fc70.jpg"
+    },
+    {
+      "id": "dominoes",
+      "name": "Dominoes",
+      "aliases": [
+        "دومينوز"
+      ],
+      "emoji": "🀣",
+      "image": "/uploads/3a76419a3f36.jpg"
+    },
+    {
+      "id": "tarneeb",
+      "name": "Tarneeb",
+      "aliases": [
+        "طرنيب"
+      ],
+      "emoji": "♠️",
+      "image": "/uploads/1b467d2be10d.jpg"
+    },
+    {
+      "id": "trix",
+      "name": "Trix",
+      "aliases": [
+        "تريكس"
+      ],
+      "emoji": "♣️",
+      "image": "/uploads/237505210888.png"
+    },
+    {
+      "id": "hand-rummy",
+      "name": "Hand (Rummy)",
+      "aliases": [
+        "هاند",
+        "رومي"
+      ],
+      "emoji": "🎴",
+      "image": "/uploads/0bf0fc6f4e3a.jpg"
+    },
+    {
+      "id": "carrom",
+      "name": "Carrom",
+      "aliases": [
+        "كيرم",
+        "كاروم"
+      ],
+      "emoji": "🎯",
+      "image": "/uploads/650ec9b3cf50.jpg"
+    },
+    {
+      "id": "mangala",
+      "name": "Mangala",
+      "aliases": [
+        "منقلة"
+      ],
+      "emoji": "🕳️",
+      "image": "/uploads/87f5355db714.jpg"
+    },
+    {
+      "id": "dama",
+      "name": "Dama",
+      "aliases": [
+        "دامة"
+      ],
+      "emoji": "♟️",
+      "image": "/uploads/82211ea01578.jpg"
+    },
+    {
+      "id": "seega",
+      "name": "Seega",
+      "aliases": [
+        "سيجة"
+      ],
+      "emoji": "🏜️"
+    },
+    {
+      "id": "ludo",
+      "name": "Ludo",
+      "aliases": [
+        "لودو"
+      ],
+      "emoji": "🎲",
+      "image": "/uploads/690ee3da41ca.jpg"
+    },
+    {
+      "id": "kout-bo-6",
+      "name": "Kout Bo 6",
+      "aliases": [
+        "كوت بو 6"
+      ],
+      "emoji": "🃏",
+      "image": "/uploads/9090ad91b20d.jpg"
+    },
+    {
+      "id": "basra",
+      "name": "Basra",
+      "aliases": [
+        "بصرة"
+      ],
+      "emoji": "🎴",
+      "image": "/uploads/36e49f918976.jpg"
+    },
+    {
+      "id": "estimation",
+      "name": "Estimation",
+      "aliases": [
+        "استيميشن"
+      ],
+      "emoji": "📝",
+      "image": "/uploads/d12ec912967a.jpg"
+    },
+    {
+      "id": "jackaroo",
+      "name": "Jackaroo",
+      "aliases": [
+        "جاكارو"
+      ],
+      "emoji": "🎲",
+      "image": "/uploads/9fedea8af794.jpg"
+    },
+    {
+      "id": "foosball-farafeera",
+      "name": "Foosball (Farafeera)",
+      "aliases": [
+        "فرفيرة",
+        "بيبي فوت"
+      ],
+      "emoji": "⚽",
+      "image": "/uploads/e056f2ef4ad3.jpg"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "nameAr": "ألعاب شعبية وورقية"
+}

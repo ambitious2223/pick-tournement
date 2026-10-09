@@ -62,7 +62,8 @@
       "aliases": [
         "برج العرب"
       ],
-      "emoji": "⛵"
+      "emoji": "⛵",
+      "image": "/uploads/8c8fa9b96924.webp"
     },
     {
       "id": "sheikh-zayed-grand-mosque",
@@ -70,7 +71,8 @@
       "aliases": [
         "جامع الشيخ زايد"
       ],
-      "emoji": "🕌"
+      "emoji": "🕌",
+      "image": "/uploads/1ea3df5a66a0.jpg"
     },
     {
       "id": "hagia-sophia",
