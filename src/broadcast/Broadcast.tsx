@@ -1,10 +1,9 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Item, SessionState } from "../../shared/types.ts";
 import { useI18n, type TKey } from "../i18n/index.tsx";
 import { useNow } from "../lib/live.ts";
 import { useSound } from "../sound/useSound.ts";
-import { engine } from "../sound/engine.ts";
-import { sound } from "../sound/manager.ts";
+import { enableSound, useSoundStatus } from "../sound/SoundStatus.tsx";
 import { activeCategory, activeMatch, categoryName, getItem, itemName } from "../lib/selectors.ts";
 import { BracketBoard } from "../bracket/BracketBoard.tsx";
 import { Stage } from "../stage/Stage.tsx";
@@ -34,24 +33,24 @@ function TopSupporters({ supporters }: { supporters: SessionState["live"]["suppo
   );
 }
 
-function SoundUnlock(): ReactNode {
+function SoundUnlock({ settings }: { settings: SessionState["settings"]["sound"] }): ReactNode {
   const { t } = useI18n();
-  const [ready, setReady] = useState(engine.running);
+  const status = useSoundStatus();
+  const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    if (ready) return;
-    const id = window.setInterval(() => setReady(engine.running), 800);
-    return () => window.clearInterval(id);
-  }, [ready]);
-
-  if (ready) return null;
+  if (status.context === "running" && !status.muted) return null;
+  const tone = status.muted ? "border-hot/60 text-hot" : "border-brand/60 text-brand";
   return (
     <button
       type="button"
-      onClick={() => void sound.unlock().then(() => setReady(true))}
-      className="fixed bottom-4 start-4 z-50 rounded-full border border-brand/60 bg-ink/80 px-4 py-2 text-sm font-bold text-brand backdrop-blur"
+      disabled={busy}
+      onClick={() => {
+        setBusy(true);
+        void enableSound(settings).finally(() => setBusy(false));
+      }}
+      className={`fixed bottom-4 start-4 z-50 rounded-full border bg-ink/80 px-4 py-2 text-sm font-bold backdrop-blur disabled:opacity-60 ${tone}`}
     >
-      🔊 {t("sound.enable")}
+      {status.muted ? `🔇 ${t("sound.mutedShort")}` : `🔊 ${t("sound.enable")}`}
     </button>
   );
 }
@@ -236,7 +235,7 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
       style={{ paddingTop: `${state.settings.safeTopPct}vh`, paddingBottom: `${state.settings.safeBottomPct}vh` }}
     >
       {body}
-      <SoundUnlock />
+      <SoundUnlock settings={state.settings.sound} />
       {preview ? (
         <div className="pointer-events-none absolute bottom-4 end-4 rounded-full border border-line bg-ink/80 px-3 py-1 text-xs text-white/45 backdrop-blur">
           {t("show.preview")}

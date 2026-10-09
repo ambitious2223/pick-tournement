@@ -13,6 +13,7 @@ import { GIFTS_DIR } from "./giftArt.ts";
 import { resolveLiveConfig, saveLiveConfig } from "./liveConfig.ts";
 import { findOrRegisterKey } from "./tikoraKey.ts";
 import { LiveClient } from "./live.ts";
+import { cacheImage } from "./imageCache.ts";
 
 const IMAGE_TYPES: Record<string, string> = {
   "image/png": ".png",
@@ -51,6 +52,40 @@ function json(res: http.ServerResponse, status: number, body: unknown): void {
     "Content-Length": Buffer.byteLength(text),
   });
   res.end(text);
+}
+
+/**
+ * True only for a plain public http(s) URL — blocks loopback, private and
+ * link-local addresses so the image endpoint can't be pointed at the LAN or
+ * the machine itself.
+ */
+function isPublicHttpUrl(raw: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+  const host = url.hostname.toLowerCase();
+  if (host === "localhost" || host.endsWith(".localhost")) return false;
+  const v4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (v4) {
+    const a = Number(v4[1]);
+    const b = Number(v4[2]);
+    if (a === 0 || a === 10 || a === 127) return false;
+    if (a === 169 && b === 254) return false;
+    if (a === 172 && b >= 16 && b <= 31) return false;
+    if (a === 192 && b === 168) return false;
+    if (a >= 224) return false;
+    return true;
+  }
+  if (host.includes(":")) {
+    const h = host.replace(/^\[|\]$/g, "");
+    if (h === "::" || h === "::1" || h.startsWith("fe80") || h.startsWith("fc") || h.startsWith("fd")) return false;
+    return true;
+  }
+  return host.includes("."); // a bare hostname like "router" is not public
 }
 
 async function readBody(req: http.IncomingMessage, limit: number): Promise<Buffer> {
@@ -203,6 +238,17 @@ async function main(): Promise<void> {
         const name = `${Date.now().toString(36)}-${crypto.randomBytes(4).toString("hex")}${ext}`;
         await fs.writeFile(path.join(UPLOADS_DIR, name), raw);
         return json(res, 200, { url: `/uploads/${name}`, bytes: raw.length });
+      }
+
+      if (pathname === "/api/photo/url" && method === "POST") {
+        const raw = await readBody(req, MAX_JSON);
+        const body = JSON.parse(raw.toString("utf8")) as { url?: unknown };
+        const target = typeof body.url === "string" ? body.url.trim() : "";
+        if (!isPublicHttpUrl(target)) return json(res, 400, { error: "Enter a public http(s) image link." });
+        // One image, verified and size-capped by the shared cache, saved locally.
+        const local = await cacheImage(target, { dir: UPLOADS_DIR, urlPath: "/uploads", maxBytes: MAX_UPLOAD });
+        if (!local) return json(res, 422, { error: "That link did not return a usable image." });
+        return json(res, 200, { url: local });
       }
 
       if (pathname === "/api/uploads/clear" && method === "POST") {

@@ -10,6 +10,18 @@ const MIN_INTERVAL: Record<string, number> = {
   "live.member": 80,
 };
 
+/** Plain-language snapshot of the audio system for the on-screen status readout. */
+export interface SoundStatus {
+  /** "not started" | "running" | "suspended" | "closed". */
+  context: string;
+  muted: boolean;
+  musicEnabled: boolean;
+  musicTrack: string | null;
+  lastCue: string | null;
+  lastCueAt: number | null;
+  overrides: string[];
+}
+
 class SoundManager {
   /** Set by the broadcast provider; forwards cues to the server for Tikora mapping. */
   onCue: ((id: string) => void) | null = null;
@@ -18,6 +30,10 @@ class SoundManager {
   private overrides = new Set<string>();
   private buffers = new Map<string, AudioBuffer>();
   private overridesLoaded = false;
+
+  /** A cue requested while the audio context was still locked, replayed on unlock. */
+  private pendingCue: { id: string; opts: CueOptions } | null = null;
+  private lastCue: { id: string; at: number } | null = null;
 
   private player = new MusicPlayer();
   private desiredSlot: string | null = null;
@@ -37,12 +53,33 @@ class SoundManager {
     return this.config;
   }
 
+  /** Snapshot of the audio system so the UI can show why sound is (not) playing. */
+  status(): SoundStatus {
+    const ctx = engine.ctx;
+    return {
+      context: !ctx ? "not started" : ctx.state === "running" ? "running" : ctx.state,
+      muted: this.config?.muted ?? false,
+      musicEnabled: this.config?.musicEnabled ?? false,
+      musicTrack: this.currentTrack,
+      lastCue: this.lastCue?.id ?? null,
+      lastCueAt: this.lastCue?.at ?? null,
+      overrides: [...this.overrides],
+    };
+  }
+
   async unlock(): Promise<void> {
     await engine.unlock();
     if (this.config) engine.applyConfig(this.config);
     // Music requested before the context existed is applied now.
     this.applyMusic();
     if (!this.overridesLoaded) await this.loadOverrides();
+    // A cue that arrived while the context was locked should not be lost.
+    if (this.pendingCue && engine.running) {
+      const p = this.pendingCue;
+      this.pendingCue = null;
+      if (this.overrides.has(p.id)) void this.playFile(p.id, p.opts);
+      else playCue(engine, p.id, p.opts);
+    }
   }
 
   private async loadOverrides(): Promise<void> {
@@ -68,23 +105,33 @@ class SoundManager {
     this.lastPlay.set(id, now);
 
     this.onCue?.(id);
+    this.lastCue = { id, at: Date.now() };
     if (this.overrides.has(id)) {
-      void this.playFile(id);
+      void this.playFile(id, opts);
       return;
     }
-    if (!engine.running) return;
+    // No audio context yet / blocked: remember the cue and replay it on unlock.
+    if (!engine.running) {
+      this.pendingCue = { id, opts };
+      return;
+    }
     playCue(engine, id, opts);
   }
 
-  private async playFile(id: string): Promise<void> {
+  private async playFile(id: string, opts: CueOptions): Promise<void> {
     const ctx = engine.ctx;
     const out = engine.bus("sfx");
-    if (!ctx || !out) return;
+    if (!ctx || !out || !engine.running) {
+      this.pendingCue = { id, opts };
+      return;
+    }
     let buffer = this.buffers.get(id);
     if (!buffer) {
       const found = await this.findOverrideFile(id);
       if (!found) {
+        // The override disappeared — use the built-in synth instead of going silent.
         this.overrides.delete(id);
+        playCue(engine, id, opts);
         return;
       }
       try {
@@ -92,6 +139,9 @@ class SoundManager {
         buffer = await ctx.decodeAudioData(await res.arrayBuffer());
         this.buffers.set(id, buffer);
       } catch {
+        // Broken file: drop the override and fall back so the cue still plays.
+        this.overrides.delete(id);
+        playCue(engine, id, opts);
         return;
       }
     }

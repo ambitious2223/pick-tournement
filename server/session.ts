@@ -38,7 +38,7 @@ import {
 } from "../engine/match.ts";
 import { completeMatch, createTournament, currentMatch } from "../engine/tournament.ts";
 import { fakeViewer, pickSide } from "../engine/simulate.ts";
-import { loadCategories, loadSession, saveCategory, deleteCategory, saveSessionDebounced } from "./store.ts";
+import { loadCategories, loadSession, saveCategory, deleteCategory, reorderCategories, saveSessionDebounced } from "./store.ts";
 
 export type ServerEvent = { type: "state"; state: SessionState };
 
@@ -1450,6 +1450,10 @@ export class Session {
         break;
       case "category:delete":
         await this.deleteCategoryAndRefresh(payload as string);
+        break;
+      case "category:reorder":
+        await reorderCategories(payload as string[]);
+        await this.refreshWait();
         break;
       case "tournament:start": {
         const arg = payload as { categoryId?: string } | undefined;

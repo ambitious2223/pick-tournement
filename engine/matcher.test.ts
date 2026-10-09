@@ -81,6 +81,15 @@ test("two competitors sharing a first word need more letters", () => {
   assert.equal(matchItem("Ahme", players), null);
 });
 
+test("a dedicated Arabic name is matchable without an alias", () => {
+  const players: (Item | null)[] = [
+    { id: "keffiyeh", name: "Keffiyeh", nameAr: "الكوفية", aliases: [] },
+    { id: "abaya", name: "Abaya", nameAr: "العباية", aliases: [] },
+  ];
+  assert.equal(matchItem("الكوفية", players), "keffiyeh");
+  assert.equal(matchItem("عباية", players), "abaya");
+});
+
 test("an equally close typo is refused rather than guessed", () => {
   const players: (Item | null)[] = [
     { id: "a", name: "runner", aliases: [] },

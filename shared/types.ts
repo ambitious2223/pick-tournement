@@ -89,6 +89,8 @@ export interface HubGift {
 export interface Item {
   id: string;
   name: string;
+  /** Dedicated Arabic display name (falls back to a matching Arabic alias). */
+  nameAr?: string;
   aliases: string[];
   image?: string;
   emoji?: string;
@@ -102,6 +104,8 @@ export interface Category {
   items: Item[];
   giftPair?: [Gift, Gift];
   roundSeconds?: number;
+  /** Manual ordering; categories without one fall after ordered ones. */
+  order?: number;
 }
 
 export interface Match {
@@ -229,6 +233,7 @@ export interface CommandMap {
   "queue:remove": number;
   "category:save": Category;
   "category:delete": string;
+  "category:reorder": string[];
   "tournament:start": { categoryId?: string } | undefined;
   "tournament:next": undefined;
   "match:start": undefined;

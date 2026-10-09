@@ -214,7 +214,7 @@ function pick(candidates: Candidate[], msg: string): string | null {
 }
 
 function keysFor(item: Item): string[] {
-  const keys = [normalize(item.name), ...item.aliases.map(normalize)];
+  const keys = [normalize(item.name), normalize(item.nameAr ?? ""), ...item.aliases.map(normalize)];
   return keys.filter((k) => k.length > 0);
 }
 

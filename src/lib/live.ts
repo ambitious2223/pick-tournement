@@ -28,6 +28,19 @@ export async function uploadImage(file: File): Promise<string> {
   return data.url;
 }
 
+export async function fetchImageFromUrl(url: string): Promise<string> {
+  const res = await fetch("/api/photo/url", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(data.error ?? "Could not fetch that image");
+  }
+  return ((await res.json()) as { url: string }).url;
+}
+
 export function useLiveState(): { state: SessionState | null; connected: boolean } {
   const [state, setState] = useState<SessionState | null>(null);
   const [connected, setConnected] = useState(false);

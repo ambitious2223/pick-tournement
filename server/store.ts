@@ -33,7 +33,25 @@ export async function loadCategories(): Promise<Category[]> {
       console.warn(`[store] skipping invalid category ${name}:`, (error as Error).message);
     }
   }
-  return categories.toSorted((a, b) => a.name.localeCompare(b.name));
+  return categories.toSorted((a, b) => {
+    const ao = a.order ?? Number.MAX_SAFE_INTEGER;
+    const bo = b.order ?? Number.MAX_SAFE_INTEGER;
+    if (ao !== bo) return ao - bo;
+    return a.name.localeCompare(b.name);
+  });
+}
+
+/** Persists a manual category order; ids not present keep their current file. */
+export async function reorderCategories(ids: string[]): Promise<void> {
+  const categories = await loadCategories();
+  const byId = new Map(categories.map((c) => [c.id, c]));
+  let position = 0;
+  for (const id of ids) {
+    const category = byId.get(id);
+    if (!category) continue;
+    category.order = position++;
+    await saveCategory(category);
+  }
 }
 
 function safeId(id: string): string {

@@ -47,6 +47,10 @@ test("every competitor has an id, a name and clean aliases", () => {
         assert.ok(normalize(alias), `${file}: alias "${alias}" normalizes to nothing`);
       }
       assert.ok(normalize(item.name), `${file}: name "${item.name}" normalizes to nothing`);
+      if (item.nameAr !== undefined) {
+        assert.ok(item.nameAr.trim(), `${file}: "${item.name}" has a blank Arabic name`);
+        assert.ok(normalize(item.nameAr), `${file}: Arabic name "${item.nameAr}" normalizes to nothing`);
+      }
     }
   }
 });
@@ -61,6 +65,13 @@ test("no two competitors in a category could be confused with each other", () =>
       const key = normalize(item.name);
       assert.ok(!names.has(key), `${file}: duplicate name ${item.name}`);
       names.add(key);
+      if (item.nameAr) {
+        const arabicKey = normalize(item.nameAr);
+        if (arabicKey && arabicKey !== key) {
+          assert.ok(!names.has(arabicKey), `${file}: Arabic name "${item.nameAr}" collides with another competitor`);
+          names.add(arabicKey);
+        }
+      }
       for (const alias of item.aliases) {
         const aliasKey = normalize(alias);
         if (aliasKey && aliasKey !== key) {
@@ -69,6 +80,16 @@ test("no two competitors in a category could be confused with each other", () =>
         }
       }
     }
+  }
+});
+
+test("manual category order, when set, is a finite number and unique", () => {
+  const seen = new Set<number>();
+  for (const { file, data } of categories) {
+    if (data.order === undefined) continue;
+    assert.ok(Number.isFinite(data.order), `${file}: order is not a number`);
+    assert.ok(!seen.has(data.order), `${file}: duplicate order ${data.order}`);
+    seen.add(data.order);
   }
 });
 

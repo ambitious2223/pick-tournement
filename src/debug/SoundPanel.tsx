@@ -6,6 +6,7 @@ import { useI18n } from "../i18n/index.tsx";
 import { CUE_IDS } from "../sound/cues.ts";
 import { sound } from "../sound/manager.ts";
 import { MusicLibrary } from "../sound/MusicLibrary.tsx";
+import { SoundStatusLine } from "../sound/SoundStatus.tsx";
 
 const patch = (p: Partial<SoundSettings>): void => void send("sound:update", p);
 
@@ -48,6 +49,7 @@ export function SoundPanel({ state }: { state: SessionState }): ReactNode {
 
   return (
     <div className="flex flex-col gap-3">
+      <SoundStatusLine settings={s} />
       <Toggle label={t("sound.muted")} checked={s.muted} onChange={(v) => patch({ muted: v })} />
       <Slider label={t("sound.master")} value={s.master} onChange={(v) => patch({ master: v })} />
       <Slider label={t("sound.music")} value={s.music} onChange={(v) => patch({ music: v })} />

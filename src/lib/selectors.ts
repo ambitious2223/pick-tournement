@@ -30,6 +30,7 @@ const ARABIC_RE = /[\u0600-\u06FF]/;
 export function itemName(item: Item | null | undefined, lang: "ar" | "en"): string {
   if (!item) return "";
   if (lang === "ar") {
+    if (item.nameAr) return item.nameAr;
     const arabic = item.aliases.find((alias) => ARABIC_RE.test(alias));
     if (arabic) return arabic;
   }
