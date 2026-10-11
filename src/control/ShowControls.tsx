@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { SessionState } from "../../shared/types.ts";
 import { Button } from "../ui/primitives.tsx";
+import { ColorWheel } from "../ui/ColorWheel.tsx";
 import { send } from "../lib/live.ts";
 import { useI18n, type TKey } from "../i18n/index.tsx";
 
@@ -52,6 +53,18 @@ export function ShowControls({ state }: { state: SessionState }): ReactNode {
       ) : (
         <p className="text-xs text-white/50">{t("show.autoHint")}</p>
       )}
+
+      <div className="mt-1 border-t border-line/60 pt-3">
+        <div className="mb-2 text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("settings.showBackground")}</div>
+        <ColorWheel
+          color={state.settings.showBackground}
+          onChange={(hex) => void send("settings:update", { showBackground: hex })}
+        />
+        <div className="mt-2 flex items-center justify-between text-[0.65rem] text-white/45">
+          <span className="font-mono">{state.settings.showBackground.toUpperCase()}</span>
+          <span className="h-4 w-10 rounded border border-line" style={{ background: state.settings.showBackground }} />
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,0 +1,164 @@
+{
+  "id": "category-mv2l4x93",
+  "name": "مارفل ",
+  "nameAr": "شخصيات مارفل ",
+  "items": [
+    {
+      "id": "hulk",
+      "name": "hulk",
+      "aliases": [
+        "hulk"
+      ],
+      "image": "/uploads/mv2kkz16-e207b764.jpg",
+      "nameAr": "هولك"
+    },
+    {
+      "id": "iron-man",
+      "name": "iron man",
+      "aliases": [
+        "iron man"
+      ],
+      "image": "/uploads/mv2klb4m-68a115a4.jpg",
+      "nameAr": "رجل حديدي"
+    },
+    {
+      "id": "spider-man",
+      "name": "spider man",
+      "aliases": [
+        "spider man"
+      ],
+      "image": "/uploads/mv2klovc-92c0c3f2.jpg",
+      "nameAr": "سبايدر مان"
+    },
+    {
+      "id": "captain-america",
+      "name": "captain america",
+      "aliases": [
+        "captain america"
+      ],
+      "image": "/uploads/mv2km0zs-940dfed7.jpg",
+      "nameAr": "كابتن امريكا"
+    },
+    {
+      "id": "flash",
+      "name": "flash",
+      "aliases": [
+        "flash"
+      ],
+      "image": "/uploads/mv2kmm1x-d7764a20.jpg",
+      "nameAr": "فلاش"
+    },
+    {
+      "id": "batman",
+      "name": "batman",
+      "aliases": [
+        "batman"
+      ],
+      "image": "/uploads/mv2kmwkp-5b5b4fb0.jpg",
+      "nameAr": "باتمان"
+    },
+    {
+      "id": "doctor-strange",
+      "name": "doctor strange",
+      "aliases": [
+        "doctor strange"
+      ],
+      "image": "/uploads/mv2kndeo-e569d565.jpg",
+      "nameAr": "دكتور سترانج"
+    },
+    {
+      "id": "thor",
+      "name": "thor",
+      "aliases": [
+        "thor"
+      ],
+      "image": "/uploads/mv2l8of9-adb880ad.jpg",
+      "nameAr": "ثور"
+    },
+    {
+      "id": "super-man",
+      "name": "super man",
+      "aliases": [
+        "super man"
+      ],
+      "image": "/uploads/mv2kv0mz-23698ec3.jpg",
+      "nameAr": "سوبر مان"
+    },
+    {
+      "id": "black-widow",
+      "name": "black widow",
+      "aliases": [
+        "black widow"
+      ],
+      "image": "/uploads/mv2kv9ur-fa31c4ba.jpg",
+      "nameAr": "بلاك ويدو"
+    },
+    {
+      "id": "batwomen",
+      "name": "batwomen",
+      "aliases": [
+        "batwomen"
+      ],
+      "image": "/uploads/mv2legqa-fff080b6.jpg",
+      "nameAr": "الخفاشة"
+    },
+    {
+      "id": "wonder-woman",
+      "name": "wonder woman",
+      "aliases": [
+        "wonder woman"
+      ],
+      "image": "/uploads/mv2ledm1-e4e6e586.jpg",
+      "nameAr": "وندر ومان"
+    },
+    {
+      "id": "wolverine",
+      "name": "wolverine",
+      "aliases": [
+        "wolverine"
+      ],
+      "image": "/uploads/mv2l00e3-165fb7ed.jpg",
+      "nameAr": "ولفرين"
+    },
+    {
+      "id": "scarlet",
+      "name": "SCARLET",
+      "aliases": [
+        "SCARLET"
+      ],
+      "image": "/uploads/mv2l033q-6b3087aa.jpg",
+      "nameAr": "سكارلت"
+    },
+    {
+      "id": "thanos",
+      "name": "THANOS",
+      "aliases": [
+        "THANOS"
+      ],
+      "image": "/uploads/mv2lg4ot-f1ce2bdd.jpg",
+      "nameAr": "ثانوس"
+    },
+    {
+      "id": "venom",
+      "name": "VENOM",
+      "aliases": [
+        "VENOM"
+      ],
+      "image": "/uploads/mv2l4nuf-396da4a4.jpg",
+      "nameAr": "فينوم"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "lang": "ar"
+}

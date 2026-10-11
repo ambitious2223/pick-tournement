@@ -4,13 +4,23 @@ import { ROUND_ORDER } from "../../shared/config.ts";
 import { Button, Field, TextInput, Select, Slider } from "../ui/primitives.tsx";
 import { Collapsible } from "../ui/Collapsible.tsx";
 import { LivePanel } from "./LivePanel.tsx";
-import { SoundPanel } from "./SoundPanel.tsx";
 import { send } from "../lib/live.ts";
 import { activeCategory, activeItems, activeMatch, categoryName } from "../lib/selectors.ts";
 import { fakeViewer } from "../../engine/simulate.ts";
-import { useI18n } from "../i18n/index.tsx";
+import { useI18n, type TKey } from "../i18n/index.tsx";
 
 const SM = "px-2 py-1 text-xs";
+
+const ROUND_LABEL_KEYS: { rid: "r16" | "qf" | "sf" | "final"; key: TKey }[] = [
+  { rid: "r16", key: "debug.roundR16" },
+  { rid: "qf", key: "debug.roundQf" },
+  { rid: "sf", key: "debug.roundSf" },
+  { rid: "final", key: "debug.roundFinal" },
+];
+
+const resetTimings = (): void => {
+  void send("settings:update", { roundSecondsByRound: { r16: 30, qf: 40, sf: 50, final: 60 } });
+};
 
 export function Debug({ state }: { state: SessionState | null }): ReactNode {
   const { t, round, lang } = useI18n();
@@ -27,6 +37,11 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
   const match = activeMatch(state);
   const category = activeCategory(state);
   const { a, b } = activeItems(state);
+
+  const setRoundSeconds = (rid: "r16" | "qf" | "sf" | "final", value: number): void => {
+    const next = { ...state.settings.roundSecondsByRound, [rid]: Math.max(1, value || 1) };
+    void send("settings:update", { roundSecondsByRound: next });
+  };
 
   const testImages = async () => {
     const urls = [a?.image, b?.image].filter((u): u is string => Boolean(u));
@@ -58,15 +73,11 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
   return (
     <div className="grid min-w-0 gap-3 lg:grid-cols-3">
       <div className="flex min-w-0 flex-col gap-3">
-        <Collapsible title={t("live.title")} defaultOpen hint={state.live.connected ? t("live.connected") : undefined}>
+        <Collapsible title={t("live.title")} defaultOpen persistKey="live" hint={state.live.connected ? t("live.connected") : undefined}>
           <LivePanel state={state} />
         </Collapsible>
 
-        <Collapsible title={t("sound.title")}>
-          <SoundPanel state={state} />
-        </Collapsible>
-
-        <Collapsible title={t("debug.display")} defaultOpen>
+        <Collapsible title={t("debug.display")} defaultOpen persistKey="display">
           <Slider
             label={t("settings.stageTextScale")}
             min={0.6}
@@ -76,10 +87,50 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
             onChange={(v) => void send("settings:update", { stageTextScale: v })}
             display={(v) => `${Math.round(v * 100)}%`}
           />
-          <p className="mt-2 text-xs text-white/50">{t("debug.displayHelp")}</p>
+
+          <div className="mt-4 border-t border-line/60 pt-3">
+            <div className="mb-2 text-[0.7rem] font-bold uppercase tracking-widest text-brand">{t("debug.roundTimings")}</div>
+            <div className="grid grid-cols-2 gap-2">
+              {ROUND_LABEL_KEYS.map(({ rid, key }) => (
+                <Field key={rid} label={t(key)}>
+                  <TextInput
+                    type="number"
+                    min={5}
+                    className={SM}
+                    value={state.settings.roundSecondsByRound[rid]}
+                    onChange={(e) => setRoundSeconds(rid, Number(e.target.value))}
+                  />
+                </Field>
+              ))}
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Button variant="ghost" className={SM} onClick={resetTimings}>
+                {t("debug.resetDefaults")}
+              </Button>
+              <span className="text-xs text-white/50">
+                {t("settings.roundRecapSeconds")}:
+                <TextInput
+                  type="number"
+                  min={0}
+                  className="ms-1 inline-block w-16 px-2 py-1 text-xs"
+                  value={state.settings.roundRecapSeconds}
+                  onChange={(e) => void send("settings:update", { roundRecapSeconds: Math.max(0, Number(e.target.value)) })}
+                />
+              </span>
+            </div>
+            <Slider
+              label={t("settings.bracketPace")}
+              min={0.6}
+              max={1.8}
+              step={0.05}
+              value={state.settings.bracketPace ?? 1}
+              onChange={(v) => void send("settings:update", { bracketPace: v })}
+              display={(v) => `${Math.round(v * 100)}%`}
+            />
+          </div>
         </Collapsible>
 
-        <Collapsible title={t("debug.voteInjector")} defaultOpen>
+        <Collapsible title={t("debug.voteInjector")} defaultOpen persistKey="vote">
           <div className="flex flex-col gap-2">
             <Field label={t("debug.chatMessage")}>
               <TextInput className={SM} value={text} onChange={(e) => setText(e.target.value)} placeholder={a?.name ?? t("debug.chatPlaceholder")} />
@@ -109,7 +160,7 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
           </div>
         </Collapsible>
 
-        <Collapsible title={t("debug.forceOutcomes")} defaultOpen>
+        <Collapsible title={t("debug.forceOutcomes")} defaultOpen persistKey="force">
           <div className="grid grid-cols-2 gap-2">
             <Button variant="ghost" className={SM} disabled={!match} onClick={() => void send("match:forceWinner", "a")}>
               {t("debug.forceLeft")}
@@ -139,7 +190,7 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
           </div>
         </Collapsible>
 
-        <Collapsible title={t("debug.photos")} defaultOpen>
+        <Collapsible title={t("debug.photos")} defaultOpen persistKey="photos">
           <div className="flex flex-col gap-2 text-xs">
             <div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
               {state.categories.map((c) => {
@@ -169,7 +220,7 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
           </div>
         </Collapsible>
 
-        <Collapsible title={t("debug.dangerZone")}>
+        <Collapsible title={t("debug.dangerZone")} persistKey="danger">
           <div className="flex flex-wrap gap-2">
             <Button
               variant="danger"
@@ -208,7 +259,7 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
         </Collapsible>
       </div>
 
-      <Collapsible title={t("debug.currentMatch")} defaultOpen>
+      <Collapsible title={t("debug.currentMatch")} defaultOpen persistKey="currentMatch">
         {match && category ? (
           <div className="flex flex-col gap-2 text-xs">
             <div className="flex justify-between gap-2">
@@ -231,7 +282,7 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
       </Collapsible>
 
       <div className="flex min-w-0 flex-col gap-3">
-        <Collapsible title={t("debug.eventLog")} defaultOpen>
+        <Collapsible title={t("debug.eventLog")} defaultOpen persistKey="eventLog">
           <div className="scroll-thin max-h-72 overflow-auto font-mono text-[0.7rem]">
             {state.log.toReversed().map((entry, i) => (
               <div key={i} className="border-b border-line/40 py-0.5">
@@ -255,7 +306,7 @@ export function Debug({ state }: { state: SessionState | null }): ReactNode {
           </div>
         </Collapsible>
 
-        <Collapsible title={t("debug.rawState")}>
+        <Collapsible title={t("debug.rawState")} persistKey="rawState">
           <pre className="scroll-thin max-h-72 overflow-auto rounded-lg bg-ink-2 p-2 text-[0.7rem] text-white/70">
             {JSON.stringify(state, null, 2)}
           </pre>

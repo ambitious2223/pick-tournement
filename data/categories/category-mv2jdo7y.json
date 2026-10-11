@@ -1,0 +1,161 @@
+{
+  "id": "category-mv2jdo7y",
+  "name": "كرتونات سبيستون ",
+  "nameAr": "spacetoon",
+  "items": [
+    {
+      "id": "item-1",
+      "name": "ناروتو",
+      "aliases": [
+        "naruto"
+      ],
+      "image": "/uploads/mv2jdgbv-1967b6eb.jpg"
+    },
+    {
+      "id": "item-2",
+      "name": "كونان",
+      "aliases": [
+        "conan"
+      ],
+      "image": "/uploads/mv2jdihg-6d49f4eb.jpg"
+    },
+    {
+      "id": "item-3",
+      "name": "ابطال",
+      "aliases": [
+        "ball hero"
+      ],
+      "image": "/uploads/mv2jdkso-daa27725.jpg"
+    },
+    {
+      "id": "item-4",
+      "name": "هزيم الرعد",
+      "aliases": [
+        "هزيم الرعد"
+      ],
+      "image": "/uploads/mv2jk4u9-01948af0.jpg",
+      "nameAr": "هزيم الرعد"
+    },
+    {
+      "id": "flame-sword",
+      "name": "BABARFILL",
+      "aliases": [
+        "BABARFILL"
+      ],
+      "image": "/uploads/mv2lp5u2-f5da386d.jpg",
+      "nameAr": "بابار فيل"
+    },
+    {
+      "id": "earth-eagles",
+      "name": "earth eagles",
+      "aliases": [
+        "earth eagles"
+      ],
+      "image": "/uploads/mv2jlq4o-4878c873.jpg",
+      "nameAr": "صقور الارض"
+    },
+    {
+      "id": "item-7",
+      "name": "HAND BALL",
+      "aliases": [
+        "HAND BALL"
+      ],
+      "image": "/uploads/mv2jmecl-514db2d1.jpg",
+      "nameAr": "الرمية الملتهبة"
+    },
+    {
+      "id": "sindibad-adventures",
+      "name": "sindibad  adventures",
+      "aliases": [
+        "sindibad  adventures"
+      ],
+      "image": "/uploads/mv2jpbek-0a30d131.jpg",
+      "nameAr": "مغامرات سندباد"
+    },
+    {
+      "id": "remi",
+      "name": "remi",
+      "aliases": [
+        "remi"
+      ],
+      "image": "/uploads/mv2jrp5a-ad4753da.jpg",
+      "nameAr": "ريمي"
+    },
+    {
+      "id": "dragon-ball",
+      "name": "dragon ball",
+      "aliases": [
+        "dragon ball"
+      ],
+      "image": "/uploads/mv2js0bz-1b97771d.jpg",
+      "nameAr": "دراغون بول"
+    },
+    {
+      "id": "adnan-and-lina",
+      "name": "adnan and lina",
+      "aliases": [
+        "adnan and lina"
+      ],
+      "image": "/uploads/mv2jsp8r-94ac78d1.jpg",
+      "nameAr": "عدنان ولينا"
+    },
+    {
+      "id": "iniusha",
+      "name": "DAI THE BARAVE",
+      "aliases": [
+        "DAI THE BARAVE"
+      ],
+      "image": "/uploads/mv2lprs9-93ab20f4.jpg",
+      "nameAr": "داي الشجاع"
+    },
+    {
+      "id": "grandizer",
+      "name": "grandizer",
+      "aliases": [
+        "grandizer"
+      ],
+      "image": "/uploads/mv2kdvqq-340339d7.jpg",
+      "nameAr": "جرانديزر"
+    },
+    {
+      "id": "martin-adventures",
+      "name": "KUNG FU SCHOLL",
+      "aliases": [
+        "KUNG FU SCHOLL"
+      ],
+      "image": "/uploads/mv2lqyef-11774997.jpg",
+      "nameAr": "مدرسة الكونج فو"
+    },
+    {
+      "id": "samurai-jack",
+      "name": "samurai jack",
+      "aliases": [
+        "samurai jack"
+      ],
+      "image": "/uploads/mv2kep22-af813947.jpg",
+      "nameAr": "ساموراي جاك"
+    },
+    {
+      "id": "me-and-my-brother",
+      "name": "me and my brother",
+      "aliases": [
+        "me and my brother"
+      ],
+      "image": "/uploads/mv2kf7zo-cd738fc3.jpg",
+      "nameAr": "انا واخي"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "lang": "ar"
+}

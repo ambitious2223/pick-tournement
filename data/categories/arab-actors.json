@@ -1,132 +1,132 @@
 {
   "id": "arab-actors",
-  "name": "Arab Actors",
+  "name": "ممثلون عرب",
   "items": [
     {
       "id": "adel-emam",
-      "name": "Adel Emam",
+      "name": "عادل إمام",
       "aliases": [
-        "عادل إمام"
+        "Adel Emam"
       ],
       "image": "/uploads/37d1dd9540e6.jpg"
     },
     {
       "id": "ahmed-helmy",
-      "name": "Ahmed Helmy",
+      "name": "أحمد حلمي",
       "aliases": [
-        "أحمد حلمي"
+        "Ahmed Helmy"
       ],
       "image": "/uploads/7e0c1625624a.jpg"
     },
     {
       "id": "mona-zaki",
-      "name": "Mona Zaki",
+      "name": "منى زكي",
       "aliases": [
-        "منى زكي"
+        "Mona Zaki"
       ],
       "image": "/uploads/03d325f318c1.jpg"
     },
     {
       "id": "youssef-el-sherif",
-      "name": "Youssef El Sherif",
+      "name": "يوسف الشريف",
       "aliases": [
-        "يوسف الشريف"
+        "Youssef El Sherif"
       ],
       "image": "/uploads/46f7e491ea09.jpg"
     },
     {
       "id": "hend-sabri",
-      "name": "Hend Sabri",
+      "name": "هند صبري",
       "aliases": [
-        "هند صبري"
+        "Hend Sabri"
       ],
       "image": "/uploads/994a914b95e5.jpg"
     },
     {
       "id": "amina-khalil",
-      "name": "Amina Khalil",
+      "name": "أمينة خليل",
       "aliases": [
-        "أمينة خليل"
+        "Amina Khalil"
       ],
       "image": "/uploads/83da96b2a021.png"
     },
     {
       "id": "hassan-el-raddad",
-      "name": "Hassan El Raddad",
+      "name": "حسن الرداد",
       "aliases": [
-        "حسن الرداد"
+        "Hassan El Raddad"
       ],
       "image": "/uploads/19d8fbd830d6.png"
     },
     {
       "id": "eyad-nassar",
-      "name": "Eyad Nassar",
+      "name": "إياد نصار",
       "aliases": [
-        "إياد نصار"
+        "Eyad Nassar"
       ],
       "image": "/uploads/bc05154f89fb.png"
     },
     {
       "id": "nadine-nassib-njeim",
-      "name": "Nadine Nassib Njeim",
+      "name": "نادين نسيب نجيم",
       "aliases": [
-        "نادين نسيب نجيم"
+        "Nadine Nassib Njeim"
       ],
       "image": "/uploads/fd6e5eff590d.png"
     },
     {
       "id": "karim-abdel-aziz",
-      "name": "Karim Abdel Aziz",
+      "name": "كريم عبد العزيز",
       "aliases": [
-        "كريم عبد العزيز"
+        "Karim Abdel Aziz"
       ],
       "image": "/uploads/0f59f8d849e1.png"
     },
     {
       "id": "ahmed-ezz",
-      "name": "Ahmed Ezz",
+      "name": "أحمد عز",
       "aliases": [
-        "أحمد عز"
+        "Ahmed Ezz"
       ],
       "image": "/uploads/5bc087f14d2b.jpg"
     },
     {
       "id": "nelly-karim",
-      "name": "Nelly Karim",
+      "name": "نيللي كريم",
       "aliases": [
-        "نيللي كريم"
+        "Nelly Karim"
       ],
       "image": "/uploads/cef770f1411b.jpg"
     },
     {
       "id": "dhafer-l-abidine",
-      "name": "Dhafer L'Abidine",
+      "name": "ظافر العابدين",
       "aliases": [
-        "ظافر العابدين"
+        "Dhafer L'Abidine"
       ],
       "image": "/uploads/2e7662939201.jpg"
     },
     {
       "id": "menna-shalabi",
-      "name": "Menna Shalabi",
+      "name": "منة شلبي",
       "aliases": [
-        "منة شلبي"
+        "Menna Shalabi"
       ],
       "image": "/uploads/7a6fccfb22ea.jpg"
     },
     {
       "id": "asser-yassin",
-      "name": "Asser Yassin",
+      "name": "آسر ياسين",
       "aliases": [
-        "آسر ياسين"
+        "Asser Yassin"
       ],
       "image": "/uploads/107eaa2fd8a1.png"
     },
     {
       "id": "ghada-adel",
-      "name": "Ghada Adel",
+      "name": "غادة عادل",
       "aliases": [
-        "غادة عادل"
+        "Ghada Adel"
       ],
       "image": "/uploads/f7ddd6f14eed.png"
     }
@@ -143,5 +143,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "ممثلون عرب"
+  "nameAr": "Arab Actors",
+  "lang": "ar"
 }

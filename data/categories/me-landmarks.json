@@ -1,147 +1,147 @@
 {
   "id": "me-landmarks",
-  "name": "Middle Eastern Landmarks",
+  "name": "معالم الشرق الأوسط",
   "items": [
     {
       "id": "burj-khalifa",
-      "name": "Burj Khalifa",
+      "name": "برج خليفة",
       "aliases": [
-        "برج خليفة"
+        "Burj Khalifa"
       ],
       "emoji": "🏗️",
       "image": "/uploads/4985d27fbad5.jpg"
     },
     {
       "id": "kaaba",
-      "name": "Kaaba",
+      "name": "الكعبة",
       "aliases": [
-        "الكعبة"
+        "Kaaba"
       ],
       "emoji": "🕋",
       "image": "/uploads/db836e6a7ded.jpg"
     },
     {
       "id": "petra",
-      "name": "Petra",
+      "name": "البتراء",
       "aliases": [
-        "البتراء"
+        "Petra"
       ],
       "emoji": "🏛️",
       "image": "/uploads/5f2ec477559f.jpg"
     },
     {
       "id": "pyramids-of-giza",
-      "name": "Pyramids of Giza",
+      "name": "أهرامات الجيزة",
       "aliases": [
-        "أهرامات الجيزة"
+        "Pyramids of Giza"
       ],
       "emoji": "🔺",
       "image": "/uploads/44187deb459c.jpg"
     },
     {
       "id": "masjid-al-haram",
-      "name": "Masjid al-Haram",
+      "name": "المسجد الحرام",
       "aliases": [
-        "المسجد الحرام"
+        "Masjid al-Haram"
       ],
       "emoji": "🕌",
       "image": "/uploads/36fde310a3fd.jpg"
     },
     {
       "id": "al-aqsa-mosque",
-      "name": "Al-Aqsa Mosque",
+      "name": "المسجد الأقصى",
       "aliases": [
-        "المسجد الأقصى"
+        "Al-Aqsa Mosque"
       ],
       "emoji": "🕌",
       "image": "/uploads/9c0416a29f59.jpg"
     },
     {
       "id": "burj-al-arab",
-      "name": "Burj Al Arab",
+      "name": "برج العرب",
       "aliases": [
-        "برج العرب"
+        "Burj Al Arab"
       ],
       "emoji": "⛵",
       "image": "/uploads/8c8fa9b96924.webp"
     },
     {
       "id": "sheikh-zayed-grand-mosque",
-      "name": "Sheikh Zayed Grand Mosque",
+      "name": "جامع الشيخ زايد",
       "aliases": [
-        "جامع الشيخ زايد"
+        "Sheikh Zayed Grand Mosque"
       ],
       "emoji": "🕌",
       "image": "/uploads/1ea3df5a66a0.jpg"
     },
     {
       "id": "hagia-sophia",
-      "name": "Hagia Sophia",
+      "name": "آيا صوفيا",
       "aliases": [
-        "آيا صوفيا"
+        "Hagia Sophia"
       ],
       "emoji": "🏛️",
       "image": "/uploads/92c2041a706c.jpg"
     },
     {
       "id": "blue-mosque",
-      "name": "Blue Mosque",
+      "name": "المسجد الأزرق",
       "aliases": [
-        "المسجد الأزرق"
+        "Blue Mosque"
       ],
       "emoji": "🕌",
       "image": "/uploads/d8c109f2b1dc.jpg"
     },
     {
       "id": "dead-sea",
-      "name": "Dead Sea",
+      "name": "البحر الميت",
       "aliases": [
-        "البحر الميت"
+        "Dead Sea"
       ],
       "emoji": "🌊",
       "image": "/uploads/49731cffe8c9.jpg"
     },
     {
       "id": "nile-river",
-      "name": "Nile River",
+      "name": "نهر النيل",
       "aliases": [
-        "نهر النيل"
+        "Nile River"
       ],
       "emoji": "🚤",
       "image": "/uploads/a871b2ed03d4.jpg"
     },
     {
       "id": "palm-jumeirah",
-      "name": "Palm Jumeirah",
+      "name": "نخلة جميرا",
       "aliases": [
-        "نخلة جميرا"
+        "Palm Jumeirah"
       ],
       "emoji": "🌴",
       "image": "/uploads/3470cdb410ec.jpg"
     },
     {
       "id": "al-ula",
-      "name": "Al-Ula",
+      "name": "العلا",
       "aliases": [
-        "العلا"
+        "Al-Ula"
       ],
       "emoji": "🏜️",
       "image": "/uploads/d106a0114b0d.jpg"
     },
     {
       "id": "wadi-rum",
-      "name": "Wadi Rum",
+      "name": "وادي رم",
       "aliases": [
-        "وادي رم"
+        "Wadi Rum"
       ],
       "emoji": "🏜️",
       "image": "/uploads/4fde5353728e.jpg"
     },
     {
       "id": "citadel-of-aleppo",
-      "name": "Citadel of Aleppo",
+      "name": "قلعة حلب",
       "aliases": [
-        "قلعة حلب"
+        "Citadel of Aleppo"
       ],
       "emoji": "🏰",
       "image": "/uploads/e6992f5ed683.jpg"
@@ -159,5 +159,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "معالم الشرق الأوسط"
+  "nameAr": "Middle Eastern Landmarks",
+  "lang": "ar"
 }

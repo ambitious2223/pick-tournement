@@ -1,147 +1,147 @@
 {
   "id": "me-cities",
-  "name": "Middle Eastern Cities",
+  "name": "مدن الشرق الأوسط",
   "items": [
     {
       "id": "dubai",
-      "name": "Dubai",
+      "name": "دبي",
       "aliases": [
-        "دبي"
+        "Dubai"
       ],
       "emoji": "🌆",
       "image": "/uploads/2be5f11ba1dd.jpg"
     },
     {
       "id": "riyadh",
-      "name": "Riyadh",
+      "name": "الرياض",
       "aliases": [
-        "الرياض"
+        "Riyadh"
       ],
       "emoji": "🏙️",
       "image": "/uploads/051a06573a18.jpg"
     },
     {
       "id": "cairo",
-      "name": "Cairo",
+      "name": "القاهرة",
       "aliases": [
-        "القاهرة"
+        "Cairo"
       ],
       "emoji": "🐪",
       "image": "/uploads/cca0471b6f49.jpg"
     },
     {
       "id": "doha",
-      "name": "Doha",
+      "name": "الدوحة",
       "aliases": [
-        "الدوحة"
+        "Doha"
       ],
       "emoji": "🏗️",
       "image": "/uploads/fc5f2f7594a7.jpg"
     },
     {
       "id": "abu-dhabi",
-      "name": "Abu Dhabi",
+      "name": "أبوظبي",
       "aliases": [
-        "أبوظبي"
+        "Abu Dhabi"
       ],
       "emoji": "🏛️",
       "image": "/uploads/53cbc30e29e6.jpg"
     },
     {
       "id": "beirut",
-      "name": "Beirut",
+      "name": "بيروت",
       "aliases": [
-        "بيروت"
+        "Beirut"
       ],
       "emoji": "🌊",
       "image": "/uploads/723b0c62df84.jpg"
     },
     {
       "id": "amman",
-      "name": "Amman",
+      "name": "عمّان",
       "aliases": [
-        "عمّان"
+        "Amman"
       ],
       "emoji": "🏛️",
       "image": "/uploads/40b84eb94b41.png"
     },
     {
       "id": "casablanca",
-      "name": "Casablanca",
+      "name": "الدار البيضاء",
       "aliases": [
-        "الدار البيضاء"
+        "Casablanca"
       ],
       "emoji": "🕌",
       "image": "/uploads/5ab79b608a78.jpg"
     },
     {
       "id": "istanbul",
-      "name": "Istanbul",
+      "name": "إسطنبول",
       "aliases": [
-        "إسطنبول"
+        "Istanbul"
       ],
       "emoji": "🌉",
       "image": "/uploads/936643e3c509.jpg"
     },
     {
       "id": "mecca",
-      "name": "Mecca",
+      "name": "مكة",
       "aliases": [
-        "مكة"
+        "Mecca"
       ],
       "emoji": "🕋",
       "image": "/uploads/347e20f44fe3.jpg"
     },
     {
       "id": "medina",
-      "name": "Medina",
+      "name": "المدينة المنورة",
       "aliases": [
-        "المدينة المنورة"
+        "Medina"
       ],
       "emoji": "🕌",
       "image": "/uploads/49a1897caa85.jpg"
     },
     {
       "id": "muscat",
-      "name": "Muscat",
+      "name": "مسقط",
       "aliases": [
-        "مسقط"
+        "Muscat"
       ],
       "emoji": "⛵",
       "image": "/uploads/39ac49d7dcf3.jpg"
     },
     {
       "id": "kuwait-city",
-      "name": "Kuwait City",
+      "name": "مدينة الكويت",
       "aliases": [
-        "مدينة الكويت"
+        "Kuwait City"
       ],
       "emoji": "🏙️",
       "image": "/uploads/54d99dd21d0a.jpg"
     },
     {
       "id": "manama",
-      "name": "Manama",
+      "name": "المنامة",
       "aliases": [
-        "المنامة"
+        "Manama"
       ],
       "emoji": "🌴",
       "image": "/uploads/1794d84718f1.jpg"
     },
     {
       "id": "jeddah",
-      "name": "Jeddah",
+      "name": "جدة",
       "aliases": [
-        "جدة"
+        "Jeddah"
       ],
       "emoji": "⚓",
       "image": "/uploads/4e45e2360b16.jpg"
     },
     {
       "id": "alexandria",
-      "name": "Alexandria",
+      "name": "الإسكندرية",
       "aliases": [
-        "الإسكندرية"
+        "Alexandria"
       ],
       "emoji": "🌊",
       "image": "/uploads/b2adb0b8eb30.jpg"
@@ -159,5 +159,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "مدن الشرق الأوسط"
+  "nameAr": "Middle Eastern Cities",
+  "lang": "ar"
 }

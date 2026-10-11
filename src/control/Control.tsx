@@ -1,15 +1,16 @@
 import { useEffect, useState, type ReactNode } from "react";
 import type { SessionState } from "../../shared/types.ts";
-import { Toggle, Panel } from "../ui/primitives.tsx";
+import { Panel } from "../ui/primitives.tsx";
 import { Tabs, type TabItem } from "../ui/Tabs.tsx";
 import { send } from "../lib/live.ts";
 import { MatchControls } from "./MatchControls.tsx";
 import { ShowControls } from "./ShowControls.tsx";
 import { SoundControls } from "./SoundControls.tsx";
 import { SettingsPanel } from "./SettingsPanel.tsx";
+import { SimControls } from "./SimControls.tsx";
 import { QueueEditor } from "./QueueEditor.tsx";
-import { ContentPanel } from "./ContentPanel.tsx";
 import { MatchStage } from "../bracket/MatchStage.tsx";
+import { CategoryPoll } from "../overlay/CategoryPoll.tsx";
 import { useI18n } from "../i18n/index.tsx";
 
 function isTyping(target: EventTarget | null): boolean {
@@ -18,9 +19,9 @@ function isTyping(target: EventTarget | null): boolean {
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
 }
 
-type ControlTab = "run" | "show" | "sound" | "settings" | "queue" | "sim" | "content";
+type ControlTab = "run" | "show" | "sound" | "settings" | "queue" | "sim";
 
-const CONTROL_TABS: readonly ControlTab[] = ["run", "show", "sound", "settings", "queue", "sim", "content"];
+const CONTROL_TABS: readonly ControlTab[] = ["run", "show", "sound", "settings", "queue", "sim"];
 
 function readTab(): ControlTab {
   try {
@@ -85,13 +86,18 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
     { id: "settings", label: t("control.settings") },
     { id: "queue", label: t("control.queue"), hint: state.queue.length ? String(state.queue.length) : undefined },
     { id: "sim", label: t("control.simulator"), hint: state.simulated ? "•" : undefined },
-    { id: "content", label: t("control.content") },
   ];
 
   return (
     <div className="grid gap-4 xl:h-full xl:min-h-0 xl:grid-cols-[1fr_19rem]">
       <section className="panel flex min-h-[420px] flex-col overflow-hidden xl:min-h-0">
-        <MatchStage state={state} variant="control" />
+        {state.show.active && state.show.phase === "category" ? (
+          <div className="scroll-thin h-full w-full overflow-auto">
+            <CategoryPoll state={state} />
+          </div>
+        ) : (
+          <MatchStage state={state} variant="control" />
+        )}
       </section>
 
       <aside className="flex min-h-0 flex-col gap-3">
@@ -106,7 +112,6 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
           {tab === "run" ? <MatchControls state={state} /> : null}
           {tab === "show" ? <ShowControls state={state} /> : null}
           {tab === "sound" ? <SoundControls state={state} /> : null}
-          {tab === "content" ? <ContentPanel state={state} /> : null}
           {tab === "settings" ? (
             <Panel title={t("control.settings")}>
               <SettingsPanel settings={state.settings} />
@@ -119,17 +124,10 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
           ) : null}
           {tab === "sim" ? (
             <Panel title={t("control.simulator")}>
-              <Toggle
-                label={t("control.simulatorToggle")}
-                checked={state.simulated}
-                onChange={(on) => void send("sim:set", { on })}
-              />
-              <p className="mt-2 text-xs text-white/50">{t("control.simulatorHelp")}</p>
+              <SimControls state={state} />
             </Panel>
           ) : null}
         </div>
-
-        <p className="px-1 text-[0.65rem] leading-relaxed text-white/35">{t("control.shortcuts")}</p>
       </aside>
     </div>
   );

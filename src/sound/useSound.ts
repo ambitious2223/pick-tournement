@@ -79,10 +79,17 @@ export function useSound(state: SessionState | null): void {
         sound.play("round.intro", { roundIndex: roundIndex(state) });
         break;
       case "bracket-intro":
-        sound.play("bracket.intro");
+        sound.play("bracket.intro", { roundIndex: roundIndex(state) });
+        sound.play("bracket.zoom.in", { roundIndex: roundIndex(state) });
+        if (roundIndex(state) >= 2) sound.play("bracket.tension", { roundIndex: roundIndex(state) });
         break;
       case "bracket-outro":
         sound.play("match.end");
+        sound.play("bracket.reveal", { roundIndex: roundIndex(state) });
+        sound.play("bracket.loser");
+        break;
+      case "round-recap":
+        sound.play("bracket.intro", { roundIndex: roundIndex(state) });
         sound.play("bracket.winner");
         break;
       case "match":

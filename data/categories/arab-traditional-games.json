@@ -1,150 +1,148 @@
 {
   "id": "arab-traditional-games",
-  "name": "Arab Traditional Games",
+  "name": "ألعاب شعبية وورقية",
   "items": [
     {
       "id": "baloot",
-      "name": "Baloot",
+      "name": "بلوت",
       "aliases": [
-        "بلوت"
+        "Baloot"
       ],
       "emoji": "🃏",
       "image": "/uploads/1baeec3d27e6.jpg"
     },
     {
       "id": "tawla-backgammon",
-      "name": "Tawla (Backgammon)",
+      "name": "طاولة",
       "aliases": [
-        "طاولة",
+        "Tawla (Backgammon)",
         "الطاولة"
       ],
       "emoji": "🎲",
-      "image": "/uploads/9ddd0f42fc70.jpg"
+      "image": "/uploads/mv2ijz0v-bb6cd4b4.jpg"
     },
     {
       "id": "dominoes",
-      "name": "Dominoes",
+      "name": "دومينوز",
       "aliases": [
-        "دومينوز"
+        "Dominoes"
       ],
       "emoji": "🀣",
       "image": "/uploads/3a76419a3f36.jpg"
     },
     {
       "id": "tarneeb",
-      "name": "Tarneeb",
+      "name": "طرنيب",
       "aliases": [
-        "طرنيب"
+        "Tarneeb"
       ],
       "emoji": "♠️",
       "image": "/uploads/1b467d2be10d.jpg"
     },
     {
       "id": "trix",
-      "name": "Trix",
+      "name": "تريكس",
       "aliases": [
-        "تريكس"
+        "Trix"
       ],
       "emoji": "♣️",
       "image": "/uploads/237505210888.png"
     },
     {
       "id": "hand-rummy",
-      "name": "Hand (Rummy)",
+      "name": "نط الحبل",
       "aliases": [
-        "هاند",
-        "رومي"
+        "jumping"
       ],
       "emoji": "🎴",
-      "image": "/uploads/0bf0fc6f4e3a.jpg"
+      "image": "/uploads/mv2ik7bn-9b06fefd.jpg"
     },
     {
       "id": "carrom",
-      "name": "Carrom",
+      "name": "طائرات",
       "aliases": [
-        "كيرم",
-        "كاروم"
+        "Carrom"
       ],
       "emoji": "🎯",
-      "image": "/uploads/650ec9b3cf50.jpg"
+      "image": "/uploads/mv2il37s-65145331.jpg"
     },
     {
       "id": "mangala",
-      "name": "Mangala",
+      "name": "جلال",
       "aliases": [
-        "منقلة"
+        "balls"
       ],
       "emoji": "🕳️",
-      "image": "/uploads/87f5355db714.jpg"
+      "image": "/uploads/mv2imj5k-0b6a0911.jpg"
     },
     {
       "id": "dama",
-      "name": "Dama",
+      "name": "دامة",
       "aliases": [
-        "دامة"
+        "Dama"
       ],
       "emoji": "♟️",
-      "image": "/uploads/82211ea01578.jpg"
+      "image": "/uploads/mv2inqv1-ec7a3231.jpg"
     },
     {
       "id": "seega",
-      "name": "Seega",
+      "name": "مملكة",
       "aliases": [
-        "سيجة"
+        "kingdom"
       ],
-      "emoji": "🏜️"
+      "emoji": "🏜️",
+      "image": "/uploads/mv2inwir-e2bd6a2b.jpg"
     },
     {
       "id": "ludo",
-      "name": "Ludo",
+      "name": "لودو",
       "aliases": [
-        "لودو"
+        "Ludo"
       ],
       "emoji": "🎲",
-      "image": "/uploads/690ee3da41ca.jpg"
+      "image": "/uploads/mv2ipcx3-df34407b.jpg"
     },
     {
       "id": "kout-bo-6",
-      "name": "Kout Bo 6",
+      "name": "شطرنج",
       "aliases": [
-        "كوت بو 6"
+        "chess"
       ],
       "emoji": "🃏",
-      "image": "/uploads/9090ad91b20d.jpg"
+      "image": "/uploads/mv2irpex-3c4f71d0.jpg"
     },
     {
       "id": "basra",
-      "name": "Basra",
+      "name": "يويو",
       "aliases": [
-        "بصرة"
+        "yoyo"
       ],
       "emoji": "🎴",
-      "image": "/uploads/36e49f918976.jpg"
+      "image": "/uploads/mv2j1etr-54dacd14.jpg"
     },
     {
       "id": "estimation",
-      "name": "Estimation",
+      "name": "يوغي",
       "aliases": [
-        "استيميشن"
+        "yo gi oh"
       ],
       "emoji": "📝",
-      "image": "/uploads/d12ec912967a.jpg"
+      "image": "/uploads/mv2j1mq1-29bf8c56.jpg"
     },
     {
       "id": "jackaroo",
-      "name": "Jackaroo",
+      "name": "بيبليد",
       "aliases": [
-        "جاكارو"
+        "beyblade"
       ],
       "emoji": "🎲",
-      "image": "/uploads/9fedea8af794.jpg"
+      "image": "/uploads/mv2j4wsk-3740d5ea.jpg"
     },
     {
       "id": "foosball-farafeera",
-      "name": "Foosball (Farafeera)",
+      "name": "فيشة",
       "aliases": [
-        "فرفيرة",
-        "بيبي فوت"
+        "Foosball (Farafeera)"
       ],
       "emoji": "⚽",
       "image": "/uploads/e056f2ef4ad3.jpg"
@@ -162,5 +160,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "ألعاب شعبية وورقية"
+  "nameAr": "Arab Traditional Games",
+  "lang": "ar"
 }

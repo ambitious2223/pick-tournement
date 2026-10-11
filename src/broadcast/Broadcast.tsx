@@ -1,13 +1,14 @@
 import { useState, type ReactNode } from "react";
 import type { Item, SessionState } from "../../shared/types.ts";
 import { useI18n, type TKey } from "../i18n/index.tsx";
-import { useNow } from "../lib/live.ts";
 import { useSound } from "../sound/useSound.ts";
 import { enableSound, useSoundStatus } from "../sound/SoundStatus.tsx";
 import { activeCategory, activeMatch, categoryName, getItem, itemName } from "../lib/selectors.ts";
-import { BracketBoard } from "../bracket/BracketBoard.tsx";
+import { BracketCinema } from "../bracket/BracketCinema.tsx";
 import { Stage } from "../stage/Stage.tsx";
 import { ItemVisual } from "../overlay/ItemVisual.tsx";
+import { CategoryPoll } from "../overlay/CategoryPoll.tsx";
+import { VoteToasts } from "../overlay/VoteToasts.tsx";
 import { Avatar } from "../ui/Avatar.tsx";
 
 function TopSupporters({ supporters }: { supporters: SessionState["live"]["supporters"] }): ReactNode {
@@ -80,10 +81,15 @@ function ResultSide({
   const ring = winner ? "ring-4 ring-lime" : "ring-2 ring-line";
   return (
     <div className={`animate-rise flex flex-col items-center gap-3 ${winner ? "" : "opacity-70"}`}>
-      <div className={`h-[clamp(7rem,20vh,13rem)] w-[clamp(7rem,20vh,13rem)] overflow-hidden rounded-2xl ${ring}`}>
+      <div className={`relative h-[clamp(7rem,20vh,13rem)] w-[clamp(7rem,20vh,13rem)] overflow-hidden rounded-2xl ${ring}`}>
         <ItemVisual item={item} className="h-full w-full" emojiClassName="text-[clamp(2.5rem,8vh,5.5rem)]" />
+        {!winner ? (
+          <div className="absolute inset-0 grid place-items-center bg-ink/40">
+            <span className="animate-x text-[clamp(3rem,10vh,7rem)] font-black text-hot drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]">✕</span>
+          </div>
+        ) : null}
       </div>
-      <div className="max-w-[18rem] truncate text-center text-3xl font-black">{item ? itemName(item, lang) : t("common.tbd")}</div>
+      <div className={`max-w-[18rem] truncate text-center text-3xl font-black ${winner ? "" : "line-through opacity-70"}`}>{item ? itemName(item, lang) : t("common.tbd")}</div>
       <div className={`text-4xl font-black ${side === "a" ? "text-brand" : "text-brand-2"}`}>{votes}</div>
     </div>
   );
@@ -98,27 +104,16 @@ function ResultSide({
 export function Broadcast({ state }: { state: SessionState | null }): ReactNode {
   const { t, lang, round } = useI18n();
   const show = state?.show;
-  const ticking = Boolean(show?.active && !show?.paused && show?.phaseEndsAt);
-  const now = useNow(ticking);
   useSound(state);
 
   if (!state || !show) {
     return (
-      <div className="overlay-root grid h-screen place-items-center text-white/50">
+      <div className="overlay-root grid h-screen place-items-center bg-ink text-white/50">
         <p>{t("common.connecting")}</p>
       </div>
     );
   }
 
-  // In OBS the overlay stays transparent; in a normal browser tab we add a dark
-  // backdrop so the white text is visible while previewing. `?transparent=1` forces
-  // the OBS look (transparent) anywhere.
-  const inObs = typeof window !== "undefined" && "obsstudio" in window;
-  const forceTransparent = new URLSearchParams(window.location.search).get("transparent") === "1";
-  const userDark = state.settings.showBackground === "dark";
-  const preview = !inObs && !forceTransparent && !userDark;
-  const dark = userDark || preview;
-  const countdown = show.phaseEndsAt ? Math.max(0, Math.ceil((show.phaseEndsAt - now) / 1000)) : 0;
   const category = activeCategory(state);
   const match = activeMatch(state);
   const banner = state.tournament ?? null;
@@ -127,25 +122,10 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
   let body: ReactNode;
 
   if (show.phase === "category") {
-    const sorted = state.categories.toSorted(
-      (a, b) => (show.categoryVotes[b.id] ?? 0) - (show.categoryVotes[a.id] ?? 0),
-    );
     body = (
-      <PhaseFrame animKey="category">
-        <h1 className="text-center text-4xl font-black text-brand">{t("show.categoryTitle")}</h1>
-        <p className="text-center text-lg font-bold text-white/85">{t("show.categoryHint")}</p>
-        <div className="grid w-full max-w-3xl gap-2 sm:grid-cols-2">
-          {sorted.map((c) => (
-            <div key={c.id} className="panel flex items-center justify-between px-4 py-2">
-              <span className="truncate font-bold">{categoryName(c, lang)}</span>
-              <span className="chip shrink-0 text-brand">{show.categoryVotes[c.id] ?? 0}</span>
-            </div>
-          ))}
-        </div>
-        <div className="text-xl font-black text-white/90">
-          {countdown} {t("show.seconds")}
-        </div>
-      </PhaseFrame>
+      <div key="category" className="animate-view-in flex h-full w-full items-center justify-center p-4">
+        <CategoryPoll state={state} />
+      </div>
     );
   } else if (show.phase === "round-intro" && match) {
     body = (
@@ -159,25 +139,22 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
         <div className="h-1 w-40 rounded-full bg-[color:var(--round)]" />
       </div>
     );
-  } else if ((show.phase === "bracket-intro" || show.phase === "bracket-outro") && banner && match) {
+  } else if (show.phase === "bracket-intro" || show.phase === "bracket-outro") {
     body = (
-      <PhaseFrame animKey={show.phase}>
-        <div className="chip border-brand text-brand">{t("show.bracketTitle")}</div>
-        <div className="w-full max-w-5xl">
-          <BracketBoard
-            bracket={banner.bracket}
-            category={category}
-            currentRound={match.round}
-            currentIndex={match.index}
-            variant="stage"
-          />
-        </div>
-      </PhaseFrame>
+      <div key={show.phase} className="animate-view-in h-full w-full">
+        <BracketCinema state={state} mode={show.phase === "bracket-intro" ? "intro" : "outro"} />
+      </div>
+    );
+  } else if (show.phase === "round-recap") {
+    body = (
+      <div key="round-recap" className="animate-view-in h-full w-full">
+        <BracketCinema state={state} mode="recap" />
+      </div>
     );
   } else if (show.phase === "match") {
     body = (
-      <div key="match" className="flex h-full w-full items-center justify-center p-4">
-        <div className="animate-match-in mx-auto flex h-full w-full max-w-5xl flex-col rounded-2xl border border-line bg-ink/75 p-5 shadow-2xl backdrop-blur-md">
+      <div key="match" className="flex h-full w-full items-center justify-center p-2">
+        <div className="animate-match-in flex h-full w-full flex-col rounded-2xl border border-line/60 bg-ink/90 p-3 shadow-2xl backdrop-blur-sm">
           <Stage state={state} variant="overlay" />
         </div>
       </div>
@@ -203,7 +180,8 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
     );
   } else if (show.phase === "champion") {
     body = (
-      <div className="flex h-full w-full flex-col items-center justify-center gap-6 p-6">
+      <div key="champion" className="animate-shake relative flex h-full w-full flex-col items-center justify-center gap-6 p-6">
+        <div className="animate-flash pointer-events-none absolute inset-0 bg-white" />
         <ChampionCard state={state} />
         <TopSupporters supporters={state.live.supporters} />
       </div>
@@ -212,8 +190,8 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
     // Show isn't running, but a match is live: mirror the Control room view so the
     // overlay is useful without starting the automatic show.
     body = (
-      <div key="live" className="flex h-full w-full items-center justify-center p-4">
-        <div className="animate-match-in mx-auto flex h-full w-full max-w-5xl flex-col rounded-2xl border border-line bg-ink/75 p-5 shadow-2xl backdrop-blur-md">
+      <div key="live" className="flex h-full w-full items-center justify-center p-2">
+        <div className="animate-match-in flex h-full w-full flex-col rounded-2xl border border-line/60 bg-ink/90 p-3 shadow-2xl backdrop-blur-sm">
           <Stage state={state} variant="overlay" />
         </div>
       </div>
@@ -231,16 +209,12 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
 
   return (
     <div
-      className={`overlay-root round-${themeRound} relative h-screen w-full overflow-hidden text-white ${dark ? "bg-ink" : ""}`}
-      style={{ paddingTop: `${state.settings.safeTopPct}vh`, paddingBottom: `${state.settings.safeBottomPct}vh` }}
+      className={`overlay-root round-${themeRound} relative h-screen w-full overflow-hidden text-white`}
+      style={{ backgroundColor: state.settings.showBackground }}
     >
       {body}
+      <VoteToasts votes={state.live.recentVotes} />
       <SoundUnlock settings={state.settings.sound} />
-      {preview ? (
-        <div className="pointer-events-none absolute bottom-4 end-4 rounded-full border border-line bg-ink/80 px-3 py-1 text-xs text-white/45 backdrop-blur">
-          {t("show.preview")}
-        </div>
-      ) : null}
       {phaseChip ? (
         <div className="pointer-events-none absolute end-4 top-4 flex items-center gap-2">
           {show.paused ? <span className="chip border-hot text-hot">{t("show.paused")}</span> : null}

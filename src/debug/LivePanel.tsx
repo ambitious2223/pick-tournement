@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { LiveEvent, SessionState } from "../../shared/types.ts";
 import { Button, Field, TextInput } from "../ui/primitives.tsx";
 import { Avatar } from "../ui/Avatar.tsx";
@@ -17,24 +17,9 @@ function eventLabel(event: LiveEvent): string {
 export function LivePanel({ state }: { state: SessionState }): ReactNode {
   const { t } = useI18n();
   const live = state.live;
-  const [url, setUrl] = useState(live.url);
-  const [slug, setSlug] = useState(live.game);
-  const [key, setKey] = useState("");
-  const [saved, setSaved] = useState(false);
   const [user, setUser] = useState("test_viewer");
   const [chat, setChat] = useState("");
   const [gift, setGift] = useState("Rose");
-
-  useEffect(() => {
-    setUrl(live.url);
-    setSlug(live.game);
-  }, [live.url, live.game]);
-
-  const save = () => {
-    void send("live:update", { url, slug, key });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1200);
-  };
 
   const inject = (event: Partial<LiveEvent>) => {
     void send("live:inject", {
@@ -57,32 +42,6 @@ export function LivePanel({ state }: { state: SessionState }): ReactNode {
         <span className="text-xs font-bold">{live.connected ? t("live.connected") : t("live.disconnected")}</span>
         <span className="text-[0.65rem] text-white/40">{live.url}</span>
       </div>
-
-      <Field label={t("live.url")}>
-        <TextInput className={SM} value={url} onChange={(e) => setUrl(e.target.value)} />
-      </Field>
-      <div className="grid grid-cols-2 gap-2">
-        <Field label={t("live.slug")}>
-          <TextInput className={SM} value={slug} onChange={(e) => setSlug(e.target.value)} />
-        </Field>
-        <Field label={t("live.key")}>
-          <TextInput className={SM} type="password" value={key} onChange={(e) => setKey(e.target.value)} placeholder={live.keySet ? "••••••" : ""} />
-        </Field>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2">
-        <Button variant="primary" className={SM} onClick={save}>
-          {t("live.save")}
-        </Button>
-        <Button variant="ghost" className={SM} disabled={live.connected} onClick={() => void send("live:connect", undefined)}>
-          {t("live.connect")}
-        </Button>
-        <Button variant="ghost" className={SM} disabled={!live.connected} onClick={() => void send("live:disconnect", undefined)}>
-          {t("live.disconnect")}
-        </Button>
-      </div>
-      {saved ? <span className="text-xs text-lime">{t("live.saved")}</span> : null}
-      <p className="text-[0.7rem] leading-relaxed text-white/45">{t("live.hint")}</p>
 
       <div className="text-[0.65rem] text-white/40">
         {t("live.counts", { chat: live.counts.chat, gift: live.counts.gift, other })}

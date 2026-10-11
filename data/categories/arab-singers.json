@@ -1,132 +1,132 @@
 {
   "id": "arab-singers",
-  "name": "Arab Singers",
+  "name": "مطربون عرب",
   "items": [
     {
       "id": "amr-diab",
-      "name": "Amr Diab",
+      "name": "عمرو دياب",
       "aliases": [
-        "عمرو دياب"
+        "Amr Diab"
       ],
       "image": "/uploads/0a83cee65994.jpg"
     },
     {
       "id": "mohamed-ramadan",
-      "name": "Mohamed Ramadan",
+      "name": "محمد رمضان",
       "aliases": [
-        "محمد رمضان"
+        "Mohamed Ramadan"
       ],
       "image": "/uploads/c0fe1ab8e87c.jpg"
     },
     {
       "id": "nancy-ajram",
-      "name": "Nancy Ajram",
+      "name": "نانسي عجرم",
       "aliases": [
-        "نانسي عجرم"
+        "Nancy Ajram"
       ],
       "image": "/uploads/948873f052a2.jpg"
     },
     {
       "id": "fairuz",
-      "name": "Fairuz",
+      "name": "فيروز",
       "aliases": [
-        "فيروز"
+        "Fairuz"
       ],
       "image": "/uploads/bc1e41e307c3.jpg"
     },
     {
       "id": "umm-kulthum",
-      "name": "Umm Kulthum",
+      "name": "أم كلثوم",
       "aliases": [
-        "أم كلثوم"
+        "Umm Kulthum"
       ],
       "image": "/uploads/2d3059f35cf2.jpg"
     },
     {
       "id": "kadim-al-sahir",
-      "name": "Kadim Al Sahir",
+      "name": "كاظم الساهر",
       "aliases": [
-        "كاظم الساهر"
+        "Kadim Al Sahir"
       ],
       "image": "/uploads/831deace115f.jpg"
     },
     {
       "id": "elissa",
-      "name": "Elissa",
+      "name": "إليسا",
       "aliases": [
-        "إليسا"
+        "Elissa"
       ],
       "image": "/uploads/058fba57d4db.jpg"
     },
     {
       "id": "ragheb-alama",
-      "name": "Ragheb Alama",
+      "name": "راغب علامة",
       "aliases": [
-        "راغب علامة"
+        "Ragheb Alama"
       ],
       "image": "/uploads/d3bc3ef0e168.jpg"
     },
     {
       "id": "sherine",
-      "name": "Sherine",
+      "name": "شيرين",
       "aliases": [
-        "شيرين"
+        "Sherine"
       ],
       "image": "/uploads/f0a1433226fa.jpg"
     },
     {
       "id": "tamer-hosny",
-      "name": "Tamer Hosny",
+      "name": "تامر حسني",
       "aliases": [
-        "تامر حسني"
+        "Tamer Hosny"
       ],
       "image": "/uploads/9e7e6f436377.png"
     },
     {
       "id": "hussain-al-jassmi",
-      "name": "Hussain Al Jassmi",
+      "name": "حسين الجسمي",
       "aliases": [
-        "حسين الجسمي"
+        "Hussain Al Jassmi"
       ],
       "image": "/uploads/d0e73f4d25ee.jpg"
     },
     {
       "id": "balqees",
-      "name": "Balqees",
+      "name": "بلقيس",
       "aliases": [
-        "بلقيس"
+        "Balqees"
       ],
       "image": "/uploads/2a053491a2db.jpg"
     },
     {
       "id": "ahlam",
-      "name": "Ahlam",
+      "name": "أحلام",
       "aliases": [
-        "أحلام"
+        "Ahlam"
       ],
       "image": "/uploads/c40a8736a852.jpg"
     },
     {
       "id": "mohammed-abdu",
-      "name": "Mohammed Abdu",
+      "name": "محمد عبده",
       "aliases": [
-        "محمد عبده"
+        "Mohammed Abdu"
       ],
       "image": "/uploads/915f8d1dd409.jpg"
     },
     {
       "id": "angham",
-      "name": "Angham",
+      "name": "أنغام",
       "aliases": [
-        "أنغام"
+        "Angham"
       ],
       "image": "/uploads/6038ca8e7551.jpg"
     },
     {
       "id": "wael-kfoury",
-      "name": "Wael Kfoury",
+      "name": "وائل كفوري",
       "aliases": [
-        "وائل كفوري"
+        "Wael Kfoury"
       ],
       "image": "/uploads/da3d5821d62d.jpg"
     }
@@ -143,5 +143,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "مطربون عرب"
+  "nameAr": "Arab Singers",
+  "lang": "ar"
 }

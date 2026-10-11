@@ -1,147 +1,147 @@
 {
   "id": "arab-sweets",
-  "name": "Arabic Desserts & Drinks",
+  "name": "حلويات ومشروبات عربية",
   "items": [
     {
       "id": "kunafa",
-      "name": "Kunafa",
+      "name": "كنافة",
       "aliases": [
-        "كنافة"
+        "Kunafa"
       ],
       "emoji": "🍮",
       "image": "/uploads/f3b54326ea78.jpg"
     },
     {
       "id": "baklava",
-      "name": "Baklava",
+      "name": "بقلاوة",
       "aliases": [
-        "بقلاوة"
+        "Baklava"
       ],
       "emoji": "🥮",
       "image": "/uploads/17f03e5cdd68.png"
     },
     {
       "id": "luqaimat",
-      "name": "Luqaimat",
+      "name": "لقيمات",
       "aliases": [
-        "لقيمات"
+        "Luqaimat"
       ],
       "emoji": "🍩",
       "image": "/uploads/c9af43baa355.jpg"
     },
     {
       "id": "umm-ali",
-      "name": "Umm Ali",
+      "name": "أم علي",
       "aliases": [
-        "أم علي"
+        "Umm Ali"
       ],
       "emoji": "🥧",
       "image": "/uploads/998d7e72f1ad.jpg"
     },
     {
       "id": "basbousa",
-      "name": "Basbousa",
+      "name": "بسبوسة",
       "aliases": [
-        "بسبوسة"
+        "Basbousa"
       ],
       "emoji": "🍰",
       "image": "/uploads/9bf240c44bf9.jpg"
     },
     {
       "id": "muhallebi",
-      "name": "Muhallebi",
+      "name": "مهلبية",
       "aliases": [
-        "مهلبية"
+        "Muhallebi"
       ],
       "emoji": "🍨",
       "image": "/uploads/98c1a06a71e5.jpg"
     },
     {
       "id": "qatayef",
-      "name": "Qatayef",
+      "name": "قطايف",
       "aliases": [
-        "قطايف"
+        "Qatayef"
       ],
       "emoji": "🥟",
       "image": "/uploads/a1aaf3cb93d9.jpg"
     },
     {
       "id": "ma-amoul",
-      "name": "Ma'amoul",
+      "name": "معمول",
       "aliases": [
-        "معمول"
+        "Ma'amoul"
       ],
       "emoji": "🍪",
       "image": "/uploads/262d79761326.jpg"
     },
     {
       "id": "arabic-coffee",
-      "name": "Arabic Coffee",
+      "name": "قهوة عربية",
       "aliases": [
-        "قهوة عربية"
+        "Arabic Coffee"
       ],
       "emoji": "☕",
       "image": "/uploads/8222487029f3.jpg"
     },
     {
       "id": "moroccan-mint-tea",
-      "name": "Moroccan Mint Tea",
+      "name": "شاي مغربي",
       "aliases": [
-        "شاي مغربي"
+        "Moroccan Mint Tea"
       ],
       "emoji": "🍵",
       "image": "/uploads/cdb1e67e0d31.jpg"
     },
     {
       "id": "karkade",
-      "name": "Karkade",
+      "name": "كركديه",
       "aliases": [
-        "كركديه"
+        "Karkade"
       ],
       "emoji": "🌺",
       "image": "/uploads/9c74d63df13e.jpg"
     },
     {
       "id": "sahlab",
-      "name": "Sahlab",
+      "name": "سحلب",
       "aliases": [
-        "سحلب"
+        "Sahlab"
       ],
       "emoji": "🥛",
       "image": "/uploads/716aedb09f51.jpg"
     },
     {
       "id": "jallab",
-      "name": "Jallab",
+      "name": "جلاب",
       "aliases": [
-        "جلاب"
+        "Jallab"
       ],
       "emoji": "🥤",
       "image": "/uploads/49e3756c1590.jpg"
     },
     {
       "id": "ayran",
-      "name": "Ayran",
+      "name": "عيران",
       "aliases": [
-        "عيران"
+        "Ayran"
       ],
       "emoji": "🥛",
       "image": "/uploads/bf2a825e67f0.jpg"
     },
     {
       "id": "qamar-al-din",
-      "name": "Qamar al-Din",
+      "name": "قمر الدين",
       "aliases": [
-        "قمر الدين"
+        "Qamar al-Din"
       ],
       "emoji": "🍑",
       "image": "/uploads/32b93bbc9740.jpg"
     },
     {
       "id": "tamarind-drink",
-      "name": "Tamarind Drink",
+      "name": "تمر هندي",
       "aliases": [
-        "تمر هندي"
+        "Tamarind Drink"
       ],
       "emoji": "🥤",
       "image": "/uploads/8027412a292f.jpg"
@@ -159,5 +159,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "حلويات ومشروبات عربية"
+  "nameAr": "Arabic Desserts & Drinks",
+  "lang": "ar"
 }

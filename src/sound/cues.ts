@@ -92,6 +92,41 @@ export const RECIPES: Record<string, Cue> = {
     tone(ctx, out, { type: "sine", freq: 587.33, t: t + 0.06, dur: 0.7, gain: 0.16 });
     engine.send(out, 0.4);
   },
+  "bracket.zoom.in": (ctx, out, t, engine, opts) => {
+    const r = opts.roundIndex ?? 0;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(180 + r * 30, t);
+    osc.frequency.exponentialRampToValueAtTime(900 + r * 400, t + 0.7);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.06 + r * 0.02, t + 0.5);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
+    osc.connect(g);
+    g.connect(out);
+    osc.start(t);
+    osc.stop(t + 0.9);
+    engine.send(g, 0.3);
+  },
+  "bracket.reveal": (ctx, out, t, engine) => {
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) =>
+      tone(ctx, out, { type: "triangle", freq: f, t: t + i * 0.06, dur: 0.6, gain: 0.18 }),
+    );
+    engine.send(out, 0.4);
+  },
+  "bracket.loser": (ctx, out, t, engine) => {
+    tone(ctx, out, { type: "sine", freq: 160, t, dur: 0.5, gain: 0.22, glideTo: 70 });
+    noise(ctx, out, { t, dur: 0.3, gain: 0.1, filter: "lowpass", freq: 1200 });
+    engine.send(out, 0.2);
+  },
+  "bracket.tension": (ctx, out, t, engine, opts) => {
+    const r = opts.roundIndex ?? 0;
+    const beats = 2 + r;
+    for (let i = 0; i < beats; i += 1) {
+      tone(ctx, out, { type: "sine", freq: 60 + r * 10, t: t + i * 0.5, dur: 0.18, gain: 0.22 });
+    }
+    engine.send(out, 0.15);
+  },
 
   // ---- match ----
   "match.countdown": (ctx, out, t, engine) => {

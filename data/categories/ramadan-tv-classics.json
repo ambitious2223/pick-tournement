@@ -1,12 +1,12 @@
 {
   "id": "ramadan-tv-classics",
-  "name": "Ramadan TV Classics",
+  "name": "كلاسيكيات مسلسلات رمضان",
   "items": [
     {
       "id": "tash-ma-tash",
-      "name": "Tash ma Tash",
+      "name": "طاش ما طاش",
       "aliases": [
-        "طاش ما طاش",
+        "Tash ma Tash",
         "طاش"
       ],
       "emoji": "📺",
@@ -14,125 +14,125 @@
     },
     {
       "id": "bab-al-hara",
-      "name": "Bab Al-Hara",
+      "name": "باب الحارة",
       "aliases": [
-        "باب الحارة"
+        "Bab Al-Hara"
       ],
       "emoji": "🚪",
       "image": "/uploads/4b247a189d6c.png"
     },
     {
       "id": "layali-el-helmeya",
-      "name": "Layali El Helmeya",
+      "name": "ليالي الحلمية",
       "aliases": [
-        "ليالي الحلمية"
+        "Layali El Helmeya"
       ],
       "emoji": "🌃",
       "image": "/uploads/9bcfa6ce614a.jpg"
     },
     {
       "id": "raafat-al-hagan",
-      "name": "Raafat Al-Hagan",
+      "name": "رأفت الهجان",
       "aliases": [
-        "رأفت الهجان"
+        "Raafat Al-Hagan"
       ],
       "emoji": "🕵️",
       "image": "/uploads/05cc0102f081.jpg"
     },
     {
       "id": "al-zir-salem",
-      "name": "Al-Zir Salem",
+      "name": "الزير سالم",
       "aliases": [
-        "الزير سالم"
+        "Al-Zir Salem"
       ],
       "emoji": "⚔️",
       "image": "/uploads/ae4d9acd6733.jpg"
     },
     {
       "id": "dayaa-dayaa",
-      "name": "Dayaa Dayaa",
+      "name": "ضيعة ضايعة",
       "aliases": [
-        "ضيعة ضايعة"
+        "Dayaa Dayaa"
       ],
       "emoji": "🏡",
       "image": "/uploads/855374ff65bb.jpg"
     },
     {
       "id": "maraya",
-      "name": "Maraya",
+      "name": "مرايا",
       "aliases": [
-        "مرايا"
+        "Maraya"
       ],
       "emoji": "🪞",
       "image": "/uploads/20b499c82647.jpg"
     },
     {
       "id": "al-fousoul-al-arbaa",
-      "name": "Al-Fousoul Al-Arbaa",
+      "name": "الفصول الأربعة",
       "aliases": [
-        "الفصول الأربعة"
+        "Al-Fousoul Al-Arbaa"
       ],
       "emoji": "🍂",
       "image": "/uploads/68e97be9a152.jpg"
     },
     {
       "id": "el-mal-we-el-banon",
-      "name": "El Mal We El Banon",
+      "name": "المال والبنون",
       "aliases": [
-        "المال والبنون"
+        "El Mal We El Banon"
       ],
       "emoji": "💰",
       "image": "/uploads/39ed98e57b79.png"
     },
     {
       "id": "zizinia",
-      "name": "Zizinia",
+      "name": "زيزينيا",
       "aliases": [
-        "زيزينيا"
+        "Zizinia"
       ],
       "emoji": "🏛️",
       "image": "/uploads/4320bb10592a.jpg"
     },
     {
       "id": "al-asouf",
-      "name": "Al-Asouf",
+      "name": "العاصوف",
       "aliases": [
-        "العاصوف"
+        "Al-Asouf"
       ],
       "emoji": "🌪️",
       "image": "/uploads/877d23e7c492.jpg"
     },
     {
       "id": "al-haj-metwalli",
-      "name": "Al-Haj Metwalli",
+      "name": "الحاج متولي",
       "aliases": [
-        "الحاج متولي"
+        "Al-Haj Metwalli"
       ],
       "emoji": "👳"
     },
     {
       "id": "al-kabir-awy",
-      "name": "Al-Kabir Awy",
+      "name": "الكبير أوي",
       "aliases": [
-        "الكبير أوي"
+        "Al-Kabir Awy"
       ],
       "emoji": "👨‍🌾",
       "image": "/uploads/3eeb235806f1.jpg"
     },
     {
       "id": "khawater",
-      "name": "Khawater",
+      "name": "خواطر",
       "aliases": [
-        "خواطر"
+        "Khawater"
       ],
       "emoji": "💡",
       "image": "/uploads/b7d0ef4ebd37.png"
     },
     {
       "id": "omar",
-      "name": "Omar",
+      "name": "مسلسل عمر",
       "aliases": [
-        "مسلسل عمر",
+        "Omar",
         "عمر"
       ],
       "emoji": "🌙",
@@ -140,9 +140,9 @@
     },
     {
       "id": "al-ikhtiyar",
-      "name": "Al-Ikhtiyar",
+      "name": "الاختيار",
       "aliases": [
-        "الاختيار"
+        "Al-Ikhtiyar"
       ],
       "emoji": "🎖️",
       "image": "/uploads/6c7407a302a0.jpg"
@@ -160,5 +160,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "كلاسيكيات مسلسلات رمضان"
+  "nameAr": "Ramadan TV Classics",
+  "lang": "ar"
 }

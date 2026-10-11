@@ -3,8 +3,8 @@
 A local web app for **TikTok Live** bracket tournaments. Competitors enter a category, viewers
 vote, one champion comes out — then the next category in the queue begins automatically.
 
-Arabic-first interface (right-to-left) with an English toggle, designed to be added to **OBS as a
-Browser Source**. It runs with a built-in simulator, or with **real TikTok events** through your
+Arabic-first interface (right-to-left) with an English toggle, shown as a standalone **show window**
+you capture as-is. It runs with a built-in simulator, or with **real TikTok events** through your
 local **Tikora** hub — no TikTok login inside this app.
 
 ## What it does
@@ -15,12 +15,19 @@ local **Tikora** hub — no TikTok login inside this app.
 - **Two ways to vote:** chat (type the on-screen name in Arabic or English) and gifts (each side
   shows a gift; sending it counts for that side).
 - **Automatic broadcast flow** with per-round colours escalating cyan → blue → purple → gold, and a
-  golden final showing the top supporters.
-- **Content Studio and a Content tab** — create and edit categories in the Studio; browse them in
-  Control → Content with per-category photo coverage, a Fetch photos button, and removal of a whole
-  category or of individual competitors. A **Debug console** covers injecting votes, simulating a
-  crowd, the Live connection and the Sound & Music mixer.
-- Categories live in `data/categories/`, each with English **and** Arabic names and aliases.
+  golden final showing the top supporters. Between matches the show window plays a **bracket
+  cinematic** (a zoom-in before each match, a zoom-out after) and then cuts back to the voting
+  screen.
+- **Two content libraries, one per language.** Switching the interface language switches the whole
+  content set — its own categories and its own play queue. Arabic is the default library; the
+  English library starts empty. Switching language stops a running show first, so a bracket never
+  points at the other library's competitors.
+- **Content Studio and a Content tab** — create and edit categories as visual cards (a photo tile
+  per competitor); browse them in Control → Content with per-category photo coverage, a Fetch photos
+  button, and removal of a whole category or of individual competitors. A **Debug console** covers
+  injecting votes, the Live connection and the Sound & Music mixer.
+- Categories live in `data/categories/`, each tagged with its language (`lang`) and its own chat
+  aliases.
 
 ## Quick start
 
@@ -29,7 +36,8 @@ seeds the categories, downloads free photos once, builds the app, starts **one s
 (`127.0.0.1:8787`) and opens the Control room in a new tab. Skip the browser with `PL_NO_BROWSER=1`,
 or the one-time photo fetch with `PL_NO_PHOTOS=1`.
 
-**First time?** Open the in-app guide at `http://127.0.0.1:8787/setup`.
+**First time?** Open the Control room, put categories in the queue, then press **Start** and watch
+the show window at `/overlay`.
 
 Or by hand:
 
@@ -41,17 +49,21 @@ npm run build
 npm run serve         # one server on http://127.0.0.1:8787
 ```
 
-- Setup guide → `/setup` · Control room → `/control` · Broadcast for OBS → `/overlay` (alias `/show`)
+- Control room → `/control` · Show window → `/overlay` (alias `/show`)
 - Content Studio → `/studio` · Debug console → `/debug`
 
-## The broadcast page
+## The show window
 
 `/overlay` (also `/show`) runs the whole show and is the only page that plays sound, so the Control
-room never doubles the audio. Transparent by default so it sits over your camera — switch to a dark
-scene in Settings; safe-area margins let it fit the middle band of a vertical canvas.
+room never doubles the audio. It has a solid background whose color you pick live from the hue
+wheel on the Control **Show** tab (default near-black).
 
-In OBS: **Add → Browser Source**, URL `http://127.0.0.1:8787/overlay`, size it to the middle band,
-keep the **transparent background**, then **Control → Show → Start**.
+Open `http://127.0.0.1:8787/overlay` in the window you capture, then **Control → Show → Start**.
+
+Between matches the overlay alternates with a **bracket cinematic** — it zooms into the live match,
+then pulls back out after the result — paced from **Control → Simulator → Bracket pacing** (intro /
+outro / recap length and the overall speed). The on-screen voting instructions are **off by
+default**; turn them back on under **Control → Settings → Show voting instructions**.
 
 ## Connecting to TikTok Live (via Tikora)
 
@@ -84,7 +96,10 @@ Nothing cosmetic, sound or host-side is declared — gameplay only. Build the li
 `scripts/manifest.ts` and run **`npm run manifest`**; tests fail if the file, the effect list and
 the handlers disagree, and `npm run smoke` proves each effect changes the match as claimed.
 
-No Tikora? Use the **Simulator** or the Debug vote injector to rehearse.
+No Tikora? Open **Control → Simulator**. It has the simulated crowd plus its own controls: how many
+votes per tick and how fast, the gift chance, **Start/Stop the automatic show**, one-tap **Demo 1 /
+Demo all** (which run the whole show, cinematic included), a **Stage size** slider (photos + text on
+the show window) and the **bracket pacing**.
 
 ## Sound & music
 
@@ -95,7 +110,7 @@ Web Audio mixer with **Master / Music / SFX / Voice** buses, a reverb send, proc
   pick the background track in **Control → Sound**. Settings apply live and persist.
 - Replace any built-in cue with **`data/sounds/<cue>.mp3|ogg|wav|webm`** (gitignored, served at
   `/sounds/…`).
-- Broadcast page only — press **🔊 Tap to enable sound** once (OBS does this automatically).
+- Broadcast page only — press **🔊 Tap to enable sound** once.
 
 ## How voting resolves
 

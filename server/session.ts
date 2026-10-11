@@ -3,9 +3,11 @@ import type {
   CommandMap,
   Gift,
   Item,
+  Lang,
   LiveEvent,
   LogEntry,
   Match,
+  PollVoter,
   QueueEntry,
   SessionState,
   Settings,
@@ -13,12 +15,15 @@ import type {
   SoundSettings,
   StageView,
   Supporter,
+  VoteToast,
 } from "../shared/types.ts";
 import {
+  bracketTension,
   DEFAULT_SETTINGS,
   isHandledEffect,
   ROUND_LABELS,
   ROUND_ORDER,
+  roundIndexFor,
   type HandledEffectKey,
 } from "../shared/config.ts";
 import { matchCategory, matchItem, normalize } from "../engine/matcher.ts";
@@ -38,7 +43,7 @@ import {
 } from "../engine/match.ts";
 import { completeMatch, createTournament, currentMatch } from "../engine/tournament.ts";
 import { fakeViewer, pickSide } from "../engine/simulate.ts";
-import { loadCategories, loadSession, saveCategory, deleteCategory, reorderCategories, saveSessionDebounced } from "./store.ts";
+import { loadCategories, categoriesForLang, loadSession, saveCategory, deleteCategory, reorderCategories, saveSessionDebounced } from "./store.ts";
 
 export type ServerEvent = { type: "state"; state: SessionState };
 
@@ -74,6 +79,15 @@ function pSide(p: Payload): "a" | "b" | null {
   return null;
 }
 
+/** The display identity of a live event's sender, for vote toasts and poll icons. */
+function voterOf(event: LiveEvent): PollVoter {
+  return {
+    id: event.userId || event.username || event.name,
+    name: event.name || event.username || event.userId || "Viewer",
+    avatar: event.avatar,
+  };
+}
+
 export class Session {
   state: SessionState;
   private listeners = new Set<Listener>();
@@ -88,6 +102,11 @@ export class Session {
   private supporters = new Map<string, Supporter>();
   private showRound: Match["round"] | null = null;
   private showFallbackCategory: string | null = null;
+  /** When set, the show marches through these categories automatically (demo mode). */
+  private demoOrder: string[] | null = null;
+  private demoIndex = 0;
+  /** True when the just-finished match completed its round and a recap should play. */
+  private pendingRoundRecap = false;
   private holdTimer: NodeJS.Timeout | null = null;
   private sideEffectTimer: NodeJS.Timeout | null = null;
 
@@ -102,7 +121,7 @@ export class Session {
       sound: { ...DEFAULT_SETTINGS.sound, trackVolume: { ...DEFAULT_SETTINGS.sound.trackVolume } },
     };
     if (!saved?.settings) return base;
-    return {
+    const merged: Settings = {
       ...base,
       ...saved.settings,
       sound: {
@@ -111,16 +130,37 @@ export class Session {
         trackVolume: { ...base.sound.trackVolume, ...saved.settings.sound?.trackVolume },
       },
     };
+    // Migrate older saved values (e.g. showBackground was "transparent" | "dark").
+    if (!/^#[0-9a-f]{6}$/i.test(merged.showBackground)) merged.showBackground = base.showBackground;
+    if (typeof merged.bracketPace !== "number" || !Number.isFinite(merged.bracketPace)) merged.bracketPace = base.bracketPace;
+    const stale = merged as unknown as Record<string, unknown>;
+    delete stale.safeTopPct;
+    delete stale.safeBottomPct;
+    return merged;
   }
 
   static async create(): Promise<Session> {
-    const categories = await loadCategories();
+    const allCategories = await loadCategories();
     const saved = await loadSession();
+    const lang: Lang = saved?.lang === "en" ? "en" : "ar";
+    const legacyQueue = Array.isArray(saved?.queue) ? saved.queue : [];
+    const legacyIndex = typeof saved?.queueIndex === "number" ? saved.queueIndex : 0;
+    const queues: Record<Lang, QueueEntry[]> = {
+      ar: Array.isArray(saved?.queues?.ar) ? saved.queues.ar : lang === "ar" ? legacyQueue : [],
+      en: Array.isArray(saved?.queues?.en) ? saved.queues.en : lang === "en" ? legacyQueue : [],
+    };
+    const queueIndexes: Record<Lang, number> = {
+      ar: typeof saved?.queueIndexes?.ar === "number" ? saved.queueIndexes.ar : lang === "ar" ? legacyIndex : 0,
+      en: typeof saved?.queueIndexes?.en === "number" ? saved.queueIndexes.en : lang === "en" ? legacyIndex : 0,
+    };
     const state: SessionState = {
       status: "idle",
       settings: Session.mergeSettings(saved),
-      queue: Array.isArray(saved?.queue) ? saved.queue : [],
-      queueIndex: typeof saved?.queueIndex === "number" ? saved.queueIndex : 0,
+      lang,
+      queue: queues[lang],
+      queueIndex: queueIndexes[lang] ?? 0,
+      queues,
+      queueIndexes,
       tournament: null,
       matchEndsAt: null,
       matchHold: null,
@@ -132,6 +172,8 @@ export class Session {
         phaseEndsAt: null,
         categoryVotes: {},
         categoryVoters: [],
+        categoryCandidates: [],
+        categoryVoterList: {},
         result: null,
         champion: null,
       },
@@ -144,9 +186,10 @@ export class Session {
         counts: { chat: 0, gift: 0, like: 0, follow: 0, share: 0, member: 0, subscribe: 0, roomUser: 0 },
         supporters: [],
         lastEvents: [],
+        recentVotes: [],
       },
       simulated: false,
-      categories,
+      categories: categoriesForLang(allCategories, lang),
       sideEffects: [],
       log: [],
     };
@@ -168,7 +211,14 @@ export class Session {
   }
 
   private persist(): void {
+    this.syncActiveQueue();
     saveSessionDebounced(this.state);
+  }
+
+  /** Mirrors the active-language queue view back into its per-language slot. */
+  private syncActiveQueue(): void {
+    this.state.queues[this.state.lang] = this.state.queue;
+    this.state.queueIndexes[this.state.lang] = this.state.queueIndex;
   }
 
   private category(id: string): Category | undefined {
@@ -187,9 +237,37 @@ export class Session {
 
   refreshCategories(): void {
     loadCategories().then((cats) => {
-      this.state.categories = cats;
+      this.state.categories = categoriesForLang(cats, this.state.lang);
       this.emit();
     });
+  }
+
+  /**
+   * Switches the active content library. Any running show/tournament is stopped
+   * first (its bracket belongs to the other library), then the new language's
+   * categories and queue are loaded.
+   */
+  async setActiveLang(lang: Lang): Promise<void> {
+    if (this.state.lang === lang) return;
+    this.syncActiveQueue();
+    const wasRunning = this.state.status !== "idle" || this.state.show.active || this.state.tournament !== null;
+    if (this.state.show.active) this.stopShow();
+    this.stopTimer();
+    this.clearShowTimer();
+    this.releaseHold();
+    this.clearSideEffects();
+    this.state.tournament = null;
+    this.state.matchEndsAt = null;
+    this.state.status = "idle";
+    this.showRound = null;
+    this.pendingRoundRecap = false;
+    this.state.lang = lang;
+    this.state.queue = this.state.queues[lang] ?? [];
+    this.state.queueIndex = this.state.queueIndexes[lang] ?? 0;
+    await this.refreshWait();
+    this.log("info", wasRunning ? `Language switched to ${lang} — the show was stopped.` : `Language switched to ${lang}.`);
+    this.persist();
+    this.emit();
   }
 
   // ---- tournament lifecycle -------------------------------------------------
@@ -245,15 +323,19 @@ export class Session {
 
   private phaseDurationMs(): number {
     const s = this.state.settings;
+    const pace = s.bracketPace ?? 1;
+    const tension = bracketTension(roundIndexFor(this.currentRound() ?? undefined));
     switch (this.state.show.phase) {
       case "category":
         return s.categorySeconds * 1000;
       case "round-intro":
         return s.roundIntroSeconds * 1000;
       case "bracket-intro":
-        return s.bracketIntroSeconds * 1000;
+        return s.bracketIntroSeconds * 1000 * tension * pace;
       case "bracket-outro":
-        return s.bracketOutroSeconds * 1000;
+        return s.bracketOutroSeconds * 1000 * tension * pace;
+      case "round-recap":
+        return (s.roundRecapSeconds ?? 6) * 1000 * tension * pace;
       case "result":
       case "champion":
         return s.resultSeconds * 1000;
@@ -269,10 +351,13 @@ export class Session {
     this.showTimer = setTimeout(() => this.onShowPhaseTimeout(), wait);
   }
 
-  startShow(): void {
+  startShow(candidates: string[] = []): void {
     this.clearShowTimer();
     this.stopTimer();
+    this.demoOrder = null;
+    this.demoIndex = 0;
     this.showRound = null;
+    this.pendingRoundRecap = false;
     // Remember the category the host already picked so the first category vote
     // falls back to it instead of the alphabetically-first category.
     this.showFallbackCategory =
@@ -282,7 +367,27 @@ export class Session {
     this.state.show.result = null;
     this.state.show.champion = null;
     this.log("info", "Show started.");
-    this.beginCategoryVote();
+    this.beginCategoryVote(candidates);
+  }
+
+  /** Launch a standalone category vote: auto-picks candidates, winner starts its tournament. */
+  startPoll(): void {
+    if (this.state.show.active) this.stopShow();
+    this.startShow(this.pickCandidates(8));
+  }
+
+  /** Shuffle the categories and take up to `count` as the poll's candidate set. */
+  private pickCandidates(count: number): string[] {
+    const ids = this.state.categories.map((c) => c.id);
+    for (let i = ids.length - 1; i > 0; i--) {
+      const j = Math.floor(this.rng() * (i + 1));
+      const a = ids[i];
+      const b = ids[j];
+      if (a === undefined || b === undefined) continue;
+      ids[i] = b;
+      ids[j] = a;
+    }
+    return ids.slice(0, Math.max(1, Math.min(count, ids.length)));
   }
 
   stopShow(): void {
@@ -290,12 +395,17 @@ export class Session {
     this.stopTimer();
     this.releaseHold();
     this.clearSideEffects();
+    this.demoOrder = null;
+    this.demoIndex = 0;
     this.state.show.active = false;
     this.state.show.paused = false;
     this.state.show.phase = "idle";
     this.state.show.phaseEndsAt = null;
     this.state.show.categoryVotes = {};
     this.state.show.categoryVoters = [];
+    this.state.show.categoryCandidates = [];
+    this.state.show.categoryVoterList = {};
+    this.pendingRoundRecap = false;
     this.log("info", "Show stopped.");
     this.emit();
   }
@@ -335,12 +445,15 @@ export class Session {
     else this.advanceShowPhase();
   }
 
-  private beginCategoryVote(): void {
+  private beginCategoryVote(candidates: string[] = []): void {
     this.clearShowTimer();
+    this.pendingRoundRecap = false;
     this.state.show.phase = "category";
     this.state.show.paused = false;
     this.state.show.categoryVotes = {};
     this.state.show.categoryVoters = [];
+    this.state.show.categoryCandidates = [...candidates];
+    this.state.show.categoryVoterList = {};
     this.state.show.result = null;
     this.state.show.champion = null;
     this.state.tournament = null;
@@ -352,10 +465,19 @@ export class Session {
     this.emit();
   }
 
+  /** The categories a vote may target: the offered set, or all when none was set. */
+  private candidateCategories(): Category[] {
+    const ids = this.state.show.categoryCandidates;
+    if (ids.length === 0) return this.state.categories;
+    return this.state.categories.filter((c) => ids.includes(c.id));
+  }
+
   private resolveCategoryVote(): string | null {
     let best: string | null = null;
     let bestVotes = 0;
+    const allowed = this.state.show.categoryCandidates;
     for (const [id, votes] of Object.entries(this.state.show.categoryVotes)) {
+      if (allowed.length > 0 && !allowed.includes(id)) continue;
       if (votes > bestVotes) {
         bestVotes = votes;
         best = id;
@@ -391,6 +513,13 @@ export class Session {
     this.emit();
   }
 
+  /** Bracket cinematic length: base seconds × round tension × pace. */
+  private bracketPhaseMs(seconds: number): number {
+    const pace = this.state.settings.bracketPace ?? 1;
+    const tension = bracketTension(roundIndexFor(this.currentRound() ?? undefined));
+    return seconds * 1000 * tension * pace;
+  }
+
   private beginBracketIntro(): void {
     const round = this.currentRound();
     if (round && this.showRound !== round) {
@@ -399,7 +528,7 @@ export class Session {
       return;
     }
     this.state.show.phase = "bracket-intro";
-    this.setShowPhaseTimer(this.state.settings.bracketIntroSeconds * 1000);
+    this.setShowPhaseTimer(this.bracketPhaseMs(this.state.settings.bracketIntroSeconds));
     this.emit();
   }
 
@@ -412,7 +541,15 @@ export class Session {
 
   private beginBracketOutro(): void {
     this.state.show.phase = "bracket-outro";
-    this.setShowPhaseTimer(this.state.settings.bracketOutroSeconds * 1000);
+    this.setShowPhaseTimer(this.bracketPhaseMs(this.state.settings.bracketOutroSeconds));
+    this.emit();
+  }
+
+  private beginRoundRecap(): void {
+    this.pendingRoundRecap = false;
+    this.state.show.phase = "round-recap";
+    this.log("round", "Round recap.");
+    this.setShowPhaseTimer(this.bracketPhaseMs(this.state.settings.roundRecapSeconds));
     this.emit();
   }
 
@@ -427,6 +564,10 @@ export class Session {
       this.state.show.phase = "champion";
       this.setShowPhaseTimer(this.state.settings.resultSeconds * 1000);
       this.emit();
+      return;
+    }
+    if (this.pendingRoundRecap) {
+      this.beginRoundRecap();
       return;
     }
     this.beginBracketIntro();
@@ -446,15 +587,35 @@ export class Session {
       case "bracket-outro":
         this.beginResult();
         break;
+      case "round-recap":
+        this.beginBracketIntro();
+        break;
       case "result":
         this.endResult();
         break;
       case "champion":
-        this.beginCategoryVote();
+        if (this.demoOrder) this.advanceDemo();
+        else this.beginCategoryVote();
         break;
       default:
         break;
     }
+  }
+
+  /**
+   * Demo mode: move straight into the next queued category's bracket (no
+   * category vote), so an automatic run shows the full show sequence end to end.
+   */
+  private advanceDemo(): void {
+    const next = this.demoOrder?.[this.demoIndex] ?? null;
+    this.demoIndex += 1;
+    if (!next || !this.prepareTournament(next)) {
+      this.demoOrder = null;
+      this.stopShow();
+      return;
+    }
+    this.log("info", `Demo category: ${this.category(next)?.name ?? next}`);
+    this.beginBracketIntro();
   }
 
   private onShowPhaseTimeout(): void {
@@ -480,7 +641,9 @@ export class Session {
     const entry = this.state.queue[this.state.queueIndex];
     const override = entry?.roundSecondsOverride;
     const categoryOverride = this.currentCategory()?.roundSeconds;
-    return override ?? categoryOverride ?? this.state.settings.roundSeconds;
+    const match = this.state.tournament ? currentMatch(this.state.tournament) : null;
+    const byRound = match ? this.state.settings.roundSecondsByRound?.[match.round] : undefined;
+    return override ?? categoryOverride ?? byRound ?? this.state.settings.roundSeconds;
   }
 
   startMatch(): void {
@@ -602,6 +765,8 @@ export class Session {
         this.state.show.champion = winner;
         this.state.matchEndsAt = null;
         this.log("info", `Champion: ${this.item(winner)?.name ?? winner}`);
+      } else {
+        this.pendingRoundRecap = progress.roundComplete;
       }
       this.beginBracketOutro();
       return;
@@ -652,6 +817,8 @@ export class Session {
       if (progress.tournamentComplete) {
         this.state.show.champion = winner;
         this.state.matchEndsAt = null;
+      } else {
+        this.pendingRoundRecap = progress.roundComplete;
       }
       this.beginBracketOutro();
       return;
@@ -703,8 +870,7 @@ export class Session {
 
   private liveChat(event: LiveEvent): void {
     if (!event.message) return;
-    const match = this.liveMatch();
-    if (match) this.chatVote(event.message, event.userId || event.name);
+    this.chatVote(event.message, event.userId || event.name, voterOf(event));
   }
 
   private liveGift(event: LiveEvent): void {
@@ -719,10 +885,18 @@ export class Session {
         const result = castGiftVote(match, itemId, event.userId || event.name, this.state.settings, event.count ?? 1);
         if (result.ok) {
           this.applyBoost(match, itemId, this.state.settings.giftWeight * Math.max(1, event.count ?? 1));
+          const side = sideOf(match, itemId);
+          if (side) this.recordVote(voterOf(event), side);
           this.log("vote", `${event.name} gifted ${event.giftName} → ${this.item(itemId)?.name ?? itemId}`);
         }
       }
     }
+  }
+
+  /** Append a vote to the overlay's recent-vote log (newest first, capped). */
+  private recordVote(voter: PollVoter, side: "a" | "b"): void {
+    const toast: VoteToast = { ...voter, side, at: Date.now() };
+    this.state.live.recentVotes = [toast, ...this.state.live.recentVotes].slice(0, 24);
   }
 
   private giftSideByName(giftName: string): string | null {
@@ -1189,15 +1363,19 @@ export class Session {
     return [this.item(match.a), this.item(match.b)];
   }
 
-  chatVote(text: string, viewer: string): void {
+  chatVote(text: string, viewer: string, voter?: PollVoter): void {
+    const who: PollVoter = voter ?? { id: normalize(viewer) || "anonymous", name: viewer || "Viewer", avatar: "" };
     if (this.state.show.active && this.state.show.phase === "category") {
-      const categoryId = matchCategory(text, this.state.categories);
+      const categoryId = matchCategory(text, this.candidateCategories());
       if (!categoryId) return;
       const key = normalize(viewer) || "anonymous";
       if (this.state.settings.dedupeChat && this.state.show.categoryVoters.includes(key)) return;
       this.state.show.categoryVotes[categoryId] =
         (this.state.show.categoryVotes[categoryId] ?? 0) + this.state.settings.chatWeight;
       this.state.show.categoryVoters.push(key);
+      const list = this.state.show.categoryVoterList[categoryId] ?? [];
+      list.push(who);
+      this.state.show.categoryVoterList[categoryId] = list;
       this.log("vote", `${viewer} voted category ${this.category(categoryId)?.name ?? categoryId}`);
       this.emit();
       return;
@@ -1214,12 +1392,14 @@ export class Session {
     const result = castChatVote(match, itemId, viewer, this.state.settings);
     if (result.ok) {
       this.applyBoost(match, itemId, this.state.settings.chatWeight);
+      const side = sideOf(match, itemId);
+      if (side) this.recordVote(who, side);
       this.log("vote", `${viewer} voted for ${this.item(itemId)?.name ?? itemId}`);
       this.emit();
     }
   }
 
-  giftVote(giftId: string, viewer: string, count = 1): void {
+  giftVote(giftId: string, viewer: string, count = 1, voter?: PollVoter): void {
     const match = this.liveMatch();
     if (!match) return;
     const itemId = this.giftSide(giftId);
@@ -1231,6 +1411,8 @@ export class Session {
     const result = castGiftVote(match, itemId, viewer, this.state.settings, count);
     if (result.ok) {
       this.applyBoost(match, itemId, this.state.settings.giftWeight * Math.max(1, count));
+      const side = sideOf(match, itemId);
+      if (side) this.recordVote(voter ?? { id: normalize(viewer) || "anonymous", name: viewer || "Viewer", avatar: "" }, side);
       this.log("vote", `${viewer} gifted → ${this.item(itemId)?.name ?? itemId}`);
       this.emit();
     }
@@ -1259,12 +1441,9 @@ export class Session {
 
   setSimulated(on: boolean): void {
     this.state.simulated = on;
-    if (this.simTimer) {
-      clearInterval(this.simTimer);
-      this.simTimer = null;
-    }
+    this.clearSimTimer();
     if (on) {
-      this.simTimer = setInterval(() => this.simTick(), 700);
+      this.rearmSimulator();
       this.log("info", "Simulator on.");
     } else {
       this.log("info", "Simulator off.");
@@ -1272,12 +1451,27 @@ export class Session {
     this.emit();
   }
 
+  private clearSimTimer(): void {
+    if (this.simTimer) {
+      clearInterval(this.simTimer);
+      this.simTimer = null;
+    }
+  }
+
+  /** (Re)starts the simulator interval using the current tick speed. */
+  private rearmSimulator(): void {
+    this.clearSimTimer();
+    const ms = Math.max(100, this.state.settings.simIntervalMs);
+    this.simTimer = setInterval(() => this.simTick(), ms);
+  }
+
   private simTick(): void {
     const match = this.liveMatch();
     if (!match) return;
-    const votes = 1 + Math.floor(this.rng() * 3);
+    const s = this.state.settings;
+    const votes = 1 + Math.floor(this.rng() * Math.max(1, s.simVotesPerTick));
     for (let i = 0; i < votes; i++) {
-      if (this.rng() < 0.12) {
+      if (this.rng() < Math.max(0, Math.min(1, s.simGiftChance))) {
         const gift = this.currentItems()[pickSide(this.rng) === "a" ? 0 : 1]?.gift;
         if (gift) {
           this.giftVote(gift.id, fakeViewer(this.rng), 1);
@@ -1352,12 +1546,20 @@ export class Session {
   }
 
   private async refreshWait(): Promise<void> {
-    this.state.categories = await loadCategories();
+    this.state.categories = categoriesForLang(await loadCategories(), this.state.lang);
     this.emit();
   }
 
   updateSettings(patch: Partial<SessionState["settings"]>): void {
-    this.state.settings = { ...this.state.settings, ...patch };
+    this.state.settings = {
+      ...this.state.settings,
+      ...patch,
+      ...(patch.roundSecondsByRound
+        ? { roundSecondsByRound: { ...this.state.settings.roundSecondsByRound, ...patch.roundSecondsByRound } }
+        : {}),
+    };
+    // A live simulator picks up a new tick speed immediately.
+    if (this.state.simulated && patch.simIntervalMs !== undefined) this.rearmSimulator();
     this.persist();
     this.emit();
   }
@@ -1380,18 +1582,43 @@ export class Session {
       return;
     }
     this.stopTimer();
+    const round = Math.max(1, seconds);
     this.state.settings = {
       ...this.state.settings,
-      roundSeconds: seconds,
       autoNextMatch: true,
       autoNextTournament: true,
+      roundSecondsByRound: { r16: round, qf: round, sf: round, final: round },
     };
-    this.state.queue = ids.map((categoryId) => ({ categoryId }));
+    this.state.queue = ids.map((categoryId) => ({ categoryId, roundSecondsOverride: round }));
     this.state.queueIndex = 0;
     this.state.tournament = null;
-    this.log("info", `Demo: ${ids.length} categories, ${seconds}s rounds`);
+    this.demoOrder = ids;
+    this.demoIndex = 0;
+    this.log("info", `Demo show: ${ids.length} categories, ${round}s rounds`);
     this.setSimulated(true);
-    this.startTournament(ids[0]);
+
+    // Launch the automatic show and jump straight into the first bracket, so the
+    // demo exercises the real show flow (bracket cinematic, result, champion…).
+    this.clearShowTimer();
+    this.stopTimer();
+    this.showRound = null;
+    this.pendingRoundRecap = false;
+    this.showFallbackCategory = null;
+    this.state.show.active = true;
+    this.state.show.paused = false;
+    this.state.show.phase = "idle";
+    this.state.show.phaseEndsAt = null;
+    this.state.show.result = null;
+    this.state.show.champion = null;
+    this.state.show.categoryVotes = {};
+    this.state.show.categoryVoters = [];
+    this.state.show.categoryCandidates = [];
+    this.state.show.categoryVoterList = {};
+    this.state.tournament = null;
+    this.state.matchEndsAt = null;
+    this.state.status = "running";
+    this.log("info", "Demo show started.");
+    this.advanceDemo();
   }
 
   reset(): void {
@@ -1400,6 +1627,8 @@ export class Session {
     this.releaseHold();
     this.clearSideEffects();
     this.setSimulated(false);
+    this.demoOrder = null;
+    this.demoIndex = 0;
     this.state.tournament = null;
     this.state.matchEndsAt = null;
     this.state.stageView = "match";
@@ -1410,13 +1639,17 @@ export class Session {
       phaseEndsAt: null,
       categoryVotes: {},
       categoryVoters: [],
+      categoryCandidates: [],
+      categoryVoterList: {},
       result: null,
       champion: null,
     };
     this.showRound = null;
+    this.pendingRoundRecap = false;
     this.supporters.clear();
     this.state.live.counts = { chat: 0, gift: 0, like: 0, follow: 0, share: 0, member: 0, subscribe: 0, roomUser: 0 };
     this.state.live.lastEvents = [];
+    this.state.live.recentVotes = [];
     this.state.live.lastEventAt = null;
     this.updateSupporters();
     this.state.status = "idle";
@@ -1454,6 +1687,9 @@ export class Session {
       case "category:reorder":
         await reorderCategories(payload as string[]);
         await this.refreshWait();
+        break;
+      case "lang:set":
+        await this.setActiveLang(payload as Lang);
         break;
       case "tournament:start": {
         const arg = payload as { categoryId?: string } | undefined;
@@ -1520,14 +1756,11 @@ export class Session {
       case "show:skipPhase":
         this.skipShowPhase();
         break;
-      case "live:connect":
-        this.live?.start();
+      case "poll:start":
+        this.startPoll();
         break;
-      case "live:disconnect":
-        this.live?.stop();
-        break;
-      case "live:update":
-        await this.updateLiveConfig((payload as { url?: string; slug?: string; key?: string } | undefined) ?? {});
+      case "poll:stop":
+        this.stopShow();
         break;
       case "live:inject":
         this.handleLiveEvent(payload as LiveEvent);

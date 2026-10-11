@@ -1,12 +1,12 @@
 {
   "id": "traditional-arab-attire",
-  "name": "Traditional Arab Attire",
+  "name": "أزياء تقليدية عربية",
   "items": [
     {
       "id": "keffiyeh-ghutra",
-      "name": "Keffiyeh (Ghutra)",
+      "name": "كوفية",
       "aliases": [
-        "كوفية",
+        "Keffiyeh (Ghutra)",
         "غترة"
       ],
       "emoji": "🧣",
@@ -14,9 +14,9 @@
     },
     {
       "id": "thobe-dishdasha",
-      "name": "Thobe (Dishdasha)",
+      "name": "ثوب",
       "aliases": [
-        "ثوب",
+        "Thobe (Dishdasha)",
         "دشداشة"
       ],
       "emoji": "👘",
@@ -24,27 +24,27 @@
     },
     {
       "id": "abaya",
-      "name": "Abaya",
+      "name": "عباءة",
       "aliases": [
-        "عباءة"
+        "Abaya"
       ],
       "emoji": "🧥",
       "image": "/uploads/f5c516909786.jpg"
     },
     {
       "id": "agal",
-      "name": "Agal",
+      "name": "عقال",
       "aliases": [
-        "عقال"
+        "Agal"
       ],
       "emoji": "🪢",
       "image": "/uploads/fd51b7ab37ad.jpg"
     },
     {
       "id": "tarboush-fez",
-      "name": "Tarboush (Fez)",
+      "name": "طربوش",
       "aliases": [
-        "طربوش",
+        "Tarboush (Fez)",
         "فيس"
       ],
       "emoji": "🎩",
@@ -52,72 +52,72 @@
     },
     {
       "id": "kaftan",
-      "name": "Kaftan",
+      "name": "قفطان",
       "aliases": [
-        "قفطان"
+        "Kaftan"
       ],
       "emoji": "👗",
       "image": "/uploads/3f8f99b2f719.png"
     },
     {
       "id": "bisht",
-      "name": "Bisht",
+      "name": "بشت",
       "aliases": [
-        "بشت"
+        "Bisht"
       ],
       "emoji": "🧥",
       "image": "/uploads/f28cbb054b98.jpg"
     },
     {
       "id": "jalabiya",
-      "name": "Jalabiya",
+      "name": "جلابية",
       "aliases": [
-        "جلابية"
+        "Jalabiya"
       ],
       "emoji": "👘",
       "image": "/uploads/8fcbd66e217a.jpg"
     },
     {
       "id": "sirwal",
-      "name": "Sirwal",
+      "name": "سروال",
       "aliases": [
-        "سروال"
+        "Sirwal"
       ],
       "emoji": "👖",
       "image": "/uploads/4b4966b13ff8.jpg"
     },
     {
       "id": "jellaba",
-      "name": "Jellaba",
+      "name": "جلابة",
       "aliases": [
-        "جلابة"
+        "Jellaba"
       ],
       "emoji": "🧥",
       "image": "/uploads/ffde75107f38.jpg"
     },
     {
       "id": "takchita",
-      "name": "Takchita",
+      "name": "تكشيطة",
       "aliases": [
-        "تكشيطة"
+        "Takchita"
       ],
       "emoji": "👗",
       "image": "/uploads/40e967c10c78.jpg"
     },
     {
       "id": "burnous",
-      "name": "Burnous",
+      "name": "برنوس",
       "aliases": [
-        "برنوس"
+        "Burnous"
       ],
       "emoji": "🧥",
       "image": "/uploads/460fc3302670.jpg"
     },
     {
       "id": "kufi-taqiyah",
-      "name": "Kufi (Taqiyah)",
+      "name": "طاقية",
       "aliases": [
-        "طاقية",
+        "Kufi (Taqiyah)",
         "كوفي"
       ],
       "emoji": "🧢",
@@ -125,27 +125,27 @@
     },
     {
       "id": "karakou",
-      "name": "Karakou",
+      "name": "كاراكو",
       "aliases": [
-        "كاراكو"
+        "Karakou"
       ],
       "emoji": "👚",
       "image": "/uploads/bc1b9fdb99e2.jpg"
     },
     {
       "id": "sherwal",
-      "name": "Sherwal",
+      "name": "شروال",
       "aliases": [
-        "شروال"
+        "Sherwal"
       ],
       "emoji": "👖",
       "image": "/uploads/427e7d9bfd9a.jpg"
     },
     {
       "id": "jibba",
-      "name": "Jibba",
+      "name": "جبة",
       "aliases": [
-        "جبة"
+        "Jibba"
       ],
       "emoji": "👘",
       "image": "/uploads/eb3096e8786a.jpg"
@@ -163,5 +163,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "أزياء تقليدية عربية"
+  "nameAr": "Traditional Arab Attire",
+  "lang": "ar"
 }

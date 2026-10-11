@@ -37,25 +37,6 @@ export function SettingsPanel({ settings }: { settings: Settings }): ReactNode {
       <Toggle label={t("settings.autoStageView")} checked={settings.autoStageView} onChange={(v) => patch({ autoStageView: v })} />
       <Toggle label={t("settings.showVoteHint")} checked={settings.showVoteHint} onChange={(v) => patch({ showVoteHint: v })} />
 
-      <Field label={t("settings.showBackground")}>
-        <Select
-          value={settings.showBackground}
-          onChange={(e) => patch({ showBackground: e.target.value as Settings["showBackground"] })}
-          className="px-2 py-1 text-xs"
-        >
-          <option value="transparent">{t("settings.bg.transparent")}</option>
-          <option value="dark">{t("settings.bg.dark")}</option>
-        </Select>
-      </Field>
-      <div className="grid grid-cols-2 gap-2">
-        <Field label={t("settings.safeTop")}>
-          <TextInput type="number" min={0} max={45} value={settings.safeTopPct} onChange={(e) => patch({ safeTopPct: Number(e.target.value) })} className="px-2 py-1 text-xs" />
-        </Field>
-        <Field label={t("settings.safeBottom")}>
-          <TextInput type="number" min={0} max={45} value={settings.safeBottomPct} onChange={(e) => patch({ safeBottomPct: Number(e.target.value) })} className="px-2 py-1 text-xs" />
-        </Field>
-      </div>
-
       <Slider
         label={t("settings.stageTextScale")}
         min={0.6}

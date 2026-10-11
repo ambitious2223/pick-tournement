@@ -3,6 +3,8 @@ import path from "node:path";
 import type { Category, Gift, Item } from "../shared/types.ts";
 import { CATEGORIES_DIR, ensureDirs } from "./store.ts";
 
+const ARABIC_RE = /[\u0600-\u06FF]/;
+
 type SeedItem = [name: string, aliases: string, emoji?: string];
 
 interface SeedCategory {
@@ -239,6 +241,7 @@ function buildCategory(seed: SeedCategory): Category {
     id: seed.id,
     name: seed.name,
     nameAr: seed.nameAr,
+    lang: "ar",
     items,
     giftPair: DEFAULT_GIFT_PAIR,
   };
@@ -294,6 +297,78 @@ export async function migrateCategoryArabicNames(): Promise<string[]> {
   return changed;
 }
 
+/**
+ * Stamps the Arabic library on every category saved before languages existed.
+ * Files that already carry a `lang` are left untouched, so this is safe to run
+ * on every boot.
+ */
+export async function migrateCategoryLangs(): Promise<string[]> {
+  await ensureDirs();
+  const entries = await fs.readdir(CATEGORIES_DIR).catch(() => [] as string[]);
+  const changed: string[] = [];
+  for (const name of entries) {
+    if (!name.endsWith(".json")) continue;
+    const file = path.join(CATEGORIES_DIR, name);
+    let category: Category;
+    try {
+      category = JSON.parse(await fs.readFile(file, "utf8")) as Category;
+    } catch {
+      continue;
+    }
+    if (!category || typeof category.id !== "string" || category.lang) continue;
+    category.lang = "ar";
+    await fs.writeFile(file, `${JSON.stringify(category, null, 2)}\n`, "utf8");
+    changed.push(category.id);
+  }
+  return changed;
+}
+
+/**
+ * The Arabic library should read in Arabic. For legacy categories whose names
+ * were still Latin, promote the Arabic alias to be the display name and keep the
+ * old Latin name as an alias (so chat voting still matches either spelling).
+ * Idempotent: once a name is Arabic it is left alone.
+ */
+export async function promoteArabicNames(): Promise<string[]> {
+  await ensureDirs();
+  const entries = await fs.readdir(CATEGORIES_DIR).catch(() => [] as string[]);
+  const changed: string[] = [];
+  for (const name of entries) {
+    if (!name.endsWith(".json")) continue;
+    const file = path.join(CATEGORIES_DIR, name);
+    let category: Category;
+    try {
+      category = JSON.parse(await fs.readFile(file, "utf8")) as Category;
+    } catch {
+      continue;
+    }
+    if (!category || (category.lang ?? "ar") !== "ar" || !Array.isArray(category.items)) continue;
+    let dirty = false;
+    for (const item of category.items) {
+      if (ARABIC_RE.test(item.name)) continue;
+      const idx = item.aliases.findIndex((alias) => ARABIC_RE.test(alias));
+      if (idx < 0) continue;
+      const arabic = item.aliases[idx]!;
+      const oldName = item.name;
+      item.name = arabic;
+      item.nameAr = undefined;
+      item.aliases = [...new Set([oldName, ...item.aliases.filter((_, i) => i !== idx)].filter(Boolean))];
+      dirty = true;
+    }
+    if (!ARABIC_RE.test(category.name) && category.nameAr && ARABIC_RE.test(category.nameAr)) {
+      const oldName = category.name;
+      category.name = category.nameAr;
+      category.nameAr = oldName;
+      dirty = true;
+    }
+    if (dirty) {
+      await fs.writeFile(file, `${JSON.stringify(category, null, 2)}\n`, "utf8");
+      changed.push(category.id);
+    }
+  }
+  return changed;
+}
+
 export async function ensureSeeded(): Promise<void> {
   const written = await seedCategories(false);
   if (written.length > 0) {
@@ -302,6 +377,14 @@ export async function ensureSeeded(): Promise<void> {
   const migrated = await migrateCategoryArabicNames();
   if (migrated.length > 0) {
     console.log(`[seed] added Arabic names to ${migrated.length} categories`);
+  }
+  const langs = await migrateCategoryLangs();
+  if (langs.length > 0) {
+    console.log(`[seed] tagged ${langs.length} categories as Arabic`);
+  }
+  const promoted = await promoteArabicNames();
+  if (promoted.length > 0) {
+    console.log(`[seed] moved Arabic names into the name field for ${promoted.length} categories`);
   }
 }
 

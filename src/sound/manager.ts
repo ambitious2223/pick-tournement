@@ -20,6 +20,7 @@ export interface SoundStatus {
   lastCue: string | null;
   lastCueAt: number | null;
   overrides: string[];
+  reason: "idle" | "no-config" | "muted" | "disabled-cue" | "not-running" | "played";
 }
 
 class SoundManager {
@@ -34,6 +35,10 @@ class SoundManager {
   /** A cue requested while the audio context was still locked, replayed on unlock. */
   private pendingCue: { id: string; opts: CueOptions } | null = null;
   private lastCue: { id: string; at: number } | null = null;
+  private reason: SoundStatus["reason"] = "idle";
+
+  /** Shared in-flight unlock so concurrent callers await the same attempt. */
+  private unlockPromise: Promise<void> | null = null;
 
   private player = new MusicPlayer();
   private desiredSlot: string | null = null;
@@ -64,10 +69,23 @@ class SoundManager {
       lastCue: this.lastCue?.id ?? null,
       lastCueAt: this.lastCue?.at ?? null,
       overrides: [...this.overrides],
+      reason: this.reason,
     };
   }
 
-  async unlock(): Promise<void> {
+  unlock(): Promise<void> {
+    if (this.unlockPromise) return this.unlockPromise;
+    this.unlockPromise = this.doUnlock()
+      .catch(() => {
+        /* a rejected resume must never leave callers hanging */
+      })
+      .finally(() => {
+        this.unlockPromise = null;
+      });
+    return this.unlockPromise;
+  }
+
+  private async doUnlock(): Promise<void> {
     await engine.unlock();
     if (this.config) engine.applyConfig(this.config);
     // Music requested before the context existed is applied now.
@@ -94,11 +112,41 @@ class SoundManager {
     }
   }
 
+  /** Re-read the override list after an upload/removal and drop stale decoded buffers. */
+  async refreshOverrides(): Promise<void> {
+    this.overrides.clear();
+    this.buffers.clear();
+    try {
+      const res = await fetch("/api/sounds", { cache: "no-store" });
+      if (res.ok) {
+        const list = (await res.json()) as string[];
+        for (const name of list) this.overrides.add(name.replace(/\.[a-z0-9]+$/i, ""));
+      }
+    } catch {
+      /* offline */
+    }
+    this.overridesLoaded = true;
+  }
+
+  hasOverride(id: string): boolean {
+    return this.overrides.has(id);
+  }
+
   /** Play a one-shot cue, honoring mute, per-cue toggles, rate limits and file overrides. */
   play(id: string, opts: CueOptions = {}): void {
     const cfg = this.config;
-    if (!cfg || cfg.muted) return;
-    if (cfg.disabledCues?.includes(id)) return;
+    if (!cfg) {
+      this.reason = "no-config";
+      return;
+    }
+    if (cfg.muted) {
+      this.reason = "muted";
+      return;
+    }
+    if (cfg.disabledCues?.includes(id)) {
+      this.reason = "disabled-cue";
+      return;
+    }
     const now = typeof performance !== "undefined" ? performance.now() : Date.now();
     const gap = MIN_INTERVAL[id] ?? 25;
     if (now - (this.lastPlay.get(id) ?? 0) < gap) return;
@@ -107,15 +155,19 @@ class SoundManager {
     this.onCue?.(id);
     this.lastCue = { id, at: Date.now() };
     if (this.overrides.has(id)) {
+      this.reason = "played";
       void this.playFile(id, opts);
       return;
     }
     // No audio context yet / blocked: remember the cue and replay it on unlock.
     if (!engine.running) {
       this.pendingCue = { id, opts };
+      this.reason = "not-running";
+      console.warn("[sound] deferred until audio unlock:", id);
       return;
     }
     playCue(engine, id, opts);
+    this.reason = "played";
   }
 
   private async playFile(id: string, opts: CueOptions): Promise<void> {

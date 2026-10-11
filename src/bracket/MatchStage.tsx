@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import type { SessionState } from "../../shared/types.ts";
-import { activeCategory, activeMatch } from "../lib/selectors.ts";
+import { activeMatch } from "../lib/selectors.ts";
 import { useNow } from "../lib/live.ts";
 import { Stage } from "../stage/Stage.tsx";
-import { BracketBoard } from "./BracketBoard.tsx";
+import { BracketCinema } from "./BracketCinema.tsx";
 
 /**
  * The tournament "stage". Two phases, chosen by `state.stageView`:
@@ -13,7 +13,6 @@ import { BracketBoard } from "./BracketBoard.tsx";
  */
 export function MatchStage({ state, variant }: { state: SessionState; variant: "control" | "overlay" }): ReactNode {
   const match = activeMatch(state);
-  const category = activeCategory(state);
   const tourney = state.tournament;
   const live = tourney !== null && tourney.status !== "done" && match !== null;
 
@@ -28,15 +27,9 @@ export function MatchStage({ state, variant }: { state: SessionState; variant: "
   return (
     <div key={state.stageView} className={`relative w-full ${height}`}>
       {bracketPhase ? (
-        <div className="animate-view-in absolute inset-0 grid place-items-center p-4">
-          <div className={`w-full ${variant === "overlay" ? "max-w-6xl" : "max-w-5xl"}`}>
-            <BracketBoard
-              bracket={tourney.bracket}
-              category={category}
-              currentRound={match!.round}
-              currentIndex={match!.index}
-              variant="stage"
-            />
+        <div className="animate-view-in absolute inset-0 p-4">
+          <div className="relative h-full w-full">
+            <BracketCinema state={state} mode="intro" variant={variant === "overlay" ? "overlay" : "control"} />
           </div>
         </div>
       ) : (

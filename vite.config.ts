@@ -14,6 +14,7 @@ export default defineConfig({
       "/api": SERVER,
       "/events": SERVER,
       "/uploads": SERVER,
+      "/sounds": SERVER,
     },
   },
   build: {

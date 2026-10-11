@@ -1,12 +1,12 @@
 {
   "id": "folklore-mythical-characters",
-  "name": "Folklore & Mythical Characters",
+  "name": "شخصيات تراثية وأسطورية",
   "items": [
     {
       "id": "sinbad-the-sailor",
-      "name": "Sinbad the Sailor",
+      "name": "السندباد",
       "aliases": [
-        "السندباد",
+        "Sinbad the Sailor",
         "السندباد البحري"
       ],
       "emoji": "⛵",
@@ -14,27 +14,27 @@
     },
     {
       "id": "aladdin",
-      "name": "Aladdin",
+      "name": "علاء الدين",
       "aliases": [
-        "علاء الدين"
+        "Aladdin"
       ],
       "emoji": "🧞",
       "image": "/uploads/02ba4a06afe5.jpg"
     },
     {
       "id": "ali-baba",
-      "name": "Ali Baba",
+      "name": "علي بابا",
       "aliases": [
-        "علي بابا"
+        "Ali Baba"
       ],
       "emoji": "💰",
       "image": "/uploads/586b2be1d9ef.jpg"
     },
     {
       "id": "juha-nasreddin",
-      "name": "Juha (Nasreddin)",
+      "name": "جحا",
       "aliases": [
-        "جحا",
+        "Juha (Nasreddin)",
         "الجحص"
       ],
       "emoji": "🫏",
@@ -42,44 +42,44 @@
     },
     {
       "id": "scheherazade",
-      "name": "Scheherazade",
+      "name": "شهرزاد",
       "aliases": [
-        "شهرزاد"
+        "Scheherazade"
       ],
       "emoji": "📖",
       "image": "/uploads/acfb7f66d9cb.jpg"
     },
     {
       "id": "shahryar",
-      "name": "Shahryar",
+      "name": "شهريار",
       "aliases": [
-        "شهريار"
+        "Shahryar"
       ],
       "emoji": "👑"
     },
     {
       "id": "abu-zayd-al-hilali",
-      "name": "Abu Zayd al-Hilali",
+      "name": "أبو زيد الهلالي",
       "aliases": [
-        "أبو زيد الهلالي"
+        "Abu Zayd al-Hilali"
       ],
       "emoji": "⚔️",
       "image": "/uploads/bb5981ae30a1.jpg"
     },
     {
       "id": "zarqa-al-yamama",
-      "name": "Zarqa al-Yamama",
+      "name": "زرقاء اليمامة",
       "aliases": [
-        "زرقاء اليمامة"
+        "Zarqa al-Yamama"
       ],
       "emoji": "👁️",
       "image": "/uploads/2d41a5345695.jpg"
     },
     {
       "id": "antarah-folklore",
-      "name": "Antarah (Folklore)",
+      "name": "عنترة بن شداد",
       "aliases": [
-        "عنترة بن شداد",
+        "Antarah (Folklore)",
         "الأسطورة"
       ],
       "emoji": "🏇",
@@ -87,18 +87,18 @@
     },
     {
       "id": "al-shater-hassan",
-      "name": "Al-Shater Hassan",
+      "name": "الشاطر حسن",
       "aliases": [
-        "الشاطر حسن"
+        "Al-Shater Hassan"
       ],
       "emoji": "🦸",
       "image": "/uploads/6078cbabae5f.jpg"
     },
     {
       "id": "qais-and-layla",
-      "name": "Qais and Layla",
+      "name": "قيس وليلى",
       "aliases": [
-        "قيس وليلى",
+        "Qais and Layla",
         "ليلى"
       ],
       "emoji": "💕",
@@ -106,36 +106,36 @@
     },
     {
       "id": "saif-ibn-dhi-yazan",
-      "name": "Saif ibn Dhi Yazan",
+      "name": "سيف بن ذي يزن",
       "aliases": [
-        "سيف بن ذي يزن"
+        "Saif ibn Dhi Yazan"
       ],
       "emoji": "🗡️",
       "image": "/uploads/320f79148afe.jpg"
     },
     {
       "id": "ghoul",
-      "name": "Ghoul",
+      "name": "الغول",
       "aliases": [
-        "الغول"
+        "Ghoul"
       ],
       "emoji": "👹",
       "image": "/uploads/168776932b9c.jpg"
     },
     {
       "id": "roc-legendary-bird",
-      "name": "Roc (Legendary Bird)",
+      "name": "طائر الرخ",
       "aliases": [
-        "طائر الرخ"
+        "Roc (Legendary Bird)"
       ],
       "emoji": "🦅",
       "image": "/uploads/b52cf63a8360.jpg"
     },
     {
       "id": "jinn-genie",
-      "name": "Jinn (Genie)",
+      "name": "الجني",
       "aliases": [
-        "الجني",
+        "Jinn (Genie)",
         "العملاق"
       ],
       "emoji": "🧞",
@@ -143,9 +143,9 @@
     },
     {
       "id": "al-naddaha",
-      "name": "Al-Naddaha",
+      "name": "النداهة",
       "aliases": [
-        "النداهة"
+        "Al-Naddaha"
       ],
       "emoji": "👻"
     }
@@ -162,5 +162,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "شخصيات تراثية وأسطورية"
+  "nameAr": "Folklore & Mythical Characters",
+  "lang": "ar"
 }

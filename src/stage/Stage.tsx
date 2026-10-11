@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { Category, Gift, Item, SessionState, SideEffect } from "../../shared/types.ts";
-import { activeCategory, activeItems, activeMatch, categoryName, getItem, itemName } from "../lib/selectors.ts";
+import { activeCategory, activeItems, activeMatch, categoryName, getItem, itemName, roundSecondsFor } from "../lib/selectors.ts";
 import { useI18n } from "../i18n/index.tsx";
 import { ItemCard } from "../overlay/ItemCard.tsx";
 import { VoteBar } from "../overlay/VoteBar.tsx";
@@ -22,14 +22,14 @@ interface Preset {
 
 const PRESETS: Record<Variant, Preset> = {
   overlay: {
-    visual: "aspect-square w-full max-w-[480px] min-w-[120px]",
-    emoji: "text-[8vh]",
-    namePx: 48,
-    votePx: 72,
-    vs: "text-7xl",
-    bar: "h-12",
-    gap: "gap-12",
-    barMax: "max-w-6xl",
+    visual: "aspect-square w-full max-w-[calc(43vw*var(--stage-scale,1))] min-w-[160px]",
+    emoji: "text-[calc(10vh*var(--stage-scale,1))]",
+    namePx: 60,
+    votePx: 96,
+    vs: "text-6xl",
+    bar: "h-16",
+    gap: "gap-6",
+    barMax: "",
   },
   control: {
     visual: "h-[clamp(9rem,16vw,14rem)] w-[clamp(9rem,16vw,14rem)]",
@@ -105,10 +105,11 @@ export function Stage({
     return "normal";
   };
 
-  const seconds = totalSeconds ?? state.settings.roundSeconds;
+  const seconds = totalSeconds ?? roundSecondsFor(state);
 
   const big = variant === "overlay";
   const userScale = clampScale(state.settings.stageTextScale);
+  const stageScale = big ? clampScale(state.settings.stageScale ?? 1) : 1;
   /** Scale a control base size (px) by the variant and the host's text-size setting. */
   const fs = (controlPx: number, overlayPx = controlPx): { fontSize: number } => ({
     fontSize: (big ? overlayPx : controlPx) * userScale,
@@ -127,18 +128,21 @@ export function Stage({
     ? "rounded-full bg-lime px-5 py-2 font-black uppercase tracking-wide text-ink shadow-lg"
     : "chip text-xs text-brand-2";
   const ruleClass = big ? "max-w-[46ch] font-bold leading-snug text-white shadow-text" : "max-w-3xl leading-relaxed text-white/60 text-xs";
-  const vsClass = big ? "font-black text-white/60" : "font-black text-white/30";
+  const vsClass = big ? "font-black text-white/55 shadow-text" : "font-black text-white/30";
   const sideAClass = big
     ? "rounded-full border-2 border-brand bg-brand/15 px-4 py-1.5 font-black text-brand shadow-text"
     : "chip text-xs border-brand/60 text-brand";
   const sideBClass = big
     ? "rounded-full border-2 border-brand-2 bg-brand-2/15 px-4 py-1.5 font-black text-brand-2 shadow-text"
     : "chip text-xs border-brand-2/60 text-brand-2";
-  const barPctPx = 14 * userScale;
-  const barLabelPx = 12 * userScale;
+  const barPctPx = 14 * userScale * stageScale;
+  const barLabelPx = 12 * userScale * stageScale;
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-between gap-4">
+    <div
+      className="flex h-full w-full flex-col items-center justify-between gap-4"
+      style={big ? ({ "--stage-scale": String(stageScale) } as CSSProperties) : undefined}
+    >
       {showHeader ? (
         <div className="flex flex-wrap items-center justify-center gap-2">
           <span className="chip text-brand" style={headerChipStyle}>{round(match.round)}</span>
@@ -149,7 +153,7 @@ export function Stage({
 
       <div className="flex w-full flex-1 flex-col items-center justify-center gap-4">
         <div className={`grid w-full grid-cols-[1fr_auto_1fr] items-center ${p.gap}`}>
-          <div className="flex justify-center">
+          <div className="flex w-full min-w-0 justify-center">
             <ItemCard
               key={match.a ?? "a"}
               item={a}
@@ -159,22 +163,22 @@ export function Stage({
               state={stateFor(match.a, leadingA)}
               size={p.visual}
               emojiClass={p.emoji}
-              namePx={p.namePx * userScale}
-              votePx={p.votePx * userScale}
+              namePx={p.namePx * userScale * stageScale}
+              votePx={p.votePx * userScale * stageScale}
               effect={effectFor("a")}
             />
           </div>
           <div className="flex flex-col items-center gap-2">
-            <div className={`font-black text-white/30 ${p.vs}`}>VS</div>
-                <RoundTimer
-                  endsAt={match.endsAt}
-                  status={state.status}
-                  totalSeconds={seconds}
-                  hold={state.matchHold}
-                  scale={big ? 1.25 : 1}
-                />
+            <div className={`${vsClass} ${p.vs}`}>VS</div>
+            <RoundTimer
+              endsAt={match.endsAt}
+              status={state.status}
+              totalSeconds={seconds}
+              hold={state.matchHold}
+              scale={stageScale}
+            />
           </div>
-          <div className="flex justify-center">
+          <div className="flex w-full min-w-0 justify-center">
             <ItemCard
               key={match.b ?? "b"}
               item={b}
@@ -184,8 +188,8 @@ export function Stage({
               state={stateFor(match.b, leadingB)}
               size={p.visual}
               emojiClass={p.emoji}
-              namePx={p.namePx * userScale}
-              votePx={p.votePx * userScale}
+              namePx={p.namePx * userScale * stageScale}
+              votePx={p.votePx * userScale * stageScale}
               effect={effectFor("b")}
             />
           </div>

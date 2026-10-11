@@ -1,147 +1,147 @@
 {
   "id": "me-history",
-  "name": "Historical Scholars & Leaders",
+  "name": "علماء وقادة تاريخيون",
   "items": [
     {
       "id": "al-khwarizmi",
-      "name": "Al-Khwarizmi",
+      "name": "الخوارزمي",
       "aliases": [
-        "الخوارزمي"
+        "Al-Khwarizmi"
       ],
       "emoji": "🔢",
       "image": "/uploads/22f11fcfe238.jpg"
     },
     {
       "id": "ibn-sina",
-      "name": "Ibn Sina",
+      "name": "ابن سينا",
       "aliases": [
-        "ابن سينا"
+        "Ibn Sina"
       ],
       "emoji": "🩺",
       "image": "/uploads/4c0e97d1533b.jpg"
     },
     {
       "id": "ibn-battuta",
-      "name": "Ibn Battuta",
+      "name": "ابن بطوطة",
       "aliases": [
-        "ابن بطوطة"
+        "Ibn Battuta"
       ],
       "emoji": "🧭",
       "image": "/uploads/f6a971e5e478.jpg"
     },
     {
       "id": "ibn-khaldun",
-      "name": "Ibn Khaldun",
+      "name": "ابن خلدون",
       "aliases": [
-        "ابن خلدون"
+        "Ibn Khaldun"
       ],
       "emoji": "📚",
       "image": "/uploads/09c70d10c4aa.jpg"
     },
     {
       "id": "al-razi",
-      "name": "Al-Razi",
+      "name": "الرازي",
       "aliases": [
-        "الرازي"
+        "Al-Razi"
       ],
       "emoji": "⚗️",
       "image": "/uploads/3c1c14fb2b64.jpg"
     },
     {
       "id": "saladin",
-      "name": "Saladin",
+      "name": "صلاح الدين الأيوبي",
       "aliases": [
-        "صلاح الدين الأيوبي"
+        "Saladin"
       ],
       "emoji": "⚔️",
       "image": "/uploads/f62af1827b7a.jpg"
     },
     {
       "id": "harun-al-rashid",
-      "name": "Harun al-Rashid",
+      "name": "هارون الرشيد",
       "aliases": [
-        "هارون الرشيد"
+        "Harun al-Rashid"
       ],
       "emoji": "👑",
       "image": "/uploads/a8729aee21c6.jpg"
     },
     {
       "id": "tariq-ibn-ziyad",
-      "name": "Tariq ibn Ziyad",
+      "name": "طارق بن زياد",
       "aliases": [
-        "طارق بن زياد"
+        "Tariq ibn Ziyad"
       ],
       "emoji": "🔥",
       "image": "/uploads/121078b8d602.jpg"
     },
     {
       "id": "al-idrisi",
-      "name": "Al-Idrisi",
+      "name": "الإدريسي",
       "aliases": [
-        "الإدريسي"
+        "Al-Idrisi"
       ],
       "emoji": "🗺️",
       "image": "/uploads/f4ee570ccafc.jpg"
     },
     {
       "id": "jabir-ibn-hayyan",
-      "name": "Jabir ibn Hayyan",
+      "name": "جابر بن حيان",
       "aliases": [
-        "جابر بن حيان"
+        "Jabir ibn Hayyan"
       ],
       "emoji": "🧪",
       "image": "/uploads/d4981b9cf422.jpg"
     },
     {
       "id": "al-biruni",
-      "name": "Al-Biruni",
+      "name": "البيروني",
       "aliases": [
-        "البيروني"
+        "Al-Biruni"
       ],
       "emoji": "🌍",
       "image": "/uploads/8b381d4478b2.jpg"
     },
     {
       "id": "ibn-rushd",
-      "name": "Ibn Rushd",
+      "name": "ابن رشد",
       "aliases": [
-        "ابن رشد"
+        "Ibn Rushd"
       ],
       "emoji": "📖",
       "image": "/uploads/3ba020f6656a.jpg"
     },
     {
       "id": "al-masudi",
-      "name": "Al-Masudi",
+      "name": "المسعودي",
       "aliases": [
-        "المسعودي"
+        "Al-Masudi"
       ],
       "emoji": "📜",
       "image": "/uploads/f4349129844c.jpg"
     },
     {
       "id": "nizam-al-mulk",
-      "name": "Nizam al-Mulk",
+      "name": "نظام الملك",
       "aliases": [
-        "نظام الملك"
+        "Nizam al-Mulk"
       ],
       "emoji": "🏛️",
       "image": "/uploads/f95e6e192aa7.png"
     },
     {
       "id": "omar-khayyam",
-      "name": "Omar Khayyam",
+      "name": "عمر الخيام",
       "aliases": [
-        "عمر الخيام"
+        "Omar Khayyam"
       ],
       "emoji": "✒️",
       "image": "/uploads/629b9ece4cf7.jpg"
     },
     {
       "id": "ibn-al-haytham",
-      "name": "Ibn al-Haytham",
+      "name": "ابن الهيثم",
       "aliases": [
-        "ابن الهيثم"
+        "Ibn al-Haytham"
       ],
       "emoji": "👁️",
       "image": "/uploads/a4396e170151.jpg"
@@ -159,5 +159,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "علماء وقادة تاريخيون"
+  "nameAr": "Historical Scholars & Leaders",
+  "lang": "ar"
 }

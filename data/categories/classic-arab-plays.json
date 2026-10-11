@@ -1,131 +1,131 @@
 {
   "id": "classic-arab-plays",
-  "name": "Classic Arab Plays",
+  "name": "مسرحيات عربية أيقونية",
   "items": [
     {
       "id": "madraset-el-moshaghbeen",
-      "name": "Madraset El Moshaghbeen",
+      "name": "مدرسة المشاغبين",
       "aliases": [
-        "مدرسة المشاغبين"
+        "Madraset El Moshaghbeen"
       ],
       "image": "/uploads/7853357d6e5a.jpg"
     },
     {
       "id": "el-eyal-kebret",
-      "name": "El Eyal Kebret",
+      "name": "العيال كبرت",
       "aliases": [
-        "العيال كبرت"
+        "El Eyal Kebret"
       ],
       "image": "/uploads/32a69b09c02e.jpg"
     },
     {
       "id": "al-zaeem",
-      "name": "Al Zaeem",
+      "name": "الزعيم",
       "aliases": [
-        "الزعيم"
+        "Al Zaeem"
       ],
       "image": "/uploads/e4796eaf68fe.jpg"
     },
     {
       "id": "shahid-mashafsh-haga",
-      "name": "Shahid Mashafsh Haga",
+      "name": "شاهد ما شافش حاجة",
       "aliases": [
-        "شاهد ما شافش حاجة"
+        "Shahid Mashafsh Haga"
       ],
       "image": "/uploads/ec178e4f5503.jpg"
     },
     {
       "id": "el-wad-sayed-el-shaghal",
-      "name": "El Wad Sayed El Shaghal",
+      "name": "الواد سيد الشغال",
       "aliases": [
-        "الواد سيد الشغال"
+        "El Wad Sayed El Shaghal"
       ],
       "image": "/uploads/a4ef5465acd8.jpg"
     },
     {
       "id": "sok-ala-banatak",
-      "name": "Sok Ala Banatak",
+      "name": "سك على بناتك",
       "aliases": [
-        "سك على بناتك"
+        "Sok Ala Banatak"
       ],
       "image": "/uploads/f7aeedd8f61c.jpg"
     },
     {
       "id": "keda-ok",
-      "name": "Keda Ok",
+      "name": "كده أوكيه",
       "aliases": [
-        "كده أوكيه"
+        "Keda Ok"
       ],
       "image": "/uploads/c5fd8b585afd.png"
     },
     {
       "id": "al-motazawegoon",
-      "name": "Al-Motazawegoon",
+      "name": "المتزوجون",
       "aliases": [
-        "المتزوجون"
+        "Al-Motazawegoon"
       ],
       "image": "/uploads/4e29d4ebf65b.jpg"
     },
     {
       "id": "bye-bye-london",
-      "name": "Bye Bye London",
+      "name": "باي باي لندن",
       "aliases": [
-        "باي باي لندن"
+        "Bye Bye London"
       ],
       "image": "/uploads/688a7a4893f5.jpg"
     },
     {
       "id": "saif-al-arab",
-      "name": "Saif Al-Arab",
+      "name": "سيف العرب",
       "aliases": [
-        "سيف العرب"
+        "Saif Al-Arab"
       ],
       "image": "/uploads/5cda475b6595.jpg"
     },
     {
       "id": "sah-el-nom",
-      "name": "Sah El Nom",
+      "name": "صح النوم",
       "aliases": [
-        "صح النوم"
+        "Sah El Nom"
       ],
       "image": "/uploads/b527523401a5.jpg"
     },
     {
       "id": "mais-el-reem",
-      "name": "Mais El Reem",
+      "name": "ميس الريم",
       "aliases": [
-        "ميس الريم"
+        "Mais El Reem"
       ],
       "image": "/uploads/04b92dff1c31.jpg"
     },
     {
       "id": "enta-fein-w-ena-fein",
-      "name": "Enta Fein W Ena Fein",
+      "name": "إنت فين وأنا فين",
       "aliases": [
-        "إنت فين وأنا فين"
+        "Enta Fein W Ena Fein"
       ]
     },
     {
       "id": "al-kharaz",
-      "name": "Al-Kharaz",
+      "name": "الخراز",
       "aliases": [
-        "الخراز"
+        "Al-Kharaz"
       ],
       "image": "/uploads/1c0a135939d4.jpg"
     },
     {
       "id": "afrotto",
-      "name": "Afrotto",
+      "name": "عفروتو",
       "aliases": [
-        "عفروتو"
+        "Afrotto"
       ],
       "image": "/uploads/de7509198533.jpg"
     },
     {
       "id": "hamiha-haramiha",
-      "name": "Hamiha Haramiha",
+      "name": "حاميها حراميها",
       "aliases": [
-        "حاميها حراميها"
+        "Hamiha Haramiha"
       ]
     }
   ],
@@ -141,5 +141,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "مسرحيات عربية أيقونية"
+  "nameAr": "Classic Arab Plays",
+  "lang": "ar"
 }

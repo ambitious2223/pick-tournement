@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
 import type { Category, Item } from "../../shared/types.ts";
 import { TextInput, Button } from "../ui/primitives.tsx";
+import { ImageCropModal } from "../ui/ImageCropModal.tsx";
+import { ItemVisual } from "../overlay/ItemVisual.tsx";
 import { send, uploadImage, fetchImageFromUrl } from "../lib/live.ts";
 import { slug } from "../lib/slug.ts";
 import { useI18n } from "../i18n/index.tsx";
@@ -12,7 +14,7 @@ function blankItem(index: number): Item {
 }
 
 function isEmpty(item: Item): boolean {
-  return !item.name.trim() && !item.nameAr?.trim() && !item.image && !item.emoji && item.aliases.length === 0;
+  return !item.name.trim() && !item.image && !item.emoji && item.aliases.length === 0;
 }
 
 /**
@@ -31,6 +33,7 @@ export function CategoryEditor({
   const { t } = useI18n();
   const [draft, setDraft] = useState<Category>(() => structuredClone(category));
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [cropFor, setCropFor] = useState<{ id: string; file: File } | null>(null);
   const [linkFor, setLinkFor] = useState<string | null>(null);
   const [linkText, setLinkText] = useState("");
   const [saving, setSaving] = useState(false);
@@ -55,13 +58,13 @@ export function CategoryEditor({
     setDraft({ ...draft, items: draft.items.filter((item) => item.id !== id) });
   };
 
-  const uploadFor = async (id: string, file: File | undefined): Promise<void> => {
-    if (!file) return;
+  const uploadFor = async (id: string, file: File): Promise<void> => {
     setBusyId(id);
     setError(null);
     try {
       const url = await uploadImage(file);
       setItem(id, { image: url });
+      setCropFor(null);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -109,7 +112,7 @@ export function CategoryEditor({
           draft.id && !draft.id.startsWith("new-")
             ? draft.id
             : slug(draft.name) || `category-${Date.now().toString(36)}`,
-        name: draft.name.trim() || draft.nameAr?.trim() || "Category",
+        name: draft.name.trim() || "Category",
         items,
       };
       await send("category:save", cleaned);
@@ -126,13 +129,7 @@ export function CategoryEditor({
           className="min-w-0 flex-1 rounded-lg border border-line bg-ink-2 px-3 py-1.5 text-sm font-bold outline-none focus:border-brand"
           value={draft.name}
           onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-          placeholder={t("content.categoryNameEn")}
-        />
-        <input
-          className="min-w-0 flex-1 rounded-lg border border-line bg-ink-2 px-3 py-1.5 text-sm font-bold outline-none focus:border-brand"
-          value={draft.nameAr ?? ""}
-          onChange={(e) => setDraft({ ...draft, nameAr: e.target.value })}
-          placeholder={t("content.categoryNameAr")}
+          placeholder={t("content.categoryName")}
         />
         <span className="shrink-0 text-[0.65rem] text-white/40">
           {draft.items.length}/{MAX_ITEMS}
@@ -148,33 +145,28 @@ export function CategoryEditor({
       {error ? <p className="border-b border-hot/40 bg-hot/10 px-3 py-1.5 text-xs text-hot">{error}</p> : null}
 
       <div className="scroll-thin flex-1 overflow-y-auto p-3">
-        <ul className="mx-auto flex max-w-4xl flex-col gap-2">
+        <ul className="mx-auto grid max-w-5xl gap-2 sm:grid-cols-2 xl:grid-cols-3">
           {draft.items.map((item, index) => {
             const busy = busyId === item.id;
             const linking = linkFor === item.id;
             return (
-              <li key={item.id} className="rounded-xl border border-line bg-ink-2 p-2">
+              <li key={item.id} className="card flex flex-col gap-2 p-2.5">
                 <div className="flex gap-2">
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-line bg-ink text-center text-xs text-white/35">
-                    {item.image ? (
-                      <img src={item.image} alt="" className="h-full w-full object-cover" />
-                    ) : (
-                      <span className="text-xl">{item.emoji || index + 1}</span>
-                    )}
+                  <div className="relative shrink-0">
+                    <ItemVisual item={item} className="h-20 w-20" emojiClassName="text-3xl" />
+                    <span className="absolute -top-1.5 -start-1.5 grid h-5 w-5 place-items-center rounded-full border border-line bg-ink text-[0.6rem] font-bold text-white/70">
+                      {index + 1}
+                    </span>
                   </div>
-                  <div className="grid min-w-0 flex-1 gap-1.5 sm:grid-cols-2">
+                  <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <TextInput
+                      className="py-1.5"
                       value={item.name}
                       onChange={(e) => setItem(item.id, { name: e.target.value })}
-                      placeholder={t("content.competitorNameEn")}
+                      placeholder={t("content.competitorName")}
                     />
                     <TextInput
-                      value={item.nameAr ?? ""}
-                      onChange={(e) => setItem(item.id, { nameAr: e.target.value })}
-                      placeholder={t("content.competitorNameAr")}
-                    />
-                    <TextInput
-                      className="sm:col-span-2"
+                      className="py-1.5"
                       value={item.aliases.join(", ")}
                       onChange={(e) =>
                         setItem(item.id, {
@@ -190,21 +182,24 @@ export function CategoryEditor({
                   <button
                     type="button"
                     onClick={() => removeItem(item.id)}
-                    className="shrink-0 self-start rounded border border-line px-2 py-1 text-xs text-white/45 transition hover:border-hot hover:text-hot"
+                    className="shrink-0 self-start rounded-lg border border-line px-2 py-1 text-xs text-white/45 transition hover:border-hot hover:text-hot"
                     title={t("content.remove")}
                   >
                     ✕
                   </button>
                 </div>
 
-                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                  <label className="cursor-pointer rounded border border-line px-2 py-0.5 text-[0.65rem] text-white/60 transition hover:border-brand">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <label className="cursor-pointer rounded-lg border border-line px-2 py-0.5 text-[0.65rem] text-white/60 transition hover:border-brand">
                     {busy ? "…" : t("content.uploadPhoto")}
                     <input
                       type="file"
                       accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
                       className="hidden"
-                      onChange={(e) => void uploadFor(item.id, e.target.files?.[0])}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setCropFor({ id: item.id, file });
+                      }}
                     />
                   </label>
                   <button
@@ -213,7 +208,7 @@ export function CategoryEditor({
                       setLinkFor(linking ? null : item.id);
                       setLinkText(item.image ?? "");
                     }}
-                    className={`rounded border px-2 py-0.5 text-[0.65rem] transition ${
+                    className={`rounded-lg border px-2 py-0.5 text-[0.65rem] transition ${
                       linking ? "border-brand text-brand" : "border-line text-white/60 hover:border-brand"
                     }`}
                   >
@@ -223,21 +218,15 @@ export function CategoryEditor({
                     <button
                       type="button"
                       onClick={() => setItem(item.id, { image: undefined })}
-                      className="rounded border border-line px-2 py-0.5 text-[0.65rem] text-white/60 transition hover:border-hot hover:text-hot"
+                      className="rounded-lg border border-line px-2 py-0.5 text-[0.65rem] text-white/60 transition hover:border-hot hover:text-hot"
                     >
                       {t("item.clearPhoto")}
                     </button>
                   ) : null}
-                  <input
-                    className="w-20 rounded border border-line bg-ink px-2 py-0.5 text-center text-sm outline-none focus:border-brand"
-                    value={item.emoji ?? ""}
-                    onChange={(e) => setItem(item.id, { emoji: e.target.value || undefined })}
-                    placeholder="🙂"
-                  />
                 </div>
 
                 {linking ? (
-                  <div className="mt-1.5 flex gap-1.5">
+                  <div className="flex gap-1.5">
                     <TextInput
                       value={linkText}
                       onChange={(e) => setLinkText(e.target.value)}
@@ -257,19 +246,28 @@ export function CategoryEditor({
               </li>
             );
           })}
-        </ul>
 
-        <div className="mx-auto mt-3 flex max-w-4xl">
-          <Button
-            variant="ghost"
-            className="w-full"
-            disabled={draft.items.length >= MAX_ITEMS}
-            onClick={addItem}
-          >
-            {t("content.addCompetitor")}
-          </Button>
-        </div>
+          <li>
+            <button
+              type="button"
+              disabled={draft.items.length >= MAX_ITEMS}
+              onClick={addItem}
+              className="flex h-full min-h-[7rem] w-full flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-line text-xs text-white/45 transition hover:border-brand hover:text-brand disabled:opacity-30"
+            >
+              <span className="text-2xl leading-none">＋</span>
+              {t("content.addCompetitor")}
+            </button>
+          </li>
+        </ul>
       </div>
+      {cropFor ? (
+        <ImageCropModal
+          file={cropFor.file}
+          onCancel={() => setCropFor(null)}
+          onDone={(cropped) => void uploadFor(cropFor.id, cropped)}
+          busy={busyId === cropFor.id}
+        />
+      ) : null}
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 Pick League is a local, **Arabic-first (RTL)** web app for TikTok Live creators. It runs 16-item
 single-elimination tournament brackets (one category at a time, with a queue of categories) and is
-meant to be added to OBS as a **Browser Source**. It runs with a built-in simulator, or with real
+meant to run as a standalone **show window** you capture as-is. It runs with a built-in simulator, or with real
 TikTok events relayed by the local **Tikora** hub. It has an automatic broadcast flow, per-round
 visual themes, a Web Audio sound system, and cached viewer avatars.
 
@@ -50,8 +50,11 @@ untested.
   the React UI. Never duplicate bracket/vote logic in a component.
 - The **server is authoritative** and holds the live session; the browser renders state received via
   SSE. Control commands go through `POST /api/command`.
-- Keep files small and single-purpose (`shared/`, `engine/`, `server/`, `src/{broadcast,control,studio,debug,setup,sound,i18n}`).
-- Categories are plain JSON in `data/categories/`, editable at runtime through the Studio (no rebuild).
+- Keep files small and single-purpose (`shared/`, `engine/`, `server/`,
+  `src/{broadcast,control,studio,debug,sound,i18n}`).
+- Categories are plain JSON in `data/categories/`, each tagged with its language (`lang`), editable
+  at runtime through the Studio (no rebuild). Arabic and English are **separate libraries** with
+  separate queues; the server only exposes the active language's categories.
 - **Arabic-first with an English toggle**, RTL-safe (use logical Tailwind utilities like `ms-`/`me-`/
   `ps-`/`pe-`/`start-`/`end-`). All user-facing strings live in `src/i18n/`.
 - **Sound** is client-side Web Audio (`src/sound/`); only the broadcast page plays audio.
@@ -61,8 +64,8 @@ untested.
 
 ## Architecture map
 
-- `shared/types.ts` — domain types (`Item`, `Category`, `Match`, `Tournament`, `SessionState`).
-- `shared/config.ts` — bracket sizes, round labels, default settings.
+- `shared/types.ts` — domain types (`Item`, `Category`, `Match`, `Tournament`, `SessionState`, `Lang`, `Settings`).
+- `shared/config.ts` — bracket sizes, round labels, default settings (incl. stage size + simulator knobs).
 - `engine/bracket.ts` — build the 16-slot tree, advance winners.
 - `engine/matcher.ts` — normalize + match chat text to a name/alias.
 - `engine/match.ts` — vote tallying, dedupe, gift weight, tie rules.
@@ -76,20 +79,26 @@ untested.
 - `server/imageCache.ts` — the one shared external fetch (a single image, verified, size-capped,
   cached under `data/`); `server/avatars.ts` and `server/giftArt.ts` wrap it for viewer avatars and
   gift artwork. `server/giftArt.ts` also serves `/gifts/`.
-- `server/seed.ts` — the built-in Middle East categories; re-creates any that are missing on first
-  boot (so deleting one means also removing it from `SEED`).
+- `server/seed.ts` — the built-in Middle East categories (tagged `lang: "ar"`); re-creates any that
+  are missing on first boot (so deleting one means also removing it from `SEED`), and runs the
+  one-time migrations: tag legacy categories as Arabic and promote each item's Arabic alias into its
+  display name (keeping the English spelling as an alias so chat still matches).
 - `server/photos.ts` — the sanctioned photo downloader (English + Arabic Wikipedia, then Commons).
 - `scripts/serve.mjs` — single-port launcher (build + serve on `:8787`); `scripts/dev.mjs` — dev.
 - `scripts/manifest.ts` — builds the hub manifest; `scripts/gen-manifest.ts` writes it (`npm run manifest`);
   `scripts/smoke-hub.ts` — drives every declared hub effect end-to-end and restores `data/session.json`;
   `scripts/smoke-key.ts` — proves the game key resolves with no manual step.
-- `src/broadcast` — the one OBS page (automatic show flow, themes, animations).
+- `src/broadcast` — the show window (automatic show flow, themes, animations).
 - `src/sound` — Web Audio engine, cue catalog, manager, `useSound` hook.
-- `src/i18n` — Arabic/English strings + RTL provider.
-- `src/bracket` — bracket board + `MatchStage` (used by Control); `src/stage` — the round view.
-- `src/overlay` — round widgets (ItemCard, VoteBar, RoundTimer, WinnerReveal).
-- `src/control` — host controls. `src/studio` — content editing. `src/debug` — vote injection,
-  live connection, sound mixer, raw state. `src/pages` — Home + Setup.
+- `src/i18n` — Arabic/English strings + RTL provider. The language toggle also switches the content
+  library (`lang:set`); each page adopts the server's language on first load.
+- `src/bracket` — `BracketCinema.tsx` (the overlay-only bracket cinematic camera, choreographed by
+  `useCinemaCamera.ts`) plus `MatchStage` (Control's stage/board); `src/stage` — the round voting view.
+- `src/overlay` — round widgets (ItemCard, VoteBar, RoundTimer, WinnerReveal, CategoryPoll, VoteToasts).
+- `src/control` — host controls (Run/Show/Sound/Settings/Queue, plus `SimControls.tsx`: the simulator
+  and its speed, show start/stop, one-tap demos, stage size and bracket pacing). `src/studio` —
+  card-based content editing. `src/debug` — vote injection, live connection, sound mixer, raw state.
+- `src/ui` — shared primitives, `ThumbMosaic`, `ImageCropModal`, `ColorWheel`, `Tabs`.
 - `tikora.manifest.json` — effects/events declared to the Tikora hub. Generated from
   `scripts/manifest.ts`; edit that file and run `npm run manifest`, never the JSON by hand.
 
@@ -98,7 +107,9 @@ untested.
 - The launcher (`Tournament.bat` → `scripts/serve.mjs`) serves the **built** app from **one port**
   (`127.0.0.1:8787`) so there is no second URL to get wrong. It binds loopback only — never LAN.
 - `npm run dev` (server `:8787` + Vite `:5173`) is for development only.
-- The single broadcast page lives at `/overlay` (alias `/show`); the in-app guide is `/setup`.
+- The show window lives at `/overlay` (alias `/show`); the app opens on the Control room `/control`.
+- The bracket cinematic and the viewer vote toasts live **only** on the show window; Control shows
+  the static board. Between matches the show window alternates cinematic ↔ voting.
 - Control and Debug lock the shell to the viewport so only the content area scrolls.
 - Every page is wrapped in an ErrorBoundary and shows a "server not reachable" banner when offline.
 

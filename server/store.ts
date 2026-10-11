@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { Category, SessionState } from "../shared/types.ts";
+import type { Category, Lang, SessionState } from "../shared/types.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(here, "..");
@@ -15,6 +15,7 @@ export const DIST_DIR = path.join(ROOT, "dist");
 export async function ensureDirs(): Promise<void> {
   await fs.mkdir(CATEGORIES_DIR, { recursive: true });
   await fs.mkdir(UPLOADS_DIR, { recursive: true });
+  await fs.mkdir(SOUNDS_DIR, { recursive: true });
 }
 
 export async function loadCategories(): Promise<Category[]> {
@@ -39,6 +40,11 @@ export async function loadCategories(): Promise<Category[]> {
     if (ao !== bo) return ao - bo;
     return a.name.localeCompare(b.name);
   });
+}
+
+/** The categories belonging to one language library (legacy files count as Arabic). */
+export function categoriesForLang(categories: Category[], lang: Lang): Category[] {
+  return categories.filter((c) => (c.lang ?? "ar") === lang);
 }
 
 /** Persists a manual category order; ids not present keep their current file. */
@@ -86,7 +92,7 @@ export function saveSessionDebounced(state: SessionState): void {
     fs.writeFile(SESSION_FILE, `${JSON.stringify(persisted, null, 2)}\n`, "utf8").catch((error) => {
       console.warn("[store] failed to persist session:", (error as Error).message);
     });
-  }, 400);
+  }, 150);
 }
 
 export async function countUploads(): Promise<number> {

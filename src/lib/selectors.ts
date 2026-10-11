@@ -15,21 +15,25 @@ export function activeCategory(state: SessionState | null): Category | null {
   return getCategory(state, state?.tournament?.categoryId);
 }
 
-export function categoryName(category: Category | null | undefined, lang: "ar" | "en"): string {
+/**
+ * Display names. Each language library stores its own names, so these simply
+ * return the stored name. The `lang` argument is kept for call-site symmetry.
+ */
+export function categoryName(category: Category | null | undefined, _lang: "ar" | "en"): string {
   if (!category) return "";
-  return lang === "ar" && category.nameAr ? category.nameAr : category.name;
+  return category.name;
 }
 
 const ARABIC_RE = /[\u0600-\u06FF]/;
 
 /**
- * The display name for an item. Item names are stored in Latin, while the
- * Arabic name lives in `aliases` (that's also what viewers type to vote). When
- * Arabic is active we show the Arabic alias so the screen matches the chat.
+ * The display name for an item. In the Arabic library the name is Arabic. As a
+ * safety net for not-yet-migrated data, fall back to an Arabic alias or the
+ * dedicated `nameAr` when the stored name is still Latin.
  */
 export function itemName(item: Item | null | undefined, lang: "ar" | "en"): string {
   if (!item) return "";
-  if (lang === "ar") {
+  if (lang === "ar" && !ARABIC_RE.test(item.name)) {
     if (item.nameAr) return item.nameAr;
     const arabic = item.aliases.find((alias) => ARABIC_RE.test(alias));
     if (arabic) return arabic;
@@ -46,4 +50,17 @@ export function activeItems(state: SessionState | null): { a: Item | null; b: It
   const category = activeCategory(state);
   const match = activeMatch(state);
   return { a: getItem(category, match?.a), b: getItem(category, match?.b) };
+}
+
+/**
+ * The effective match length in seconds, mirroring the server's resolution:
+ * queue override → category override → per-round default → global fallback.
+ */
+export function roundSecondsFor(state: SessionState): number {
+  const entry = state.queue[state.queueIndex];
+  const override = entry?.roundSecondsOverride;
+  const categoryOverride = activeCategory(state)?.roundSeconds;
+  const match = activeMatch(state);
+  const byRound = match ? state.settings.roundSecondsByRound?.[match.round] : undefined;
+  return override ?? categoryOverride ?? byRound ?? state.settings.roundSeconds;
 }

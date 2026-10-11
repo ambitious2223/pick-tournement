@@ -56,11 +56,18 @@ export function ItemCard({
   }, [votes]);
 
   return (
-    <div className={`animate-rise relative flex flex-col items-center gap-2 ${dim ? "opacity-40" : ""}`}>
+    <div className={`animate-rise relative flex w-full min-w-0 flex-col items-center gap-2 ${dim ? "opacity-40" : ""}`}>
       <div className={`relative shrink-0 ${size}`}>
         <div className={`h-full w-full overflow-hidden rounded-xl ring-2 ${ring} ${glow}`}>
           <ItemVisual item={item} className="h-full w-full" emojiClassName={emojiClass} />
         </div>
+        {dim ? (
+          <div className="absolute inset-0 grid place-items-center rounded-xl bg-ink/45">
+            <span className="animate-x font-black text-hot drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]" style={{ fontSize: Math.round(namePx * 1.7) }}>
+              ✕
+            </span>
+          </div>
+        ) : null}
         {alive ? (
           <div
             className={`absolute top-2 end-2 flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.7rem] font-black shadow-lg backdrop-blur ${

@@ -18,8 +18,20 @@ export const ROUND_SIZES: Record<RoundId, number> = {
   final: 1,
 };
 
+/** 0 for the Round of 16 … 3 for the Grand Final. */
+export function roundIndexFor(round: RoundId | undefined): number {
+  const idx = round ? ROUND_ORDER.indexOf(round) : 0;
+  return idx < 0 ? 0 : idx;
+}
+
+/** How much longer/more dramatic a bracket cinematic gets the closer to the Final. */
+export function bracketTension(roundIndex: number): number {
+  return [1, 1.15, 1.35, 1.6][roundIndex] ?? 1;
+}
+
 export const DEFAULT_SETTINGS: Settings = {
   roundSeconds: 30,
+  roundSecondsByRound: { r16: 30, qf: 40, sf: 50, final: 60 },
   suddenDeathSeconds: 5,
   chatWeight: 1,
   giftWeight: 10,
@@ -28,16 +40,20 @@ export const DEFAULT_SETTINGS: Settings = {
   autoNextMatch: true,
   autoNextTournament: false,
   autoStageView: false,
-  showVoteHint: true,
+  showVoteHint: false,
   categorySeconds: 20,
   roundIntroSeconds: 4,
   bracketIntroSeconds: 3,
   bracketOutroSeconds: 8,
+  roundRecapSeconds: 6,
   resultSeconds: 6,
-  showBackground: "transparent",
-  safeTopPct: 0,
-  safeBottomPct: 0,
+  showBackground: "#070a14",
+  bracketPace: 1,
   stageTextScale: 1.15,
+  stageScale: 1,
+  simVotesPerTick: 3,
+  simIntervalMs: 700,
+  simGiftChance: 0.12,
   sound: {
     muted: false,
     master: 0.8,
@@ -61,6 +77,10 @@ export const SOUND_CUE_IDS = [
   "round.intro",
   "bracket.intro",
   "bracket.focus",
+  "bracket.zoom.in",
+  "bracket.reveal",
+  "bracket.loser",
+  "bracket.tension",
   "bracket.outro",
   "bracket.winner",
   "match.countdown",

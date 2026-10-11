@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { RoundId } from "../../shared/types.ts";
+import type { Lang, RoundId } from "../../shared/types.ts";
+import { send } from "../lib/live.ts";
 
-export type Lang = "ar" | "en";
+export type { Lang };
 
 const STORAGE_KEY = "pl.lang";
 
@@ -21,91 +22,13 @@ export const DICT = {
 
   "nav.control": { ar: "التحكم", en: "Control" },
   "nav.studio": { ar: "الاستوديو", en: "Studio" },
-  "nav.overlay": { ar: "الأوفرلاي", en: "Overlay" },
-  "nav.broadcast": { ar: "البث", en: "Broadcast" },
-  "nav.debug": { ar: "تصحيح", en: "debug" },
   "nav.offline": {
     ar: "تعذّر الوصول إلى الخادم — أغلق هذه النافذة وشغّل Tournament.bat مرة أخرى.",
     en: "Server not reachable — close this window and run Tournament.bat again.",
   },
 
-  "nav.setup": { ar: "الإعداد", en: "Setup" },
-  "setup.badge": { ar: "دليل الإعداد", en: "Setup guide" },
-  "setup.title": { ar: "جهّز العرض في دقائق", en: "Get the show running in minutes" },
-  "setup.intro": {
-    ar: "هذه خطوات لمرة واحدة. بعدها كل شيء يعمل تلقائياً — لا حاجة للتبديل بين الشاشات.",
-    en: "These are one-time steps. After that everything runs automatically — no switching between screens.",
-  },
-  "setup.s1.title": { ar: "1) شغّل الخادم", en: "1) Start the server" },
-  "setup.s1.body": {
-    ar: "انقر نقراً مزدوجاً على Tournament.bat. يفتح غرفة التحكم على 127.0.0.1:8787.",
-    en: "Double-click Tournament.bat. It opens the Control Room on 127.0.0.1:8787.",
-  },
-  "setup.s2.title": { ar: "2) صِل تيك توك (عبر Tikora)", en: "2) Connect TikTok (via Tikora)" },
-  "setup.s2.body": {
-    ar: "شغّل تطبيق Tikora (يتصل بتيك توك). من Tikora انسخ معرّف ومفتاح لعبة Pick League، ثم في التصحيح ← الاتصال المباشر ألصقهما واحفظ. لا حاجة لاسم المستخدم.",
-    en: "Start your Tikora app (it connects to TikTok). In Tikora copy the Pick League game slug + key, then in Debug → Live connection paste and Save. No username needed.",
-  },
-  "setup.s3.title": { ar: "3) جهّز الفئات (اختياري)", en: "3) Prepare categories (optional)" },
-  "setup.s3.body": {
-    ar: "من الاستوديو أنشئ الفئات وعدّل العناصر والصور. هناك 10 فئات جاهزة.",
-    en: "In the Studio, create categories and edit items and photos. Ten categories are already seeded.",
-  },
-  "setup.s4.title": { ar: "4) ابدأ العرض", en: "4) Start the show" },
-  "setup.s4.body": {
-    ar: "من غرفة التحكم، اختر فئة أو املأ القائمة، ثم اضغط \"العرض ← ابدأ\". يتولّى التسلسل التالي: تصويت الفئة ← مقدمة الجولة ← الجدول ← المباريات ← النتائج ← البطل، ثم ينتقل تلقائياً إلى الفئة التالية.",
-    en: "From the Control Room pick a category or fill the queue, then press Show → Start. It runs: category vote → round intro → bracket → matches → results → champion, then the next category automatically.",
-  },
-  "setup.s5.title": { ar: "5) أضفه إلى OBS", en: "5) Add it to OBS" },
-  "setup.s5.body": {
-    ar: "أضف مصدر متصفح (Browser Source) بالرابط ‎http://127.0.0.1:8787/overlay وغيّر حجمه ليناسب المنطقة الوسطى بين الكاميرا والتعليقات. الخلفية شفافة افتراضياً؛ ويمكنك ضبط هوامش آمنة من الإعدادات. اضغط زر الصوت مرة واحدة على صفحة البث لتفعيل الصوت (يفعّله OBS تلقائياً).",
-    en: "Add a Browser Source with http://127.0.0.1:8787/overlay and size it to the middle band between your camera and comments. The background is transparent by default; tune safe-area margins in Settings. Press the sound button once on the broadcast page to enable audio (OBS does this automatically).",
-  },
-  "setup.s6.title": { ar: "6) تدرّب بدون تيك توك", en: "6) Rehearse without TikTok" },
-  "setup.s6.body": {
-    ar: "من غرفة التحكم، شغّل \"جمهور مُحاكى\" أو استخدم حاقن الأصوات في التصحيح لتدريب كامل دون اتصال مباشر.",
-    en: "In the Control Room turn on 'Simulated crowd', or use the Debug vote injector, to rehearse a full run without a live connection.",
-  },
-  "setup.openControl": { ar: "افتح غرفة التحكم", en: "Open Control Room" },
-  "setup.openDebug": { ar: "إعداد الاتصال المباشر", en: "Set up live connection" },
-  "setup.openBroadcast": { ar: "افتح البث", en: "Open broadcast" },
-
-  "home.badge": { ar: "مسابقة تيك توك المباشرة", en: "TikTok Live Bracket" },
-  "home.title1": { ar: "16 متسابقًا.", en: "16 competitors." },
-  "home.title2": { ar: "بطل واحد.", en: "One champion." },
-  "home.body": {
-    ar: "يصوّت المشاهدون بكتابة اسم اللاعب الظاهر على الشاشة أو بإرسال الهدية الموضحة بجانب الجهة. كل مباراة تعمل بمؤقّت قابل للضبط، والفئات تتسلسل تلقائيًا — دون رجوع للخلف.",
-    en: "Viewers vote by typing the on-screen name or sending the gift shown beside a side. Every match runs on a configurable timer, and categories chain automatically — no looping back.",
-  },
-  "home.setup.title": { ar: "الإعداد والبدء", en: "Setup & Start" },
-  "home.setup.body": {
-    ar: "دليل مختصر لمرة واحدة: شغّل الخادم، صِل تيك توك عبر Tikora، ثم أضف مصدر OBS وابدأ العرض.",
-    en: "A short one-time guide: start the server, connect TikTok via Tikora, add the OBS source, and start the show.",
-  },
-  "home.control.title": { ar: "غرفة التحكم", en: "Control Room" },
-  "home.control.body": {
-    ar: "أدِر البطولة: ابدأ، أوقف مؤقتًا، مدّد الوقت، افرض الفائز، وأدِر قائمة الفئات والمحاكي.",
-    en: "Run the tournament: start, pause, extend, force winners, manage the category queue and the simulator.",
-  },
-  "home.studio.title": { ar: "استوديو المحتوى", en: "Content Studio" },
-  "home.studio.body": {
-    ar: "أنشئ فئات و16 عنصرًا، وأضف الأسماء البديلة والهدايا، وارفع صور العناصر.",
-    en: "Create categories and 16 items, add aliases and gifts, upload item photos.",
-  },
-  "home.debug.title": { ar: "وحدة التصحيح", en: "Debug Console" },
-  "home.debug.body": {
-    ar: "احقن أصواتًا، افرض النتائج، حاكِ الجمهور، واضبط الاتصال المباشر ومزيج الصوت، وافحص الحالة الخام.",
-    en: "Inject votes, force outcomes, simulate crowds, set up the live connection and the sound mixer, and inspect raw state.",
-  },
-  "home.overlay.title": { ar: "أوفرلاي OBS", en: "OBS Overlay" },
-  "home.overlay.body": {
-    ar: "مصدر المتصفح الشفاف. أضف http://127.0.0.1:8787/overlay إلى OBS.",
-    en: "The transparent browser source. Add http://127.0.0.1:8787/overlay to OBS.",
-  },
-
   "show.idleTitle": { ar: "لا يوجد عرض حالياً", en: "No show running" },
   "show.idleHint": { ar: "استعد للتصويت!", en: "Get ready to vote!" },
-  "show.preview": { ar: "معاينة — يبقى البث شفافاً داخل OBS", en: "Preview — stays transparent inside OBS" },
   "show.categoryTitle": { ar: "صوّتوا للفئة القادمة", en: "Vote for the next category" },
   "show.categoryHint": { ar: "اكتبوا اسم الفئة في الدردشة للتصويت", en: "Type a category name in chat to vote" },
   "show.bracketTitle": { ar: "الجدول", en: "Bracket" },
@@ -117,6 +40,7 @@ export const DICT = {
   "show.phase.bracket-intro": { ar: "الجدول — البداية", en: "Bracket — start" },
   "show.phase.match": { ar: "المباراة", en: "Match" },
   "show.phase.bracket-outro": { ar: "الجدول — النهاية", en: "Bracket — end" },
+  "show.phase.round-recap": { ar: "ملخّص الجولة", en: "Round recap" },
   "show.phase.result": { ar: "النتيجة", en: "Result" },
   "show.phase.champion": { ar: "البطل", en: "Champion" },
   "show.start": { ar: "▶ ابدأ العرض", en: "▶ Start show" },
@@ -185,25 +109,45 @@ export const DICT = {
   "control.extend": { ar: "+10 ث", en: "+10s" },
   "control.forceL": { ar: "فوز يسار", en: "Force L" },
   "control.forceR": { ar: "فوز يمين", en: "Force R" },
-  "control.shortcuts": {
-    ar: "اختصارات: مسافة تشغيل/إيقاف · N التالي · L/R فرض الفائز · B الجدول · M المباراة",
-    en: "Shortcuts: Space start/pause · N next · L/R force winner · B bracket · M match",
-  },
   "control.show": { ar: "العرض", en: "Show" },
   "control.sound": { ar: "الصوت", en: "Sound" },
   "control.settings": { ar: "الإعدادات", en: "Settings" },
   "control.queue": { ar: "القائمة", en: "Queue" },
   "control.simulator": { ar: "المحاكي", en: "Simulator" },
-  "control.simulatorToggle": { ar: "جمهور مُحاكى (بدون تيك توك)", en: "Simulated crowd (no TikTok needed)" },
+  "control.simulatorToggle": { ar: "جمهور مُحاكى (بدون بث)", en: "Simulated crowd (no live feed)" },
   "control.simulatorHelp": {
     ar: "يرسل أصوات دردشة وهدايا وهمية إلى المباراة الجارية لتتدرب على بطولة كاملة دون اتصال.",
     en: "Fires fake chat + gift votes at the live match so you can rehearse a full tournament offline.",
   },
   "control.simHintOn": { ar: "مفعّل", en: "on" },
+
+  "sim.volume": { ar: "شدة المحاكاة", en: "Simulator volume" },
+  "sim.votesPerTick": { ar: "أصوات لكل نبضة", en: "Votes per tick" },
+  "sim.tickSpeed": { ar: "سرعة النبضات", en: "Tick speed" },
+  "sim.giftChance": { ar: "احتمال الهدايا", en: "Gift chance" },
+  "sim.show": { ar: "العرض التلقائي", en: "Automatic show" },
+  "sim.stage": { ar: "حجم الشاشة", en: "Stage" },
+  "sim.stageSize": { ar: "الحجم (صور + نص)", en: "Size (photos + text)" },
+  "sim.pacing": { ar: "إيقاع الجدول السينمائي", en: "Bracket pacing" },
+  "sim.intro": { ar: "مدة الدخول", en: "Intro length" },
+  "sim.outro": { ar: "مدة الخروج", en: "Outro length" },
+  "sim.recap": { ar: "مدة الملخّص", en: "Recap length" },
   "control.confirmReset": {
     ar: "هل تريد إيقاف الجلسة كاملة وإعادة ضبطها؟ سيُمحى الجدول الحالي.",
     en: "Stop and reset the whole session? This clears the current tournament.",
   },
+  "poll.button": { ar: "🗳️ ابدأ تصويت الفئات", en: "🗳️ Start category vote" },
+  "poll.running": { ar: "التصويت جارٍ — اضغط للإيقاف", en: "Voting is live — tap to stop" },
+  "poll.confirmReplace": {
+    ar: "يوجد جدول قيد التشغيل. بدء تصويت فئات سيبدأ بطولة جديدة للفئة الفائزة. أتريد المتابعة؟",
+    en: "A tournament is running. Starting a category vote begins a fresh tournament for the winning category. Continue?",
+  },
+  "poll.title": { ar: "صوّتوا للفئة القادمة", en: "Vote for the next category" },
+  "poll.hint": { ar: "اكتبوا اسم الفئة في الدردشة", en: "Type a category name in chat" },
+  "poll.votes": { ar: "{n} صوت", en: "{n} votes" },
+  "poll.leading": { ar: "المتصدّر", en: "Leading" },
+  "poll.standings": { ar: "الترتيب الحالي", en: "Live standings" },
+  "poll.noVotes": { ar: "لا أصوات بعد", en: "No votes yet" },
 
   "settings.roundSeconds": { ar: "الجولة (ث)", en: "Round (s)" },
   "settings.suddenDeath": { ar: "الموت المفاجئ (ث)", en: "Sudden death (s)" },
@@ -219,16 +163,14 @@ export const DICT = {
   "settings.autoStageView": { ar: "تبديل تلقائي (جدول ← مباراة)", en: "Auto phase (bracket → match)" },
   "settings.showVoteHint": { ar: "إظهار تعليمات التصويت على الشاشة", en: "Show voting instructions on screen" },
   "settings.showTimings": { ar: "توقيتات العرض", en: "Show timings" },
-  "settings.showBackground": { ar: "خلفية البث", en: "Broadcast background" },
-  "settings.bg.transparent": { ar: "شفافة (فوق الكاميرا)", en: "Transparent (over camera)" },
-  "settings.bg.dark": { ar: "داكنة (ملء الشاشة)", en: "Dark (full screen)" },
-  "settings.safeTop": { ar: "هامش آمن أعلى %", en: "Safe top %" },
-  "settings.safeBottom": { ar: "هامش آمن أسفل %", en: "Safe bottom %" },
+  "settings.showBackground": { ar: "لون الخلفية", en: "Background color" },
+  "settings.bracketPace": { ar: "إيقاع الجدول السينمائي", en: "Bracket cinematic pace" },
   "settings.stageTextScale": { ar: "حجم نص المباراة", en: "Match text size" },
   "settings.categorySeconds": { ar: "تصويت الفئة (ث)", en: "Category vote (s)" },
   "settings.roundIntroSeconds": { ar: "مقدمة الجولة (ث)", en: "Round intro (s)" },
   "settings.bracketIntroSeconds": { ar: "الجدول — البداية (ث)", en: "Bracket start (s)" },
   "settings.bracketOutroSeconds": { ar: "الجدول — النهاية (ث)", en: "Bracket end (s)" },
+  "settings.roundRecapSeconds": { ar: "ملخّص الجولة (ث)", en: "Round recap (s)" },
   "settings.resultSeconds": { ar: "مدة النتيجة (ث)", en: "Result (s)" },
 
   "queue.add": { ar: "أضف فئة…", en: "Add a category…" },
@@ -254,7 +196,12 @@ export const DICT = {
   "debug.extend30": { ar: "مدّد +30 ث", en: "Extend +30s" },
   "debug.jump": { ar: "انتقال", en: "Jump" },
   "debug.display": { ar: "العرض", en: "Display" },
-  "debug.displayHelp": { ar: "كبّر نص المباراة (الأسماء، الأصوات، الرؤوس، شريط التصويت، وتعليمات التصويت) على غرفة التحكم والبث معاً.", en: "Scale match text (header, names, votes, vote bar and vote hint) on both the Control Room and the broadcast." },
+  "debug.roundTimings": { ar: "توقيت الجولات (ثوانٍ)", en: "Round timings (seconds)" },
+  "debug.roundR16": { ar: "دور الـ16", en: "Round of 16" },
+  "debug.roundQf": { ar: "ربع النهائي", en: "Quarterfinals" },
+  "debug.roundSf": { ar: "نصف النهائي", en: "Semifinals" },
+  "debug.roundFinal": { ar: "النهائي", en: "Grand Final" },
+  "debug.resetDefaults": { ar: "إعادة للافتراضي 30/40/50/60", en: "Reset to 30/40/50/60" },
   "debug.photos": { ar: "الصور", en: "Photos" },
   "debug.testImages": { ar: "اختبر صور المباراة الحالية", en: "Test current match images" },
   "debug.dangerZone": { ar: "منطقة الخطر", en: "Danger zone" },
@@ -300,10 +247,26 @@ export const DICT = {
   "sound.previewAll": { ar: "معاينة الكل", en: "Preview all" },
   "sound.test": { ar: "🔊 اختبار الصوت", en: "🔊 Test sound" },
   "sound.stop": { ar: "إيقاف", en: "Stop" },
-  "sound.hint": {
-    ar: "الإعدادات تُطبّق مباشرة على صفحة البث. اختبر كل مؤثر من هنا؛ ملفاتك في data/sounds تتجاوز الأصوات المدمجة تلقائياً.",
-    en: "Settings apply live to the broadcast. Preview each cue here; files in data/sounds automatically override the built-in synth.",
+  "sound.cuesTitle": { ar: "المؤثرات (مرحلة بمرحلة)", en: "Sound effects (by phase)" },
+  "sound.upload": { ar: "ارفع", en: "Upload" },
+  "sound.replace": { ar: "استبدل", en: "Replace" },
+  "sound.resetBuiltin": { ar: "الافتراضي", en: "Default" },
+  "sound.customBadge": { ar: "مخصّص", en: "Custom" },
+  "sound.builtinBadge": { ar: "مدمج", en: "Built-in" },
+  "sound.uploaded": { ar: "تم الرفع ✓", en: "Uploaded ✓" },
+  "sound.uploadFailed": { ar: "تعذّر الرفع", en: "Upload failed" },
+  "sound.managerHint": {
+    ar: "لكل مرحلة مؤثرها الخاص. ارفع ملفاً (mp3/ogg/wav/webm) ليحلّ محلّ الصوت المدمج، ثم استخدم «الافتراضي» للعودة.",
+    en: "Every phase has its own cue. Upload a file (mp3/ogg/wav/webm) to replace the built-in sound, then use “Default” to revert.",
   },
+  "sound.grp.category": { ar: "الفئة", en: "Category" },
+  "sound.grp.round": { ar: "الجولة", en: "Round" },
+  "sound.grp.bracket": { ar: "الجدول", en: "Bracket" },
+  "sound.grp.match": { ar: "المباراة", en: "Match" },
+  "sound.grp.votes": { ar: "الأصوات", en: "Votes" },
+  "sound.grp.result": { ar: "النتيجة", en: "Result" },
+  "sound.grp.champion": { ar: "البطل", en: "Champion" },
+  "sound.grp.live": { ar: "التفاعل المباشر", en: "Live events" },
 
   "live.title": { ar: "الاتصال المباشر", en: "Live connection" },
   "live.url": { ar: "عنوان المرحّل (Tikora)", en: "Relay URL (Tikora)" },
@@ -324,10 +287,6 @@ export const DICT = {
   "live.inject": { ar: "إدخال حدث تجريبي", en: "Inject test event" },
   "live.injectChat": { ar: "دردشة", en: "Chat" },
   "live.injectGift": { ar: "هدية", en: "Gift" },
-  "live.hint": {
-    ar: "يتصل هذا بمرحّل Tikora المحلي (ws://127.0.0.1:27016) الذي يوفّر أحداث تيك توك. أدخل معرّف اللعبة والمفتاح من Tikora لتسجيل بيك ليغ كلعبة. لا حاجة لاسم المستخدم.",
-    en: "Connects to the local Tikora hub relay (ws://127.0.0.1:27016) that provides TikTok events. Enter the game slug + key from Tikora to register Pick League as a game. No username needed.",
-  },
   "live.counts": { ar: "دردشة {chat} · هدايا {gift} · تفاعلات {other}", en: "chat {chat} · gifts {gift} · other {other}" },
 
   "debug.noPhoto": { ar: "المباراة الحالية بلا صورة لأي طرف", en: "current match has no photo for either side" },
@@ -372,10 +331,17 @@ export const DICT = {
   "content.moveDown": { ar: "تحريك لأسفل", en: "Move down" },
   "content.categoryNameEn": { ar: "اسم الفئة بالإنجليزية", en: "Category name (English)" },
   "content.categoryNameAr": { ar: "اسم الفئة بالعربية", en: "Category name (Arabic)" },
+  "content.categoryName": { ar: "اسم الفئة", en: "Category name" },
+  "content.competitorName": { ar: "اسم المتسابق", en: "Competitor name" },
   "content.competitorNameEn": { ar: "الاسم بالإنجليزية", en: "Name (English)" },
   "content.competitorNameAr": { ar: "الاسم بالعربية", en: "Name (Arabic)" },
   "content.aliases": { ar: "أسماء بديلة للمحادثة، بفاصلة", en: "Chat aliases, comma separated" },
   "content.uploadPhoto": { ar: "رفع صورة", en: "Upload photo" },
+  "crop.title": { ar: "قصّ الصورة", en: "Crop photo" },
+  "crop.hint": { ar: "اسحب الصورة وقرّبها لاختيار الجزء الذي سيظهر.", en: "Drag and zoom to choose the part that shows." },
+  "crop.zoom": { ar: "تكبير", en: "Zoom" },
+  "crop.apply": { ar: "قصّ ورفع", en: "Crop & upload" },
+  "crop.cancel": { ar: "إلغاء", en: "Cancel" },
   "content.photoUrl": { ar: "من رابط", en: "From link" },
   "content.fetchUrl": { ar: "جلب", en: "Fetch" },
   "content.addCompetitor": { ar: "+ إضافة متسابق", en: "+ Add competitor" },
@@ -388,10 +354,6 @@ export const DICT = {
   "studio.fetching": { ar: "جارٍ الجلب…", en: "Fetching…" },
   "studio.editCategory": { ar: "تعديل الفئة", en: "Edit category" },
   "studio.selectOrCreate": { ar: "اختر فئة أو أنشئ واحدة", en: "Select or create a category" },
-  "studio.hint": {
-    ar: "اختر فئة من اليسار، أو أنشئ واحدة جديدة. كل فئة تحتوي 16 عنصرًا باسم وأسماء بديلة لمطابقة الدردشة ورمز تعبيري بديل وصورة اختيارية.",
-    en: "Pick a category on the left, or create a new one. Each category holds 16 items with a name, aliases for chat matching, an emoji fallback, and an optional photo.",
-  },
   "studio.categoryName": { ar: "اسم الفئة", en: "Category name" },
   "studio.leftGift": { ar: "هدية اليسار", en: "left gift" },
   "studio.rightGift": { ar: "هدية اليمين", en: "right gift" },
@@ -456,6 +418,15 @@ export function I18nProvider({ children }: { children: ReactNode }): ReactNode {
     document.documentElement.dir = dir;
   }, [lang, dir]);
 
+  // Keep other open windows (e.g. the show window) on the same language.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) setLangState(e.newValue === "en" ? "en" : "ar");
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   const setLang = useCallback((next: Lang) => {
     try {
       localStorage.setItem(STORAGE_KEY, next);
@@ -463,6 +434,7 @@ export function I18nProvider({ children }: { children: ReactNode }): ReactNode {
       /* ignore */
     }
     setLangState(next);
+    void send("lang:set", next);
   }, []);
 
   const t = useCallback<I18nValue["t"]>((key, vars) => format(DICT[key][lang], vars), [lang]);

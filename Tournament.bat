@@ -72,6 +72,7 @@ rem Opens the Control Room in a NEW TAB of your default browser once it is ready
 rem It never closes or reloads your other tabs. Set PL_NO_BROWSER=1 to skip.
 echo Keep this window open while testing. Press Ctrl+C to stop.
 echo.
+if defined TIKORA_NO_BROWSER set "PL_NO_BROWSER=1"
 if /i "%PL_NO_BROWSER%"=="1" (
   echo Browser auto-open is OFF. Paste a link above into the tab you want.
   call npm run serve

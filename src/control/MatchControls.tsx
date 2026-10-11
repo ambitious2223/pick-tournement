@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import type { SessionState } from "../../shared/types.ts";
+import type { Category, SessionState } from "../../shared/types.ts";
 import { Button, Select } from "../ui/primitives.tsx";
 import { send } from "../lib/live.ts";
 import { activeCategory, activeMatch, categoryName } from "../lib/selectors.ts";
@@ -13,6 +13,14 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
   const match = activeMatch(state);
   const running = state.status === "running";
   const paused = state.status === "paused";
+  const pollRunning = state.show.active && state.show.phase === "category";
+  const pollIds = state.show.categoryCandidates.length
+    ? state.show.categoryCandidates
+    : state.categories.map((c) => c.id);
+  const standings = pollIds
+    .map((id) => ({ cat: state.categories.find((c) => c.id === id) ?? null, votes: state.show.categoryVotes[id] ?? 0 }))
+    .filter((entry): entry is { cat: Category; votes: number } => entry.cat !== null)
+    .toSorted((a, b) => b.votes - a.votes);
 
   // The dropdown only selects; pressing Start launches the selection.
   const [selected, setSelected] = useState(state.tournament?.categoryId ?? "");
@@ -23,6 +31,23 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
   return (
     <section className="panel flex flex-col gap-2 p-3">
       <div className="text-[0.7rem] font-bold uppercase tracking-widest text-brand">{t("control.run")}</div>
+
+      {pollRunning ? (
+        <Button variant="hot" className="py-2 text-base" onClick={() => void send("poll:stop", undefined)}>
+          {t("poll.running")}
+        </Button>
+      ) : (
+        <Button
+          variant="lime"
+          className="py-2 text-base"
+          onClick={() => {
+            if (state.tournament && !window.confirm(t("poll.confirmReplace"))) return;
+            void send("poll:start", undefined);
+          }}
+        >
+          {t("poll.button")}
+        </Button>
+      )}
 
       <Select value={selected} onChange={(e) => setSelected(e.target.value)}>
         <option value="">{t("control.pickCategory")}</option>
@@ -120,6 +145,18 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
           {t("control.forceR")}
         </Button>
       </div>
+
+      {pollRunning ? (
+        <div className="flex flex-col gap-1 text-xs">
+          <div className="font-bold uppercase tracking-widest text-white/50">{t("poll.standings")}</div>
+          {standings.map((entry) => (
+            <div key={entry.cat.id} className="flex items-center justify-between gap-2">
+              <span className="truncate text-white/70">{categoryName(entry.cat, lang)}</span>
+              <span className="shrink-0 font-bold text-brand">{t("poll.votes", { n: entry.votes })}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

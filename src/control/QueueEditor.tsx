@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { SessionState } from "../../shared/types.ts";
 import { Button, Select } from "../ui/primitives.tsx";
+import { ThumbMosaic } from "../ui/ThumbMosaic.tsx";
 import { send } from "../lib/live.ts";
 import { categoryName } from "../lib/selectors.ts";
 import { useI18n } from "../i18n/index.tsx";
@@ -40,19 +41,22 @@ export function QueueEditor({ state }: { state: SessionState }): ReactNode {
       {queue.length === 0 ? (
         <p className="text-xs text-white/50">{t("queue.empty")}</p>
       ) : (
-        <ol className="flex flex-col gap-1">
+        <ol className="flex flex-col gap-1.5">
           {queue.map((entry, i) => {
             const category = state.categories.find((c) => c.id === entry.categoryId);
             const current = i === state.queueIndex;
             return (
               <li
                 key={`${entry.categoryId}-${i}`}
-                className={`flex items-center gap-1 rounded-md border px-2 py-1 text-xs ${
-                  current ? "border-brand bg-brand/10" : "border-line bg-ink-2"
+                className={`card flex items-center gap-2 px-1.5 py-1.5 text-xs ${
+                  current ? "card-active" : "card-hover"
                 }`}
               >
-                <span className="w-4 text-white/40">{i + 1}</span>
-                <span className="flex-1 truncate">{category ? categoryName(category, lang) : entry.categoryId}</span>
+                <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-ink/70 text-[0.6rem] font-bold text-white/60">
+                  {i + 1}
+                </span>
+                {category ? <ThumbMosaic items={category.items} tileClass="h-5 w-5" /> : null}
+                <span className="min-w-0 flex-1 truncate">{category ? categoryName(category, lang) : entry.categoryId}</span>
                 <button onClick={() => move(i, i - 1)} className="px-1 text-white/50 hover:text-white">
                   ↑
                 </button>

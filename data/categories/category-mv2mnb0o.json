@@ -1,0 +1,164 @@
+{
+  "id": "category-mv2mnb0o",
+  "name": "مسلسلات سورية",
+  "nameAr": "مسلسلات سورية",
+  "items": [
+    {
+      "id": "item-1",
+      "name": "بيت جدي",
+      "aliases": [
+        "بيت جدي"
+      ],
+      "image": "/uploads/mv2m0s1e-3e511617.webp",
+      "nameAr": "بيت جدي"
+    },
+    {
+      "id": "item-2",
+      "name": "رجال العز",
+      "aliases": [
+        "رجال العز"
+      ],
+      "image": "/uploads/mv2m0xl0-32bb1a05.jpg",
+      "nameAr": "رجال العز"
+    },
+    {
+      "id": "item-3",
+      "name": "طوق البنات",
+      "aliases": [
+        "طوق البنات"
+      ],
+      "image": "/uploads/mv2m1idx-a1afcae9.jpg",
+      "nameAr": "طوق البنات"
+    },
+    {
+      "id": "item-4",
+      "name": "ايام الدراسة",
+      "aliases": [
+        "ايام الدراسة"
+      ],
+      "image": "/uploads/mv2m1o8t-c112f217.jpg",
+      "nameAr": "ايام الدراسة"
+    },
+    {
+      "id": "item-5",
+      "name": "باب الحارة",
+      "aliases": [
+        "باب الحارة"
+      ],
+      "image": "/uploads/mv2m1y7d-35713842.jpg",
+      "nameAr": "باب الحارة"
+    },
+    {
+      "id": "item-6",
+      "name": "الدبور",
+      "aliases": [
+        "الدبور"
+      ],
+      "image": "/uploads/mv2m7ser-b0e5fbe1.jpg",
+      "nameAr": "الدبور"
+    },
+    {
+      "id": "item-7",
+      "name": "مرايا",
+      "aliases": [
+        "مرايا"
+      ],
+      "image": "/uploads/mv2m7z13-f0ba1257.jpg",
+      "nameAr": "مرايا"
+    },
+    {
+      "id": "item-8",
+      "name": "ابو جانتي",
+      "aliases": [
+        "ابو جانتي"
+      ],
+      "image": "/uploads/mv2ma1jb-7c47df94.jpg",
+      "nameAr": "ابو جانتي"
+    },
+    {
+      "id": "item-9",
+      "name": "ضيعة ضايعة",
+      "aliases": [
+        "ضيعة ضايعة"
+      ],
+      "image": "/uploads/mv2mauiq-03a92dd2.jpg",
+      "nameAr": "ضيعة ضايعة"
+    },
+    {
+      "id": "item-10",
+      "name": "ليالي الصالحية",
+      "aliases": [
+        "ليالي الصالحية"
+      ],
+      "image": "/uploads/mv2mbrqn-e5d0ccea.jpg",
+      "nameAr": "ليالي الصالحية"
+    },
+    {
+      "id": "item-11",
+      "name": "بقعة ضوء",
+      "aliases": [
+        "بقعة ضوء"
+      ],
+      "image": "/uploads/mv2mgg3i-12e2dc10.jpg",
+      "nameAr": "بقعة ضوء"
+    },
+    {
+      "id": "item-12",
+      "name": "الفصول الاربعة",
+      "aliases": [
+        "الفصول الاربعة"
+      ],
+      "image": "/uploads/mv2mgo7w-765feb3b.jpg",
+      "nameAr": "الفصول الاربعة"
+    },
+    {
+      "id": "item-13",
+      "name": "كسر  الخواطر",
+      "aliases": [
+        "كسر  الخواطر"
+      ],
+      "image": "/uploads/mv2mj5c8-5326f8ef.jpg",
+      "nameAr": "كسر  الخواطر"
+    },
+    {
+      "id": "item-14",
+      "name": "ولادة من الخاصرة",
+      "aliases": [
+        "ولادة من الخاصرة"
+      ],
+      "image": "/uploads/mv2mlptk-f6be448f.jpg",
+      "nameAr": "ولادة من الخاصرة"
+    },
+    {
+      "id": "item-15",
+      "name": "غوار",
+      "aliases": [
+        "غوار"
+      ],
+      "image": "/uploads/mv2mm1gj-d6168d0c.jpg",
+      "nameAr": "غوار"
+    },
+    {
+      "id": "item-16",
+      "name": "دنيا",
+      "aliases": [
+        "دنيا"
+      ],
+      "image": "/uploads/mv2mn05h-13d3e89f.jpg",
+      "nameAr": "دنيا"
+    }
+  ],
+  "giftPair": [
+    {
+      "id": "rose",
+      "name": "Rose",
+      "icon": "🌹"
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "icon": "🎵"
+    }
+  ],
+  "lang": "ar"
+}

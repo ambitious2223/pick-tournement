@@ -23,6 +23,18 @@ const IMAGE_TYPES: Record<string, string> = {
   "image/avif": ".avif",
 };
 
+const SOUND_TYPES: Record<string, string> = {
+  "audio/mpeg": ".mp3",
+  "audio/mp3": ".mp3",
+  "audio/ogg": ".ogg",
+  "audio/wav": ".wav",
+  "audio/x-wav": ".wav",
+  "audio/wave": ".wav",
+  "audio/webm": ".webm",
+  "audio/mp4": ".m4a",
+  "audio/x-m4a": ".m4a",
+};
+
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
@@ -37,10 +49,27 @@ const MIME: Record<string, string> = {
   ".avif": "image/avif",
   ".ico": "image/x-icon",
   ".woff2": "font/woff2",
+  ".mp3": "audio/mpeg",
+  ".ogg": "audio/ogg",
+  ".wav": "audio/wav",
+  ".webm": "audio/webm",
+  ".m4a": "audio/mp4",
 };
 
 const MAX_UPLOAD = 8 * 1024 * 1024;
+const MAX_SOUND = 8 * 1024 * 1024;
 const MAX_JSON = 2 * 1024 * 1024;
+
+/** Keep a cue id safe for a filename (cue ids are lowercase, dot/dash/underscore). */
+function safeSoundId(raw: string): string {
+  return raw.replace(/[^a-zA-Z0-9._-]/g, "").slice(0, 64);
+}
+
+/** Every file in data/sounds whose name (minus extension) equals `id`. */
+async function soundFilesFor(id: string): Promise<string[]> {
+  const files = await fs.readdir(SOUNDS_DIR).catch(() => [] as string[]);
+  return files.filter((f) => f.replace(/\.[a-z0-9]+$/i, "") === id);
+}
 
 process.title = "Pick League";
 
@@ -263,14 +292,14 @@ async function main(): Promise<void> {
       }
 
       if (pathname === "/api/photos/coverage" && method === "GET") {
-        return json(res, 200, await photoCoverage());
+        return json(res, 200, await photoCoverage(session.state.lang));
       }
 
       if (pathname === "/api/photos/fetch" && method === "POST") {
         const category = url.searchParams.get("category") ?? undefined;
         const force = url.searchParams.get("force") === "1";
         console.log(`[photos] fetching${category ? ` for ${category}` : ""}…`);
-        const summary = await fetchPhotos({ category, force, log: (line) => console.log(line) });
+        const summary = await fetchPhotos({ category, lang: session.state.lang, force, log: (line) => console.log(line) });
         session.refreshCategories();
         console.log(`[photos] done: +${summary.changed}, ${summary.skipped} skipped`);
         return json(res, 200, summary);
@@ -288,10 +317,34 @@ async function main(): Promise<void> {
             return serveStatic(res, pathname.replace("/gifts", ""), GIFTS_DIR, false);
           }
 
+      if (pathname.startsWith("/api/sounds/") && method === "POST") {
+        const id = safeSoundId(decodeURIComponent(pathname.slice("/api/sounds/".length)));
+        if (!id) return json(res, 400, { error: "Missing cue id." });
+        const contentType = (req.headers["content-type"] ?? "").toString().split(";")[0]?.trim().toLowerCase() ?? "";
+        const ext = SOUND_TYPES[contentType];
+        if (!ext) return json(res, 415, { error: "Only mp3, ogg, wav, webm or m4a audio is allowed." });
+        const raw = await readBody(req, MAX_SOUND);
+        if (raw.length === 0) return json(res, 400, { error: "Empty file." });
+        await ensureDirs();
+        const previous = await soundFilesFor(id);
+        await Promise.all(previous.map((f) => fs.rm(path.join(SOUNDS_DIR, f), { force: true })));
+        const file = `${id}${ext}`;
+        await fs.writeFile(path.join(SOUNDS_DIR, file), raw);
+        return json(res, 200, { id, file, bytes: raw.length });
+      }
+
+      if (pathname.startsWith("/api/sounds/") && method === "DELETE") {
+        const id = safeSoundId(decodeURIComponent(pathname.slice("/api/sounds/".length)));
+        if (!id) return json(res, 400, { error: "Missing cue id." });
+        const targets = await soundFilesFor(id);
+        await Promise.all(targets.map((f) => fs.rm(path.join(SOUNDS_DIR, f), { force: true })));
+        return json(res, 200, { id, removed: targets.length });
+      }
+
       if (pathname === "/api/sounds" && method === "GET") {
         const names = await fs
           .readdir(SOUNDS_DIR)
-          .then((files) => files.filter((f) => /\.(mp3|ogg|wav|webm)$/i.test(f)))
+          .then((files) => files.filter((f) => /\.(mp3|ogg|wav|webm|m4a)$/i.test(f)))
           .catch(() => [] as string[]);
         return json(res, 200, names);
       }

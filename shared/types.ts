@@ -1,5 +1,8 @@
 export type RoundId = "r16" | "qf" | "sf" | "final";
 
+/** The app's two content/display languages. Each has its own category library. */
+export type Lang = "ar" | "en";
+
 export type StageView = "match" | "bracket";
 
 export type LiveEventType = "chat" | "gift" | "like" | "follow" | "share" | "member" | "subscribe" | "roomUser";
@@ -26,6 +29,19 @@ export interface Supporter {
   points: number;
 }
 
+/** A viewer who cast a vote, retaining the display name + avatar for toasts/polls. */
+export interface PollVoter {
+  id: string;
+  name: string;
+  avatar: string;
+}
+
+/** A short-lived record of one vote, so the overlay can raise a nickname toast. */
+export interface VoteToast extends PollVoter {
+  side: "a" | "b";
+  at: number;
+}
+
 export interface LiveState {
   connected: boolean;
   url: string;
@@ -35,6 +51,8 @@ export interface LiveState {
   counts: Record<LiveEventType, number>;
   supporters: Supporter[];
   lastEvents: LiveEvent[];
+  /** Newest-first log of recent match votes (capped), for the overlay toasts. */
+  recentVotes: VoteToast[];
 }
 
 export type ShowPhase =
@@ -44,6 +62,7 @@ export type ShowPhase =
   | "bracket-intro"
   | "match"
   | "bracket-outro"
+  | "round-recap"
   | "result"
   | "champion";
 
@@ -65,6 +84,10 @@ export interface ShowState {
   phaseEndsAt: number | null;
   categoryVotes: Record<string, number>;
   categoryVoters: string[];
+  /** The offered categories for the current category vote (empty = all). */
+  categoryCandidates: string[];
+  /** Voters per category (with name + avatar) so the poll can show profile icons. */
+  categoryVoterList: Record<string, PollVoter[]>;
   result: ShowResult | null;
   champion: string | null;
 }
@@ -101,6 +124,8 @@ export interface Category {
   id: string;
   name: string;
   nameAr?: string;
+  /** Which language library this category belongs to. Missing = "ar" (legacy). */
+  lang?: Lang;
   items: Item[];
   giftPair?: [Gift, Gift];
   roundSeconds?: number;
@@ -144,6 +169,8 @@ export interface SoundSettings {
 
 export interface Settings {
   roundSeconds: number;
+  /** Default match length per round; the global `roundSeconds` is the fallback. */
+  roundSecondsByRound: Record<RoundId, number>;
   suddenDeathSeconds: number;
   chatWeight: number;
   giftWeight: number;
@@ -157,12 +184,22 @@ export interface Settings {
   roundIntroSeconds: number;
   bracketIntroSeconds: number;
   bracketOutroSeconds: number;
+  roundRecapSeconds: number;
   resultSeconds: number;
-  showBackground: "transparent" | "dark";
-  safeTopPct: number;
-  safeBottomPct: number;
+  /** Show-window background color (hex). */
+  showBackground: string;
+  /** Multiplier for the bracket cinematic length (0.6 = quick, 1.8 = slow/dramatic). */
+  bracketPace: number;
   /** Multiplier for match text (header, names, votes, vote bar, vote hint). */
   stageTextScale: number;
+  /** Multiplier for the whole overlay stage (photos + text). 1 = default. */
+  stageScale: number;
+  /** Simulator: max fake votes per tick (1 is the floor). */
+  simVotesPerTick: number;
+  /** Simulator: how often a tick runs, in milliseconds. */
+  simIntervalMs: number;
+  /** Simulator: chance a tick fires a gift instead of a chat vote. */
+  simGiftChance: number;
   sound: SoundSettings;
 }
 
@@ -212,8 +249,14 @@ export interface ClockHold {
 export interface SessionState {
   status: "idle" | "running" | "paused" | "done";
   settings: Settings;
+  /** The active content/display language. Categories and queue are scoped to it. */
+  lang: Lang;
+  /** Active-language view of the queue (kept in sync with `queues[lang]`). */
   queue: QueueEntry[];
   queueIndex: number;
+  /** Per-language queues, so switching language keeps each side's list intact. */
+  queues: Record<Lang, QueueEntry[]>;
+  queueIndexes: Record<Lang, number>;
   tournament: Tournament | null;
   matchEndsAt: number | null;
   matchHold: ClockHold | null;
@@ -234,6 +277,7 @@ export interface CommandMap {
   "category:save": Category;
   "category:delete": string;
   "category:reorder": string[];
+  "lang:set": Lang;
   "tournament:start": { categoryId?: string } | undefined;
   "tournament:next": undefined;
   "match:start": undefined;
@@ -251,6 +295,8 @@ export interface CommandMap {
   "show:pause": undefined;
   "show:resume": undefined;
   "show:skipPhase": undefined;
+  "poll:start": undefined;
+  "poll:stop": undefined;
   "live:connect": undefined;
   "live:disconnect": undefined;
   "live:update": { url?: string; slug?: string; key?: string };

@@ -1,26 +1,36 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useLiveState } from "./lib/live.ts";
+import { useAudioUnlock } from "./sound/useAudioUnlock.ts";
 import { ErrorBoundary } from "./ui/ErrorBoundary.tsx";
-import { Home } from "./pages/Home.tsx";
-import { Setup } from "./pages/Setup.tsx";
 import { Control } from "./control/Control.tsx";
 import { Studio } from "./studio/Studio.tsx";
 import { Debug } from "./debug/Debug.tsx";
 import { Broadcast } from "./broadcast/Broadcast.tsx";
 import { useI18n } from "./i18n/index.tsx";
 
-const ROUTES = ["/control", "/studio", "/debug", "/overlay", "/show", "/setup"] as const;
+const ROUTES = ["/control", "/studio", "/debug", "/overlay", "/show"] as const;
 
 function routeFor(pathname: string): string {
   const clean = pathname.replace(/\/+$/, "") || "/";
+  if (clean === "/") return "/control";
   const match = ROUTES.find((r) => clean === r || clean.startsWith(`${r}/`));
-  return match ?? "/";
+  return match ?? "/control";
 }
 
 export function App(): ReactNode {
   const { state, connected } = useLiveState();
-  const { t } = useI18n();
+  useAudioUnlock();
+  const { t, lang, setLang } = useI18n();
   const route = routeFor(window.location.pathname);
+
+  // The server owns the active content language. Adopt it once on first load so
+  // a reloaded window never shows one language's UI with the other's content.
+  const langSynced = useRef(false);
+  useEffect(() => {
+    if (langSynced.current || !state?.lang) return;
+    langSynced.current = true;
+    if (state.lang !== lang) setLang(state.lang);
+  }, [state?.lang, lang, setLang]);
 
   if (route === "/overlay" || route === "/show") {
     return (
@@ -53,8 +63,6 @@ export function App(): ReactNode {
           {route === "/control" ? <Control state={state} /> : null}
           {route === "/studio" ? <Studio state={state} /> : null}
           {route === "/debug" ? <Debug state={state} /> : null}
-          {route === "/setup" ? <Setup /> : null}
-          {route === "/" ? <Home /> : null}
         </ErrorBoundary>
       </main>
     </div>
@@ -64,10 +72,8 @@ export function App(): ReactNode {
 function TopNav({ route }: { route: string }): ReactNode {
   const { t, lang, setLang } = useI18n();
   const links = [
-    { href: "/setup", label: t("nav.setup") },
     { href: "/control", label: t("nav.control") },
     { href: "/studio", label: t("nav.studio") },
-    { href: "/overlay", label: t("nav.broadcast"), blank: true },
   ];
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-ink/85 backdrop-blur">
@@ -81,27 +87,18 @@ function TopNav({ route }: { route: string }): ReactNode {
             <a
               key={link.href}
               href={link.href}
-              target={link.blank ? "_blank" : undefined}
               className={`rounded-md px-2.5 py-1 transition hover:bg-surface ${
                 route === link.href ? "bg-surface text-brand" : "text-white/70"
               }`}
             >
               {link.label}
             </a>
-          ))}
-          <a
-            href="/debug"
-            className={`ms-2 rounded-md px-2 py-1 text-[0.7rem] uppercase tracking-widest transition hover:bg-surface ${
-              route === "/debug" ? "bg-surface text-brand" : "text-white/35"
-            }`}
-          >
-            {t("nav.debug")}
-          </a>
+          )          )}
           <button
             type="button"
             onClick={() => setLang(lang === "ar" ? "en" : "ar")}
             aria-label={t("lang.label")}
-            className="rounded-md border border-line px-2.5 py-1 text-xs text-white/70 transition hover:border-brand hover:text-brand"
+            className="ms-1 rounded-md border border-line px-2.5 py-1 text-xs text-white/70 transition hover:border-brand hover:text-brand"
           >
             {t("lang.switch")}
           </button>

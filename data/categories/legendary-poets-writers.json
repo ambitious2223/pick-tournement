@@ -1,48 +1,48 @@
 {
   "id": "legendary-poets-writers",
-  "name": "Legendary Poets & Writers",
+  "name": "شعراء وأدباء أسطوريون",
   "items": [
     {
       "id": "al-mutanabbi",
-      "name": "Al-Mutanabbi",
+      "name": "المتنبي",
       "aliases": [
-        "المتنبي"
+        "Al-Mutanabbi"
       ],
       "emoji": "📜",
       "image": "/uploads/e14492122df5.png"
     },
     {
       "id": "mahmoud-darwish",
-      "name": "Mahmoud Darwish",
+      "name": "محمود درويش",
       "aliases": [
-        "محمود درويش"
+        "Mahmoud Darwish"
       ],
       "emoji": "🕊️",
       "image": "/uploads/bf1a66d6fb11.jpg"
     },
     {
       "id": "nizar-qabbani",
-      "name": "Nizar Qabbani",
+      "name": "نزار قباني",
       "aliases": [
-        "نزار قباني"
+        "Nizar Qabbani"
       ],
       "emoji": "💌",
       "image": "/uploads/d97be5a78ce7.jpg"
     },
     {
       "id": "ahmed-shawqi",
-      "name": "Ahmed Shawqi",
+      "name": "أحمد شوقي",
       "aliases": [
-        "أحمد شوقي"
+        "Ahmed Shawqi"
       ],
       "emoji": "🏛️",
       "image": "/uploads/8a0ee6bfa64d.jpg"
     },
     {
       "id": "gibran-khalil-gibran",
-      "name": "Gibran Khalil Gibran",
+      "name": "جبران خليل جبران",
       "aliases": [
-        "جبران خليل جبران",
+        "Gibran Khalil Gibran",
         "جبران"
       ],
       "emoji": "📖",
@@ -50,99 +50,99 @@
     },
     {
       "id": "antarah-ibn-shaddad",
-      "name": "Antarah ibn Shaddad",
+      "name": "عنترة بن شداد",
       "aliases": [
-        "عنترة بن شداد"
+        "Antarah ibn Shaddad"
       ],
       "emoji": "⚔️",
       "image": "/uploads/ece0d79a2bf0.jpg"
     },
     {
       "id": "imru-al-qais",
-      "name": "Imru' al-Qais",
+      "name": "امرؤ القيس",
       "aliases": [
-        "امرؤ القيس"
+        "Imru' al-Qais"
       ],
       "emoji": "🐪",
       "image": "/uploads/0802860b2385.png"
     },
     {
       "id": "taha-hussein",
-      "name": "Taha Hussein",
+      "name": "طه حسين",
       "aliases": [
-        "طه حسين"
+        "Taha Hussein"
       ],
       "emoji": "📚",
       "image": "/uploads/bc1d00fdd1f5.jpg"
     },
     {
       "id": "naguib-mahfouz",
-      "name": "Naguib Mahfouz",
+      "name": "نجيب محفوظ",
       "aliases": [
-        "نجيب محفوظ"
+        "Naguib Mahfouz"
       ],
       "emoji": "🖋️",
       "image": "/uploads/01b4101e4dbd.jpg"
     },
     {
       "id": "elia-abu-madi",
-      "name": "Elia Abu Madi",
+      "name": "إيليا أبو ماضي",
       "aliases": [
-        "إيليا أبو ماضي"
+        "Elia Abu Madi"
       ],
       "emoji": "🌿",
       "image": "/uploads/40f8569e9616.jpg"
     },
     {
       "id": "al-maarri",
-      "name": "Al-Ma'arri",
+      "name": "المعري",
       "aliases": [
-        "المعري"
+        "Al-Ma'arri"
       ],
       "emoji": "👁️",
       "image": "/uploads/c36dd82db281.png"
     },
     {
       "id": "hafez-ibrahim",
-      "name": "Hafez Ibrahim",
+      "name": "حافظ إبراهيم",
       "aliases": [
-        "حافظ إبراهيم"
+        "Hafez Ibrahim"
       ],
       "emoji": "🌊",
       "image": "/uploads/05fe783af632.jpg"
     },
     {
       "id": "ghassan-kanafani",
-      "name": "Ghassan Kanafani",
+      "name": "غسان كنفاني",
       "aliases": [
-        "غسان كنفاني"
+        "Ghassan Kanafani"
       ],
       "emoji": "✍️",
       "image": "/uploads/602f26c6300a.jpg"
     },
     {
       "id": "al-jahiz",
-      "name": "Al-Jahiz",
+      "name": "الجاحظ",
       "aliases": [
-        "الجاحظ"
+        "Al-Jahiz"
       ],
       "emoji": "📜",
       "image": "/uploads/1d59c4279372.jpg"
     },
     {
       "id": "badr-shakir-al-sayyab",
-      "name": "Badr Shakir al-Sayyab",
+      "name": "بدر شاكر السياب",
       "aliases": [
-        "بدر شاكر السياب"
+        "Badr Shakir al-Sayyab"
       ],
       "emoji": "🌧️",
       "image": "/uploads/557831e6c6f0.jpg"
     },
     {
       "id": "al-asmai",
-      "name": "Al-Asma'i",
+      "name": "الأصمعي",
       "aliases": [
-        "الأصمعي"
+        "Al-Asma'i"
       ],
       "emoji": "🐪",
       "image": "/uploads/02e12cb3771d.png"
@@ -160,5 +160,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "شعراء وأدباء أسطوريون"
+  "nameAr": "Legendary Poets & Writers",
+  "lang": "ar"
 }

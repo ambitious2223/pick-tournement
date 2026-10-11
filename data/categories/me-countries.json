@@ -1,12 +1,12 @@
 {
   "id": "me-countries",
-  "name": "Middle Eastern Countries",
+  "name": "دول الشرق الأوسط",
   "items": [
     {
       "id": "saudi-arabia",
-      "name": "Saudi Arabia",
+      "name": "السعودية",
       "aliases": [
-        "السعودية",
+        "Saudi Arabia",
         "ksa"
       ],
       "emoji": "🇸🇦",
@@ -14,9 +14,9 @@
     },
     {
       "id": "united-arab-emirates",
-      "name": "United Arab Emirates",
+      "name": "الإمارات",
       "aliases": [
-        "الإمارات",
+        "United Arab Emirates",
         "uae"
       ],
       "emoji": "🇦🇪",
@@ -24,126 +24,126 @@
     },
     {
       "id": "egypt",
-      "name": "Egypt",
+      "name": "مصر",
       "aliases": [
-        "مصر"
+        "Egypt"
       ],
       "emoji": "🇪🇬",
       "image": "/uploads/6901d05da1a9.png"
     },
     {
       "id": "qatar",
-      "name": "Qatar",
+      "name": "قطر",
       "aliases": [
-        "قطر"
+        "Qatar"
       ],
       "emoji": "🇶🇦",
       "image": "/uploads/a60455d5031b.png"
     },
     {
       "id": "kuwait",
-      "name": "Kuwait",
+      "name": "الكويت",
       "aliases": [
-        "الكويت"
+        "Kuwait"
       ],
       "emoji": "🇰🇼",
       "image": "/uploads/70591a2e01ba.png"
     },
     {
       "id": "bahrain",
-      "name": "Bahrain",
+      "name": "البحرين",
       "aliases": [
-        "البحرين"
+        "Bahrain"
       ],
       "emoji": "🇧🇭",
       "image": "/uploads/4b63ed3e3b92.png"
     },
     {
       "id": "oman",
-      "name": "Oman",
+      "name": "عمان",
       "aliases": [
-        "عمان"
+        "Oman"
       ],
       "emoji": "🇴🇲",
       "image": "/uploads/373bf8c87518.png"
     },
     {
       "id": "jordan",
-      "name": "Jordan",
+      "name": "الأردن",
       "aliases": [
-        "الأردن"
+        "Jordan"
       ],
       "emoji": "🇯🇴",
       "image": "/uploads/3e668c7d0b0e.png"
     },
     {
       "id": "lebanon",
-      "name": "Lebanon",
+      "name": "لبنان",
       "aliases": [
-        "لبنان"
+        "Lebanon"
       ],
       "emoji": "🇱🇧",
       "image": "/uploads/c72f9ecbce08.png"
     },
     {
       "id": "syria",
-      "name": "Syria",
+      "name": "سوريا",
       "aliases": [
-        "سوريا"
+        "Syria"
       ],
       "emoji": "🇸🇾",
       "image": "/uploads/24e58c55a64b.png"
     },
     {
       "id": "iraq",
-      "name": "Iraq",
+      "name": "العراق",
       "aliases": [
-        "العراق"
+        "Iraq"
       ],
       "emoji": "🇮🇶",
       "image": "/uploads/ed88299ca97b.png"
     },
     {
       "id": "yemen",
-      "name": "Yemen",
+      "name": "اليمن",
       "aliases": [
-        "اليمن"
+        "Yemen"
       ],
       "emoji": "🇾🇪",
       "image": "/uploads/202834ef8de1.png"
     },
     {
       "id": "morocco",
-      "name": "Morocco",
+      "name": "المغرب",
       "aliases": [
-        "المغرب"
+        "Morocco"
       ],
       "emoji": "🇲🇦",
       "image": "/uploads/4bd0652746ce.png"
     },
     {
       "id": "algeria",
-      "name": "Algeria",
+      "name": "الجزائر",
       "aliases": [
-        "الجزائر"
+        "Algeria"
       ],
       "emoji": "🇩🇿",
       "image": "/uploads/12b8db88239c.png"
     },
     {
       "id": "tunisia",
-      "name": "Tunisia",
+      "name": "تونس",
       "aliases": [
-        "تونس"
+        "Tunisia"
       ],
       "emoji": "🇹🇳",
       "image": "/uploads/14a0f70cd722.png"
     },
     {
       "id": "palestine",
-      "name": "Palestine",
+      "name": "فلسطين",
       "aliases": [
-        "فلسطين"
+        "Palestine"
       ],
       "emoji": "🇵🇸",
       "image": "/uploads/a4bb8bb1c7a1.png"
@@ -161,5 +161,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "دول الشرق الأوسط"
+  "nameAr": "Middle Eastern Countries",
+  "lang": "ar"
 }

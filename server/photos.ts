@@ -1,8 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import type { Category, Item } from "../shared/types.ts";
-import { loadCategories, saveCategory, UPLOADS_DIR, DATA_DIR, ensureDirs } from "./store.ts";
+import type { Category, Item, Lang } from "../shared/types.ts";
+import { loadCategories, categoriesForLang, saveCategory, UPLOADS_DIR, DATA_DIR, ensureDirs } from "./store.ts";
 
 /**
  * Pick League photo fetcher.
@@ -36,6 +36,7 @@ const IMAGE_EXT: Record<string, string> = {
 
 export interface FetchOptions {
   category?: string;
+  lang?: Lang;
   limit?: number;
   force?: boolean;
   log?: (line: string) => void;
@@ -214,8 +215,9 @@ async function processItem(item: Item, force: boolean, log: (line: string) => vo
   return true;
 }
 
-export async function photoCoverage(): Promise<FetchSummary["coverage"]> {
-  const categories = await loadCategories();
+export async function photoCoverage(lang?: Lang): Promise<FetchSummary["coverage"]> {
+  const all = await loadCategories();
+  const categories = lang ? categoriesForLang(all, lang) : all;
   return categories.map((c) => ({
     id: c.id,
     name: c.name,
@@ -229,7 +231,8 @@ export async function fetchPhotos(options: FetchOptions = {}): Promise<FetchSumm
   const log = options.log ?? ((line: string) => console.log(line));
   const limit = options.limit ?? 400;
   const force = options.force ?? false;
-  const categories = await loadCategories();
+  const all = await loadCategories();
+  const categories = options.lang ? categoriesForLang(all, options.lang) : all;
 
   let budget = limit;
   let changed = 0;
@@ -261,5 +264,5 @@ export async function fetchPhotos(options: FetchOptions = {}): Promise<FetchSumm
     if (dirty) await saveCategory({ ...category, items } as Category);
   }
 
-  return { changed, skipped, attempted, coverage: await photoCoverage() };
+  return { changed, skipped, attempted, coverage: await photoCoverage(options.lang) };
 }

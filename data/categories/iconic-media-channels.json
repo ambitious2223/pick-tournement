@@ -1,93 +1,93 @@
 {
   "id": "iconic-media-channels",
-  "name": "Iconic Media Channels",
+  "name": "قنوات إعلامية أيقونية",
   "items": [
     {
       "id": "spacetoon",
-      "name": "Spacetoon",
+      "name": "سبيستون",
       "aliases": [
-        "سبيستون"
+        "Spacetoon"
       ],
       "emoji": "🚀",
       "image": "/uploads/6256f5dc441e.png"
     },
     {
       "id": "mbc-3",
-      "name": "MBC 3",
+      "name": "ام بي سي 3",
       "aliases": [
-        "ام بي سي 3"
+        "MBC 3"
       ],
       "emoji": "🎈",
       "image": "/uploads/77f60b2bddf1.png"
     },
     {
       "id": "al-jazeera",
-      "name": "Al Jazeera",
+      "name": "الجزيرة",
       "aliases": [
-        "الجزيرة"
+        "Al Jazeera"
       ],
       "emoji": "📺",
       "image": "/uploads/79254352c2f6.png"
     },
     {
       "id": "al-arabiya",
-      "name": "Al Arabiya",
+      "name": "العربية",
       "aliases": [
-        "العربية"
+        "Al Arabiya"
       ],
       "emoji": "📰",
       "image": "/uploads/dd6b06a715ed.png"
     },
     {
       "id": "rotana-cinema",
-      "name": "Rotana Cinema",
+      "name": "روتانا سينما",
       "aliases": [
-        "روتانا سينما"
+        "Rotana Cinema"
       ],
       "emoji": "🎬",
       "image": "/uploads/65a203ea9064.png"
     },
     {
       "id": "mbc-2",
-      "name": "MBC 2",
+      "name": "ام بي سي 2",
       "aliases": [
-        "ام بي سي 2"
+        "MBC 2"
       ],
       "emoji": "🍿",
       "image": "/uploads/cd7dcd60d745.png"
     },
     {
       "id": "bein-sports",
-      "name": "BeIN Sports",
+      "name": "بي إن سبورتس",
       "aliases": [
-        "بي إن سبورتس",
+        "BeIN Sports",
         "bein"
       ],
       "emoji": "⚽"
     },
     {
       "id": "abu-dhabi-sports",
-      "name": "Abu Dhabi Sports",
+      "name": "أبوظبي الرياضية",
       "aliases": [
-        "أبوظبي الرياضية"
+        "Abu Dhabi Sports"
       ],
       "emoji": "🏅",
       "image": "/uploads/1a3043f2531d.png"
     },
     {
       "id": "lbci",
-      "name": "LBCI",
+      "name": "إل بي سي",
       "aliases": [
-        "إل بي سي"
+        "LBCI"
       ],
       "emoji": "🇱🇧",
       "image": "/uploads/0ca025b383f2.png"
     },
     {
       "id": "roya-tv",
-      "name": "Roya TV",
+      "name": "قناة رؤيا",
       "aliases": [
-        "قناة رؤيا",
+        "Roya TV",
         "رؤيا"
       ],
       "emoji": "🇯🇴",
@@ -95,54 +95,54 @@
     },
     {
       "id": "iqraa",
-      "name": "Iqraa",
+      "name": "إقرأ",
       "aliases": [
-        "إقرأ"
+        "Iqraa"
       ],
       "emoji": "🕌",
       "image": "/uploads/d6bb1d2a82d0.png"
     },
     {
       "id": "al-resalah",
-      "name": "Al-Resalah",
+      "name": "الرسالة",
       "aliases": [
-        "الرسالة"
+        "Al-Resalah"
       ],
       "emoji": "🕊️",
       "image": "/uploads/6beaea9423ef.png"
     },
     {
       "id": "melody-hits",
-      "name": "Melody Hits",
+      "name": "ميلودي هيتس",
       "aliases": [
-        "ميلودي هيتس"
+        "Melody Hits"
       ],
       "emoji": "🎸",
       "image": "/uploads/7d0e2131362d.png"
     },
     {
       "id": "mazzika",
-      "name": "Mazzika",
+      "name": "مزيكا",
       "aliases": [
-        "مزيكا"
+        "Mazzika"
       ],
       "emoji": "🎵",
       "image": "/uploads/4a4a9bc44b9a.png"
     },
     {
       "id": "toyor-al-janah",
-      "name": "Toyor Al-Janah",
+      "name": "طيور الجنة",
       "aliases": [
-        "طيور الجنة"
+        "Toyor Al-Janah"
       ],
       "emoji": "🐦",
       "image": "/uploads/cf4ca714650d.png"
     },
     {
       "id": "karameesh",
-      "name": "Karameesh",
+      "name": "كراميش",
       "aliases": [
-        "كراميش"
+        "Karameesh"
       ],
       "emoji": "🎈",
       "image": "/uploads/208d9521f44f.jpg"
@@ -160,5 +160,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "قنوات إعلامية أيقونية"
+  "nameAr": "Iconic Media Channels",
+  "lang": "ar"
 }

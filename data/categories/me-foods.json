@@ -1,147 +1,147 @@
 {
   "id": "me-foods",
-  "name": "Middle Eastern Foods",
+  "name": "أكلات الشرق الأوسط",
   "items": [
     {
       "id": "kabsa",
-      "name": "Kabsa",
+      "name": "كبسة",
       "aliases": [
-        "كبسة"
+        "Kabsa"
       ],
       "emoji": "🍚",
       "image": "/uploads/2fedf0647275.jpg"
     },
     {
       "id": "shawarma",
-      "name": "Shawarma",
+      "name": "شاورما",
       "aliases": [
-        "شاورما"
+        "Shawarma"
       ],
       "emoji": "🌯",
       "image": "/uploads/9aa3fbbe0c24.jpg"
     },
     {
       "id": "falafel",
-      "name": "Falafel",
+      "name": "فلافل",
       "aliases": [
-        "فلافل"
+        "Falafel"
       ],
       "emoji": "🧆",
       "image": "/uploads/dfc996b6adeb.jpg"
     },
     {
       "id": "hummus",
-      "name": "Hummus",
+      "name": "حمص",
       "aliases": [
-        "حمص"
+        "Hummus"
       ],
       "emoji": "🥣",
       "image": "/uploads/132c644c4ffa.jpg"
     },
     {
       "id": "mansaf",
-      "name": "Mansaf",
+      "name": "منسف",
       "aliases": [
-        "منسف"
+        "Mansaf"
       ],
       "emoji": "🍲",
       "image": "/uploads/45e6ea9bf63a.jpg"
     },
     {
       "id": "koshari",
-      "name": "Koshari",
+      "name": "كشري",
       "aliases": [
-        "كشري"
+        "Koshari"
       ],
       "emoji": "🍝",
       "image": "/uploads/7d6c6a20ec19.jpg"
     },
     {
       "id": "maqluba",
-      "name": "Maqluba",
+      "name": "مقلوبة",
       "aliases": [
-        "مقلوبة"
+        "Maqluba"
       ],
       "emoji": "🍛",
       "image": "/uploads/da395c62221c.jpg"
     },
     {
       "id": "mandi",
-      "name": "Mandi",
+      "name": "مندي",
       "aliases": [
-        "مندي"
+        "Mandi"
       ],
       "emoji": "🍗",
       "image": "/uploads/9364189bc6b5.jpg"
     },
     {
       "id": "fattoush",
-      "name": "Fattoush",
+      "name": "فتوش",
       "aliases": [
-        "فتوش"
+        "Fattoush"
       ],
       "emoji": "🥗",
       "image": "/uploads/a900c5bbaead.jpg"
     },
     {
       "id": "tabbouleh",
-      "name": "Tabbouleh",
+      "name": "تبولة",
       "aliases": [
-        "تبولة"
+        "Tabbouleh"
       ],
       "emoji": "🌿",
       "image": "/uploads/f672e7f8f29f.jpg"
     },
     {
       "id": "shish-tawook",
-      "name": "Shish Tawook",
+      "name": "شيش طاووق",
       "aliases": [
-        "شيش طاووق"
+        "Shish Tawook"
       ],
       "emoji": "🍢",
       "image": "/uploads/62cf58d87e97.jpg"
     },
     {
       "id": "molokhia",
-      "name": "Molokhia",
+      "name": "ملوخية",
       "aliases": [
-        "ملوخية"
+        "Molokhia"
       ],
       "emoji": "🍜",
       "image": "/uploads/d0c32074a79d.jpg"
     },
     {
       "id": "kibbeh",
-      "name": "Kibbeh",
+      "name": "كبة",
       "aliases": [
-        "كبة"
+        "Kibbeh"
       ],
       "emoji": "🥟",
       "image": "/uploads/9760ffd72de3.jpg"
     },
     {
       "id": "foul-medames",
-      "name": "Foul Medames",
+      "name": "فول مدمس",
       "aliases": [
-        "فول مدمس"
+        "Foul Medames"
       ],
       "emoji": "🫘",
       "image": "/uploads/08760d2aac1f.jpg"
     },
     {
       "id": "musakhan",
-      "name": "Musakhan",
+      "name": "مسخن",
       "aliases": [
-        "مسخن"
+        "Musakhan"
       ],
       "emoji": "🍗",
       "image": "/uploads/bdd84d3e0e1b.jpg"
     },
     {
       "id": "harees",
-      "name": "Harees",
+      "name": "هريس",
       "aliases": [
-        "هريس"
+        "Harees"
       ],
       "emoji": "🥣",
       "image": "/uploads/ad428cd61e9b.jpg"
@@ -159,5 +159,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "أكلات الشرق الأوسط"
+  "nameAr": "Middle Eastern Foods",
+  "lang": "ar"
 }

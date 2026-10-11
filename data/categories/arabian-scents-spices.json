@@ -1,12 +1,12 @@
 {
   "id": "arabian-scents-spices",
-  "name": "Arabian Scents & Spices",
+  "name": "عطور وتوابل عربية",
   "items": [
     {
       "id": "oud-agarwood",
-      "name": "Oud (Agarwood)",
+      "name": "عود",
       "aliases": [
-        "عود",
+        "Oud (Agarwood)",
         "العود"
       ],
       "emoji": "🪵",
@@ -14,27 +14,27 @@
     },
     {
       "id": "musk",
-      "name": "Musk",
+      "name": "مسك",
       "aliases": [
-        "مسك"
+        "Musk"
       ],
       "emoji": "🧴",
       "image": "/uploads/3123110f5122.jpg"
     },
     {
       "id": "amber",
-      "name": "Amber",
+      "name": "عنبر",
       "aliases": [
-        "عنبر"
+        "Amber"
       ],
       "emoji": "🪨",
       "image": "/uploads/ac32509753e8.jpg"
     },
     {
       "id": "frankincense-luban",
-      "name": "Frankincense (Luban)",
+      "name": "لبان ذكر",
       "aliases": [
-        "لبان ذكر",
+        "Frankincense (Luban)",
         "لبان"
       ],
       "emoji": "🌿",
@@ -42,18 +42,18 @@
     },
     {
       "id": "saffron",
-      "name": "Saffron",
+      "name": "زعفران",
       "aliases": [
-        "زعفران"
+        "Saffron"
       ],
       "emoji": "🌸",
       "image": "/uploads/93b6dc1eda31.jpg"
     },
     {
       "id": "cardamom",
-      "name": "Cardamom",
+      "name": "حبهان",
       "aliases": [
-        "حبهان",
+        "Cardamom",
         "هيل"
       ],
       "emoji": "🫘",
@@ -61,90 +61,90 @@
     },
     {
       "id": "rose-water",
-      "name": "Rose Water",
+      "name": "ماء ورد",
       "aliases": [
-        "ماء ورد"
+        "Rose Water"
       ],
       "emoji": "🌹",
       "image": "/uploads/5bfa237084e7.jpg"
     },
     {
       "id": "orange-blossom-water",
-      "name": "Orange Blossom Water",
+      "name": "ماء زهر",
       "aliases": [
-        "ماء زهر"
+        "Orange Blossom Water"
       ],
       "emoji": "🍊",
       "image": "/uploads/fc8a2e41402d.jpg"
     },
     {
       "id": "bukhoor-incense",
-      "name": "Bukhoor (Incense)",
+      "name": "بخور",
       "aliases": [
-        "بخور"
+        "Bukhoor (Incense)"
       ],
       "emoji": "💨",
       "image": "/uploads/8701503f89f3.jpg"
     },
     {
       "id": "cumin",
-      "name": "Cumin",
+      "name": "كمون",
       "aliases": [
-        "كمون"
+        "Cumin"
       ],
       "emoji": "🌿",
       "image": "/uploads/d023219b984f.jpg"
     },
     {
       "id": "sumac",
-      "name": "Sumac",
+      "name": "سماق",
       "aliases": [
-        "سماق"
+        "Sumac"
       ],
       "emoji": "🍒",
       "image": "/uploads/390f75c136e2.jpg"
     },
     {
       "id": "zaatar",
-      "name": "Za'atar",
+      "name": "زعتر",
       "aliases": [
-        "زعتر"
+        "Za'atar"
       ],
       "emoji": "🍃",
       "image": "/uploads/caa925f8398a.jpg"
     },
     {
       "id": "mastic-mistika",
-      "name": "Mastic (Mistika)",
+      "name": "مستكة",
       "aliases": [
-        "مستكة"
+        "Mastic (Mistika)"
       ],
       "emoji": "💧",
       "image": "/uploads/7285de0b2bdc.jpg"
     },
     {
       "id": "jasmine",
-      "name": "Jasmine",
+      "name": "ياسمين",
       "aliases": [
-        "ياسمين"
+        "Jasmine"
       ],
       "emoji": "🌼",
       "image": "/uploads/560aede84c90.jpg"
     },
     {
       "id": "sandalwood",
-      "name": "Sandalwood",
+      "name": "خشب الصندل",
       "aliases": [
-        "خشب الصندل"
+        "Sandalwood"
       ],
       "emoji": "🪵",
       "image": "/uploads/0317216cd694.jpg"
     },
     {
       "id": "myrrh",
-      "name": "Myrrh",
+      "name": "مر",
       "aliases": [
-        "مر",
+        "Myrrh",
         "المري"
       ],
       "emoji": "🪨",
@@ -163,5 +163,6 @@
       "icon": "🎵"
     }
   ],
-  "nameAr": "عطور وتوابل عربية"
+  "nameAr": "Arabian Scents & Spices",
+  "lang": "ar"
 }
