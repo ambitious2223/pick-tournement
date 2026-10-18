@@ -23,6 +23,8 @@ type ControlTab = "run" | "settings" | "queue" | "sim";
 const CONTROL_TABS: readonly ControlTab[] = ["run", "settings", "queue", "sim"];
 
 function readTab(): ControlTab {
+  const fromUrl = new URLSearchParams(window.location.search).get("tab");
+  if (fromUrl && (CONTROL_TABS as readonly string[]).includes(fromUrl)) return fromUrl as ControlTab;
   try {
     const saved = window.localStorage.getItem("pl.control.tab");
     if (saved && (CONTROL_TABS as readonly string[]).includes(saved)) return saved as ControlTab;
@@ -32,9 +34,17 @@ function readTab(): ControlTab {
   return "run";
 }
 
+type SettingsSection = "appearance" | "advanced";
+
+function readSettingsSection(): SettingsSection | null {
+  const open = new URLSearchParams(window.location.search).get("open");
+  return open === "appearance" || open === "advanced" ? open : null;
+}
+
 export function Control({ state }: { state: SessionState | null }): ReactNode {
   const { t } = useI18n();
   const [tab, setTab] = useState<ControlTab>(readTab);
+  const [settingsSection] = useState<SettingsSection | null>(readSettingsSection);
 
   useEffect(() => {
     try {
@@ -87,7 +97,10 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
 
   return (
     <div className="grid gap-4 xl:h-full xl:min-h-0 xl:grid-cols-[1fr_19rem]">
-      <section className="panel flex min-h-[420px] flex-col overflow-hidden xl:min-h-0">
+      <section
+        className="panel flex min-h-[420px] flex-col overflow-hidden transition-colors duration-300 xl:min-h-0"
+        style={{ backgroundColor: state.settings.showBackground }}
+      >
         {state.show.active && state.show.phase === "category" ? (
           <div className="scroll-thin h-full w-full overflow-auto">
             <CategoryPoll state={state} />
@@ -114,7 +127,7 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
           ) : null}
           {tab === "settings" ? (
             <Panel title={t("control.settings")}>
-              <SettingsPanel state={state} />
+              <SettingsPanel state={state} initialOpen={settingsSection} />
             </Panel>
           ) : null}
           {tab === "queue" ? (

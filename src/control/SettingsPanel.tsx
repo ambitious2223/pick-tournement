@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import type { SessionState, Settings } from "../../shared/types.ts";
-import { Field, TextInput, Select, Toggle, Slider } from "../ui/primitives.tsx";
+import { Field, TextInput, Select, Slider } from "../ui/primitives.tsx";
 import { Collapsible } from "../ui/Collapsible.tsx";
 import { ColorWheel } from "../ui/ColorWheel.tsx";
 import { SoundAdvanced } from "./SoundControls.tsx";
@@ -10,9 +10,26 @@ import { useI18n } from "../i18n/index.tsx";
 
 const patch = (p: Partial<Settings>): void => void send("settings:update", p);
 
-export function SettingsPanel({ state }: { state: SessionState }): ReactNode {
+export function SettingsPanel({
+  state,
+  initialOpen = null,
+}: {
+  state: SessionState;
+  initialOpen?: "appearance" | "advanced" | null;
+}): ReactNode {
   const { t } = useI18n();
   const settings = state.settings;
+  const appearanceRef = useRef<HTMLDivElement | null>(null);
+  const advancedRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!initialOpen) return;
+    const timer = window.setTimeout(() => {
+      const target = initialOpen === "advanced" ? advancedRef.current : appearanceRef.current;
+      target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [initialOpen]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -37,17 +54,6 @@ export function SettingsPanel({ state }: { state: SessionState }): ReactNode {
           <option value="higher-seed">{t("settings.tie.seed")}</option>
         </Select>
       </Field>
-      <Toggle label={t("settings.dedupe")} checked={settings.dedupeChat} onChange={(v) => patch({ dedupeChat: v })} />
-      <Toggle
-        label={t("settings.allowVoteChange")}
-        checked={settings.allowVoteChange}
-        onChange={(v) => patch({ allowVoteChange: v })}
-      />
-      <Toggle label={t("settings.autoNextMatch")} checked={settings.autoNextMatch} onChange={(v) => patch({ autoNextMatch: v })} />
-      <Toggle label={t("settings.autoNextTournament")} checked={settings.autoNextTournament} onChange={(v) => patch({ autoNextTournament: v })} />
-      <Toggle label={t("settings.autoStageView")} checked={settings.autoStageView} onChange={(v) => patch({ autoStageView: v })} />
-      <Toggle label={t("settings.showVoteHint")} checked={settings.showVoteHint} onChange={(v) => patch({ showVoteHint: v })} />
-
       <Slider
         label={t("settings.stageTextScale")}
         min={0.6}
@@ -77,32 +83,41 @@ export function SettingsPanel({ state }: { state: SessionState }): ReactNode {
         </Field>
       </div>
 
-      <Collapsible
-        title={t("settings.appearance")}
-        hint={settings.showBackground.toUpperCase()}
-        persistKey="settings.appearance"
-      >
-        <ColorWheel
-          color={settings.showBackground}
-          onChange={(hex) => void send("settings:update", { showBackground: hex })}
-        />
-        <div className="mt-3 flex items-center justify-between text-[0.65rem] text-white/45">
-          <span>{t("settings.showBackground")}</span>
-          <span className="h-4 w-10 rounded border border-line" style={{ background: settings.showBackground }} />
-        </div>
-      </Collapsible>
-
-      <Collapsible title={t("settings.advanced")} persistKey="settings.advanced">
-        <div className="flex flex-col gap-3">
-          <div className="text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("sound.filesTitle")}</div>
-          <SoundAdvanced state={state} />
-
-          <div className="mt-1 border-t border-line/60 pt-3">
-            <div className="mb-2 text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("settings.showLook")}</div>
-            <ShowTuning settings={settings} />
+      <div ref={appearanceRef}>
+        <Collapsible
+          title={t("settings.appearance")}
+          hint={settings.showBackground.toUpperCase()}
+          persistKey="settings.appearance"
+          forceOpen={initialOpen === "appearance"}
+        >
+          <ColorWheel
+            color={settings.showBackground}
+            onChange={(hex) => void send("settings:update", { showBackground: hex })}
+          />
+          <div className="mt-3 flex items-center justify-between text-[0.65rem] text-white/45">
+            <span>{t("settings.showBackground")}</span>
+            <span className="h-4 w-10 rounded border border-line" style={{ background: settings.showBackground }} />
           </div>
-        </div>
-      </Collapsible>
+        </Collapsible>
+      </div>
+
+      <div ref={advancedRef}>
+        <Collapsible
+          title={t("settings.advanced")}
+          persistKey="settings.advanced"
+          forceOpen={initialOpen === "advanced"}
+        >
+          <div className="flex flex-col gap-3">
+            <div className="text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("sound.filesTitle")}</div>
+            <SoundAdvanced state={state} />
+
+            <div className="mt-1 border-t border-line/60 pt-3">
+              <div className="mb-2 text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("settings.showLook")}</div>
+              <ShowTuning settings={settings} />
+            </div>
+          </div>
+        </Collapsible>
+      </div>
     </div>
   );
 }

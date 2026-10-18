@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 const STORAGE_PREFIX = "pl.collapse.";
 
@@ -27,6 +27,7 @@ export function Collapsible({
   defaultOpen = false,
   hint,
   persistKey,
+  forceOpen = false,
 }: {
   title: string;
   children: ReactNode;
@@ -34,8 +35,16 @@ export function Collapsible({
   hint?: string;
   /** When set, the open/closed state is remembered across sessions. */
   persistKey?: string;
+  /** Deep links can force a section open once, even if it was closed before. */
+  forceOpen?: boolean;
 }): ReactNode {
   const [open, setOpen] = useState(() => readOpen(persistKey, defaultOpen));
+
+  useEffect(() => {
+    if (!forceOpen) return;
+    setOpen(true);
+    writeOpen(persistKey, true);
+  }, [forceOpen, persistKey]);
   const toggle = (): void => {
     setOpen((current) => {
       const next = !current;

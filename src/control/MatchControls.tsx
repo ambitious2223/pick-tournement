@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import type { Category, SessionState } from "../../shared/types.ts";
 import { Button, Select } from "../ui/primitives.tsx";
 import { Collapsible } from "../ui/Collapsible.tsx";
+import { RunToggles } from "./RunToggles.tsx";
 import { send } from "../lib/live.ts";
 import { activeCategory, activeMatch, categoryName } from "../lib/selectors.ts";
 import { useI18n, type TKey } from "../i18n/index.tsx";
@@ -138,6 +139,8 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
           {t("control.skip")}
         </Button>
       </div>
+
+      <RunToggles settings={state.settings} />
 
       <Collapsible title={t("run.advanced")} persistKey="run.advanced">
         <div className="flex flex-col gap-2">

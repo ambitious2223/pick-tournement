@@ -64,7 +64,7 @@ export function App(): ReactNode {
           {route === "/control" ? <Control state={state} /> : null}
           {route === "/studio" ? <Studio state={state} /> : null}
           {route === "/debug" ? <Debug state={state} /> : null}
-          {route === "/setup" ? <Setup /> : null}
+          {route === "/setup" ? <Setup state={state} connected={connected} /> : null}
         </ErrorBoundary>
       </main>
     </div>

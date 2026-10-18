@@ -101,7 +101,8 @@ untested.
   match controls and quick mute/master volume; Settings holds the background color, sound-file setup
   and show look/pacing (both behind Advanced); `SimControls.tsx` is practice mode only.
   `src/studio` — card-based content editing. `src/debug` — vote injection, live connection, photos,
-  timings, event log and raw state. `src/pages/Setup.tsx` — the in-app setup guide at `/setup`.
+  timings, event log and raw state. `src/pages/Setup.tsx` — the interactive guide at `/setup`
+  (live readiness chips, a step path and pop-outs); `src/ui/Dialog.tsx` — its accessible pop-out.
 - `src/ui` — shared primitives, `ThumbMosaic`, `ImageCropModal`, `ColorWheel`, `Tabs`.
 - `tikora.manifest.json` — effects/events declared to the Tikora hub. Generated from
   `scripts/manifest.ts`; edit that file and run `npm run manifest`, never the JSON by hand.
@@ -112,7 +113,9 @@ untested.
   (`127.0.0.1:8787`) so there is no second URL to get wrong. It binds loopback only — never LAN.
 - `npm run dev` (server `:8787` + Vite `:5173`) is for development only.
 - The show window lives at `/overlay` (alias `/show`); the app opens on the Control room `/control`.
-  The one-time setup guide (not a wizard) lives at `/setup` and is linked from the top bar.
+  The interactive setup guide (not a wizard) lives at `/setup` and is linked from the top bar.
+  Control accepts `?tab=run|settings|queue|sim` and `?open=appearance|advanced`, so guide steps can
+  deep-link to the exact screen or Settings section.
 - The bracket cinematic and the viewer vote toasts live **only** on the show window; Control shows
   the static board. Between matches the show window alternates cinematic ↔ voting.
 - Control and Debug lock the shell to the viewport so only the content area scrolls.

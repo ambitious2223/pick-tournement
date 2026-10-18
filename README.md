@@ -25,8 +25,9 @@ local **Tikora** hub — no TikTok login inside this app.
 - **Content Studio and a Queue tab** — create and edit categories as visual cards (a photo tile per
   competitor) in Studio, then line up the next categories in Control → Queue. A **Debug console**
   covers injecting votes, the Live connection, photos, timings, the event log and raw state.
-- **A plain-language Setup guide** at `/setup`, linked from the top bar, walks through the one-time
-  setup and the everyday controls.
+- **An interactive Guide** at `/setup`, linked from the top bar: live readiness chips, a numbered
+  setup path, and a pop-out for each step with direct links to the exact Control tab or Settings
+  section.
 - Categories live in `data/categories/`, each tagged with its language (`lang`) and its own chat
   aliases.
 
@@ -38,8 +39,8 @@ seeds the categories, downloads free photos once, builds the app, starts **one s
 or the one-time photo fetch with `PL_NO_PHOTOS=1`.
 
 **First time?** Open the Control room, put categories in the queue, then press **Start show** on the
-**Run** tab and watch the show window at `/overlay`. The in-app **Guide** at `/setup` lists the same
-steps with the current buttons.
+**Run** tab and watch the show window at `/overlay`. The in-app **Guide** at `/setup` shows live
+status and links straight to each step.
 
 Or by hand:
 
@@ -66,7 +67,8 @@ show**.
 Between matches the overlay alternates with a **bracket cinematic** — it zooms into the live match,
 then pulls back out after the result — paced from **Control → Settings → Advanced → Show look &
 pacing** (intro / outro / recap length and the overall speed). The on-screen voting instructions are
-**off by default**; turn them back on under **Control → Settings → Show voting instructions**.
+**off by default**; turn them back on with the **Vote instructions** switch under **Control → Run →
+Round behavior**.
 
 ## Connecting to TikTok Live (via Tikora)
 
