@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Lang, RoundId } from "../../shared/types.ts";
 import { send } from "../lib/live.ts";
+import { TR } from "./tr.ts";
 
 export type { Lang };
 
@@ -540,7 +541,9 @@ export const DICT = {
   "error.tryAgain": { ar: "حاول مجددًا", en: "Try again" },
   "error.goControl": { ar: "اذهب لغرفة التحكم", en: "Go to Control Room" },
 
-  "lang.switch": { ar: "English", en: "العربية" },
+  "lang.ar": { ar: "العربية", en: "العربية" },
+  "lang.en": { ar: "English", en: "English" },
+  "lang.tr": { ar: "Türkçe", en: "Türkçe" },
   "lang.label": { ar: "اللغة", en: "Language" },
 } as const satisfies Record<string, Entry>;
 
@@ -563,7 +566,8 @@ const I18nContext = createContext<I18nValue | null>(null);
 
 export function initialLang(): Lang {
   try {
-    return localStorage.getItem(STORAGE_KEY) === "en" ? "en" : "ar";
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved === "en" || saved === "tr" ? saved : "ar";
   } catch {
     return "ar";
   }
@@ -581,7 +585,7 @@ export function I18nProvider({ children }: { children: ReactNode }): ReactNode {
   // Keep other open windows (e.g. the show window) on the same language.
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setLangState(e.newValue === "en" ? "en" : "ar");
+      if (e.key === STORAGE_KEY) setLangState(e.newValue === "en" ? "en" : e.newValue === "tr" ? "tr" : "ar");
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -597,9 +601,15 @@ export function I18nProvider({ children }: { children: ReactNode }): ReactNode {
     void send("lang:set", next);
   }, []);
 
-  const t = useCallback<I18nValue["t"]>((key, vars) => format(DICT[key][lang], vars), [lang]);
+  const t = useCallback<I18nValue["t"]>(
+    (key, vars) => format(lang === "tr" ? TR[key] : DICT[key][lang], vars),
+    [lang],
+  );
 
-  const round = useCallback<I18nValue["round"]>((id) => DICT[`round.${id}` as TKey][lang], [lang]);
+  const round = useCallback<I18nValue["round"]>(
+    (id) => (lang === "tr" ? TR[`round.${id}` as TKey] : DICT[`round.${id}` as TKey][lang]),
+    [lang],
+  );
 
   const value = useMemo<I18nValue>(() => ({ lang, setLang, dir, t, round }), [lang, setLang, dir, t, round]);
 

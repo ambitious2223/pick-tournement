@@ -127,8 +127,8 @@ export function SoundAdvanced({ state }: { state: SessionState }): ReactNode {
     const id = cue.id;
     const off = s.disabledCues.includes(id);
     const isCustom = custom.has(id);
-    const when = lang === "ar" ? cue.when.ar : cue.when.en;
-    const what = lang === "ar" ? cue.what.ar : cue.what.en;
+    const when = cue.when[lang];
+    const what = cue.what[lang];
     return (
       <div
         key={id}

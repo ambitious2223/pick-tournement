@@ -1,7 +1,7 @@
 export type RoundId = "r16" | "qf" | "sf" | "final";
 
-/** The app's two content/display languages. Each has its own category library. */
-export type Lang = "ar" | "en";
+/** The app's content/display languages. Each has its own category library. */
+export type Lang = "ar" | "en" | "tr";
 
 export type StageView = "match" | "bracket";
 

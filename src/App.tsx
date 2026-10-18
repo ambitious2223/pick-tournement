@@ -7,7 +7,7 @@ import { Studio } from "./studio/Studio.tsx";
 import { Debug } from "./debug/Debug.tsx";
 import { Setup } from "./pages/Setup.tsx";
 import { Broadcast } from "./broadcast/Broadcast.tsx";
-import { useI18n } from "./i18n/index.tsx";
+import { useI18n, type Lang } from "./i18n/index.tsx";
 
 const ROUTES = ["/control", "/studio", "/debug", "/setup", "/overlay", "/show"] as const;
 
@@ -97,14 +97,16 @@ function TopNav({ route }: { route: string }): ReactNode {
               {link.label}
             </a>
           )          )}
-          <button
-            type="button"
-            onClick={() => setLang(lang === "ar" ? "en" : "ar")}
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value as Lang)}
             aria-label={t("lang.label")}
-            className="ms-1 rounded-md border border-line px-2.5 py-1 text-xs text-white/70 transition hover:border-brand hover:text-brand"
+            className="ms-1 rounded-md border border-line bg-ink px-2 py-1 text-xs text-white/70 outline-none transition hover:border-brand hover:text-brand"
           >
-            {t("lang.switch")}
-          </button>
+            <option value="ar">{t("lang.ar")}</option>
+            <option value="en">{t("lang.en")}</option>
+            <option value="tr">{t("lang.tr")}</option>
+          </select>
         </nav>
       </div>
     </header>

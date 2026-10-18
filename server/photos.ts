@@ -18,6 +18,7 @@ import { loadCategories, categoriesForLang, saveCategory, UPLOADS_DIR, DATA_DIR,
 const ALLOWED_HOSTS = new Set([
   "en.wikipedia.org",
   "ar.wikipedia.org",
+  "tr.wikipedia.org",
   "upload.wikimedia.org",
   "thumb.wikimedia.org",
   "commons.wikimedia.org",
@@ -86,7 +87,7 @@ async function fetchJson<T>(url: string): Promise<T | null> {
 }
 
 function isFreeUrl(url: string): boolean {
-  return !url.includes("/wikipedia/en/") && !url.includes("/wikipedia/fairuse/");
+  return !url.includes("/wikipedia/en/") && !url.includes("/wikipedia/tr/") && !url.includes("/wikipedia/fairuse/");
 }
 
 interface Summary {
@@ -151,13 +152,13 @@ async function findImage(name: string, aliases: string[]): Promise<{ url: string
   const candidates = [name, ...aliases].slice(0, 4);
   // Fair-use hits are skipped rather than accepted, so discovery keeps going
   // and can still land on a free image in Arabic Wikipedia or Commons.
-  for (const lang of ["en", "ar"]) {
+  for (const lang of ["en", "ar", "tr"]) {
     for (const candidate of candidates) {
       const url = await summaryThumb(lang, candidate);
       if (url && isFreeUrl(url)) return { url, via: `${lang}-summary` };
     }
   }
-  for (const lang of ["en", "ar"]) {
+  for (const lang of ["en", "ar", "tr"]) {
     for (const title of await searchTitles(lang, name)) {
       const url = await pageImage(lang, title);
       if (url && isFreeUrl(url)) return { url, via: `${lang}-search` };

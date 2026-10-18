@@ -145,16 +145,18 @@ export class Session {
   static async create(): Promise<Session> {
     const allCategories = await loadCategories();
     const saved = await loadSession();
-    const lang: Lang = saved?.lang === "en" ? "en" : "ar";
+    const lang: Lang = saved?.lang === "en" ? "en" : saved?.lang === "tr" ? "tr" : "ar";
     const legacyQueue = Array.isArray(saved?.queue) ? saved.queue : [];
     const legacyIndex = typeof saved?.queueIndex === "number" ? saved.queueIndex : 0;
     const queues: Record<Lang, QueueEntry[]> = {
       ar: Array.isArray(saved?.queues?.ar) ? saved.queues.ar : lang === "ar" ? legacyQueue : [],
       en: Array.isArray(saved?.queues?.en) ? saved.queues.en : lang === "en" ? legacyQueue : [],
+      tr: Array.isArray(saved?.queues?.tr) ? saved.queues.tr : lang === "tr" ? legacyQueue : [],
     };
     const queueIndexes: Record<Lang, number> = {
       ar: typeof saved?.queueIndexes?.ar === "number" ? saved.queueIndexes.ar : lang === "ar" ? legacyIndex : 0,
       en: typeof saved?.queueIndexes?.en === "number" ? saved.queueIndexes.en : lang === "en" ? legacyIndex : 0,
+      tr: typeof saved?.queueIndexes?.tr === "number" ? saved.queueIndexes.tr : lang === "tr" ? legacyIndex : 0,
     };
     const state: SessionState = {
       status: "idle",

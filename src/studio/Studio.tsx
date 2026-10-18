@@ -70,7 +70,7 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
   const newCategory = () => {
     const category: Category = {
       id: `new-${Date.now().toString(36)}`,
-      name: lang === "ar" ? "فئة جديدة" : "New Category",
+      name: t("content.defaultCategoryName"),
       lang: state.lang,
       items: blankItems(),
       giftPair: [

@@ -1,4 +1,4 @@
-import type { Category, Item, SessionState } from "../../shared/types.ts";
+import type { Category, Item, Lang, SessionState } from "../../shared/types.ts";
 import { currentMatch as engineCurrentMatch } from "../../engine/tournament.ts";
 
 export function getCategory(state: SessionState | null, id: string | undefined): Category | null {
@@ -19,7 +19,7 @@ export function activeCategory(state: SessionState | null): Category | null {
  * Display names. Each language library stores its own names, so these simply
  * return the stored name. The `lang` argument is kept for call-site symmetry.
  */
-export function categoryName(category: Category | null | undefined, _lang: "ar" | "en"): string {
+export function categoryName(category: Category | null | undefined, _lang: Lang): string {
   if (!category) return "";
   return category.name;
 }
@@ -31,7 +31,7 @@ const ARABIC_RE = /[\u0600-\u06FF]/;
  * safety net for not-yet-migrated data, fall back to an Arabic alias or the
  * dedicated `nameAr` when the stored name is still Latin.
  */
-export function itemName(item: Item | null | undefined, lang: "ar" | "en"): string {
+export function itemName(item: Item | null | undefined, lang: Lang): string {
   if (!item) return "";
   if (lang === "ar" && !ARABIC_RE.test(item.name)) {
     if (item.nameAr) return item.nameAr;

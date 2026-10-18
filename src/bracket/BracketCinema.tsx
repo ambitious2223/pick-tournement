@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import type { Item, Match, SessionState } from "../../shared/types.ts";
+import type { Item, Lang, Match, SessionState } from "../../shared/types.ts";
 import { bracketTension, ROUND_ORDER, roundIndexFor } from "../../shared/config.ts";
 import { useI18n } from "../i18n/index.tsx";
 import { activeCategory, getItem, itemName } from "../lib/selectors.ts";
@@ -18,7 +18,7 @@ function CompRow({
   side: "a" | "b";
   won: boolean;
   lost: boolean;
-  lang: "ar" | "en";
+  lang: Lang;
 }): ReactNode {
   const { t } = useI18n();
   const tone = won ? "text-lime" : lost ? "text-hot/80" : side === "a" ? "text-brand" : "text-brand-2";
@@ -45,7 +45,7 @@ function CinemaCard({
   itemA: Item | null;
   itemB: Item | null;
   active: boolean;
-  lang: "ar" | "en";
+  lang: Lang;
 }): ReactNode {
   const done = match.winner !== null;
   const state = active

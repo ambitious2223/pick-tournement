@@ -3,7 +3,7 @@
 A local web app for **TikTok Live** bracket tournaments. Competitors enter a category, viewers
 vote, one champion comes out — then the next category in the queue begins automatically.
 
-Arabic-first interface (right-to-left) with an English toggle, shown as a standalone **show window**
+Arabic-first interface (right-to-left) with English and Turkish options, shown as a standalone **show window**
 you capture as-is. It runs with a built-in simulator, or with **real TikTok events** through your
 local **Tikora** hub — no TikTok login inside this app.
 
@@ -12,16 +12,16 @@ local **Tikora** hub — no TikTok login inside this app.
 - **Single-elimination brackets**, up to 16 competitors per category
   (Round of 16 → Quarterfinals → Semifinals → Grand Final). Fewer than 16 is fine — empty slots are
   byes.
-- **Two ways to vote:** chat (type the on-screen name in Arabic or English) and gifts (each side
+- **Two ways to vote:** chat (type the on-screen name in Arabic, English or Turkish) and gifts (each side
   shows a gift; sending it counts for that side).
 - **Automatic broadcast flow** with per-round colours escalating cyan → blue → purple → gold, and a
   golden final showing the top supporters. Between matches the show window plays a **bracket
   cinematic** (a zoom-in before each match, a zoom-out after) and then cuts back to the voting
   screen.
-- **Two content libraries, one per language.** Switching the interface language switches the whole
-  content set — its own categories and its own play queue. Arabic is the default library; the
-  English library starts empty. Switching language stops a running show first, so a bracket never
-  points at the other library's competitors.
+- **Three content libraries, one per language.** Switching the interface language switches the whole
+  content set - its own categories and its own play queue. Arabic is the default library; the
+  English and Turkish libraries start empty. Switching language stops a running show first, so a
+  bracket never points at another library's competitors.
 - **Content Studio and a Queue tab** — create and edit categories as visual cards (a photo tile per
   competitor) in Studio, then line up the next categories in Control → Queue. A **Debug console**
   covers injecting votes, the Live connection, photos, timings, the event log and raw state.
@@ -153,7 +153,7 @@ only page that plays audio — press **🔊 Tap to enable sound** once.
 | `live.subscribe` | a new subscriber | 4-note rise |
 | `live.member` | a new member joins (rate-limited) | single warm tone |
 
-The same list, with Arabic and English descriptions, is shown in the app next to every upload.
+The same list, with Arabic, English and Turkish descriptions, is shown in the app next to every upload.
 
 ## How voting resolves
 
@@ -169,7 +169,7 @@ it.
 
 No external network calls at runtime, with two approved exceptions: `server/imageCache.ts` fetches a
 single viewer avatar or gift picture from a URL the local hub delivered (verified, size-capped,
-cached under `data/`), and `npm run seed:photos` queries English and Arabic Wikipedia then Commons —
+cached under `data/`), and `npm run seed:photos` queries English, Arabic and Turkish Wikipedia then Commons —
 allowlisted hosts only, real image types only, fair-use rejected, every URL logged to
 `data/photos.log`. Everything lands in gitignored `data/uploads/`, `data/avatars/` and `data/gifts/`.
 Items without a photo fall back to their emoji or an initial tile.

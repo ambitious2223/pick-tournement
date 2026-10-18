@@ -53,9 +53,9 @@ untested.
 - Keep files small and single-purpose (`shared/`, `engine/`, `server/`,
   `src/{broadcast,control,studio,debug,pages,sound,i18n}`).
 - Categories are plain JSON in `data/categories/`, each tagged with its language (`lang`), editable
-  at runtime through the Studio (no rebuild). Arabic and English are **separate libraries** with
-  separate queues; the server only exposes the active language's categories.
-- **Arabic-first with an English toggle**, RTL-safe (use logical Tailwind utilities like `ms-`/`me-`/
+  at runtime through the Studio (no rebuild). Arabic, English and Turkish are **separate libraries**
+  with separate queues; the server only exposes the active language's categories.
+- **Arabic-first with English and Turkish options**, RTL-safe (use logical Tailwind utilities like `ms-`/`me-`/
   `ps-`/`pe-`/`start-`/`end-`). All user-facing strings live in `src/i18n/`.
 - **Sound** is client-side Web Audio (`src/sound/`); only the broadcast page plays audio.
 - **Live events** come from the Tikora hub relay via `server/live.ts`; no TikTok credentials live here.
@@ -83,17 +83,18 @@ untested.
   are missing on first boot (so deleting one means also removing it from `SEED`), and runs the
   one-time migrations: tag legacy categories as Arabic and promote each item's Arabic alias into its
   display name (keeping the English spelling as an alias so chat still matches).
-- `server/photos.ts` — the sanctioned photo downloader (English + Arabic Wikipedia, then Commons).
+- `server/photos.ts` — the sanctioned photo downloader (English + Arabic + Turkish Wikipedia, then Commons).
 - `scripts/serve.mjs` — single-port launcher (build + serve on `:8787`); `scripts/dev.mjs` — dev.
 - `scripts/manifest.ts` — builds the hub manifest; `scripts/gen-manifest.ts` writes it (`npm run manifest`);
   `scripts/smoke-hub.ts` — drives every declared hub effect end-to-end and restores `data/session.json`;
   `scripts/smoke-key.ts` — proves the game key resolves with no manual step.
 - `src/broadcast` — the show window (automatic show flow, themes, animations).
-- `src/sound` — upload-only sound: `catalog.ts` (every cue + its Arabic/English description),
+- `src/sound` — upload-only sound: `catalog.ts` (every cue + its Arabic/English/Turkish description),
   `manager.ts` (plays `data/sounds/<id>.<ext>` with gentle fades, marks missing cues), `engine.ts`
   (master/sfx/voice buses), `useSound.ts`. No built-in tones or music — a cue is silent until uploaded.
-- `src/i18n` — Arabic/English strings + RTL provider. The language toggle also switches the content
-  library (`lang:set`); each page adopts the server's language on first load.
+- `src/i18n` — Arabic/English/Turkish strings + RTL provider (`tr.ts` holds Turkish). The language
+  menu also switches the content library (`lang:set`); each page adopts the server's language on
+  first load.
 - `src/bracket` — `BracketCinema.tsx` (the overlay-only bracket cinematic camera, choreographed by
   `useCinemaCamera.ts`) plus `MatchStage` (Control's stage/board); `src/stage` — the round voting view.
 - `src/overlay` — round widgets (ItemCard, VoteBar, RoundTimer, WinnerReveal, CategoryPoll, VoteToasts).

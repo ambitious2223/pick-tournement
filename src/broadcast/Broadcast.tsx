@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import type { Item, RoundId, SessionState, ShowPhase } from "../../shared/types.ts";
+import type { Item, Lang, RoundId, SessionState, ShowPhase } from "../../shared/types.ts";
 import { useI18n, type TKey } from "../i18n/index.tsx";
 import { useSound } from "../sound/useSound.ts";
 import { enableSound, useSoundStatus } from "../sound/SoundStatus.tsx";
@@ -79,7 +79,7 @@ function ResultSide({
   votes: number;
   winner: boolean;
   side: "a" | "b";
-  lang: "ar" | "en";
+  lang: Lang;
 }): ReactNode {
   const { t } = useI18n();
   const ring = winner ? "ring-4 ring-lime" : "ring-2 ring-line";
