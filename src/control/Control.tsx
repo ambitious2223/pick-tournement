@@ -4,8 +4,7 @@ import { Panel } from "../ui/primitives.tsx";
 import { Tabs, type TabItem } from "../ui/Tabs.tsx";
 import { send } from "../lib/live.ts";
 import { MatchControls } from "./MatchControls.tsx";
-import { ShowControls } from "./ShowControls.tsx";
-import { SoundControls } from "./SoundControls.tsx";
+import { SoundQuickControls } from "./SoundControls.tsx";
 import { SettingsPanel } from "./SettingsPanel.tsx";
 import { SimControls } from "./SimControls.tsx";
 import { QueueEditor } from "./QueueEditor.tsx";
@@ -19,9 +18,9 @@ function isTyping(target: EventTarget | null): boolean {
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
 }
 
-type ControlTab = "run" | "show" | "sound" | "settings" | "queue" | "sim";
+type ControlTab = "run" | "settings" | "queue" | "sim";
 
-const CONTROL_TABS: readonly ControlTab[] = ["run", "show", "sound", "settings", "queue", "sim"];
+const CONTROL_TABS: readonly ControlTab[] = ["run", "settings", "queue", "sim"];
 
 function readTab(): ControlTab {
   try {
@@ -81,8 +80,6 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
 
   const tabs: TabItem<ControlTab>[] = [
     { id: "run", label: t("control.run") },
-    { id: "show", label: t("control.show") },
-    { id: "sound", label: t("control.sound") },
     { id: "settings", label: t("control.settings") },
     { id: "queue", label: t("control.queue"), hint: state.queue.length ? String(state.queue.length) : undefined },
     { id: "sim", label: t("control.simulator"), hint: state.simulated ? "•" : undefined },
@@ -109,12 +106,15 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
         <Tabs tabs={tabs} value={tab} onChange={setTab} />
 
         <div className="scroll-thin max-h-[65vh] min-h-0 flex-1 overflow-y-auto pe-1 xl:max-h-none">
-          {tab === "run" ? <MatchControls state={state} /> : null}
-          {tab === "show" ? <ShowControls state={state} /> : null}
-          {tab === "sound" ? <SoundControls state={state} /> : null}
+          {tab === "run" ? (
+            <div className="flex flex-col gap-3">
+              <MatchControls state={state} />
+              <SoundQuickControls state={state} />
+            </div>
+          ) : null}
           {tab === "settings" ? (
             <Panel title={t("control.settings")}>
-              <SettingsPanel settings={state.settings} />
+              <SettingsPanel state={state} />
             </Panel>
           ) : null}
           {tab === "queue" ? (

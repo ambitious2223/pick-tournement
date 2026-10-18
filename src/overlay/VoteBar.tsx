@@ -60,7 +60,7 @@ export function VoteBar({
         </div>
       </div>
       {showCounts ? (
-        <div className="flex justify-between px-1 text-xs text-white/50" style={{ fontSize: labelPx }}>
+        <div className="flex justify-between px-1 text-xs text-white/80" style={{ fontSize: labelPx }}>
           <span>{t("stage.votes", { n: votesA })}</span>
           <span>{voterLine}</span>
           <span>{t("stage.votes", { n: votesB })}</span>

@@ -92,6 +92,7 @@ function strongScore(msg: string, key: string, words: string[]): number {
  * This lives in the fallback tier, so it only ever wins when it is unique.
  */
 function fragmentScore(msg: string, key: string): number {
+  if (isPhrase(key)) return 0;
   const floor = /[\u0600-\u06FF]/.test(msg) ? 2 : MIN_PREFIX;
   if (msg.length < floor) return 0;
   return key.includes(msg) ? 600 + msg.length : 0;
@@ -99,6 +100,15 @@ function fragmentScore(msg: string, key: string): number {
 
 function isArabic(word: string): boolean {
   return /[\u0600-\u06FF]/.test(word);
+}
+
+/**
+ * A sentence-like competitor: three or more words. For these, only the leading
+ * word(s) may vote — a random word from the middle of a sentence is far too
+ * easy to trip over in ordinary chat, so it never counts.
+ */
+function isPhrase(key: string): boolean {
+  return key.split(" ").length >= 3;
 }
 
 /**
@@ -129,6 +139,7 @@ function allowedDistance(a: string, b: string): number {
  * greeting becomes a vote for whoever happens to be playing.
  */
 function fuzzyScore(words: string[], key: string): number {
+  if (isPhrase(key)) return 0;
   if (words.length > 1) return 0;
   const keyWords = key.split(" ");
   let best = 0;
@@ -180,11 +191,28 @@ function pick(candidates: Candidate[], msg: string): string | null {
       if (!best || hit.score > best.score || (hit.score === best.score && hit.len > best.len)) best = hit;
     }
     if (best) return best.id;
-    // Below that, two competitors matched the same fragment (two "Ahmed"s) —
-    // refuse rather than pick one at random and ask for more letters.
-    if (new Set(near.map((hit) => hit.id)).size > 1) return null;
-    const only = near[0];
-    return only ? only.id : null;
+    // No exact hit: the clearly-best leading match wins. A genuine tie (two
+    // competitors matched the same fragment, e.g. two "Ahmed"s) still refuses
+    // rather than pick one at random — but a longer leading word that only one
+    // name starts with now resolves instead of being thrown away.
+    const byId = new Map<string, number>();
+    for (const hit of near) {
+      byId.set(hit.id, Math.max(byId.get(hit.id) ?? -1, hit.score));
+    }
+    let topId: string | null = null;
+    let top = -1;
+    let second = -1;
+    for (const [id, score] of byId) {
+      if (score > top) {
+        second = top;
+        top = score;
+        topId = id;
+      } else if (score > second) {
+        second = score;
+      }
+    }
+    if (topId === null || top <= second) return null;
+    return topId;
   }
 
   const scores = new Map<string, number>();
@@ -240,4 +268,17 @@ export function matchCategory(text: string, categories: Category[]): string | nu
     if (keys.length > 0) candidates.push({ id: category.id, keys });
   }
   return pick(candidates, msg);
+}
+
+/**
+ * The 1-based candidate a chat message picks when it is *exactly* a number in
+ * `1..count`. Arabic-Indic digits normalise to ASCII, so `١` and `1` agree.
+ * A number buried in a sentence is chat, not a vote.
+ */
+export function pollNumber(text: string, count: number): number | null {
+  if (count < 1) return null;
+  const msg = normalize(text);
+  if (!/^\d+$/.test(msg)) return null;
+  const n = Number(msg);
+  return Number.isInteger(n) && n >= 1 && n <= count ? n : null;
 }

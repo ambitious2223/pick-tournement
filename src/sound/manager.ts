@@ -1,13 +1,12 @@
 import type { SoundSettings } from "../../shared/types.ts";
 import { engine } from "./engine.ts";
-import { playCue, type CueOptions } from "./cues.ts";
-import { AUTO_TRACK, MUSIC_BY_ID, MusicPlayer, resolveTrack } from "./music.ts";
 
 /** Minimum gap between repeats of the same cue (ms). */
 const MIN_INTERVAL: Record<string, number> = {
   "vote.chat": 45,
   "live.like": 120,
   "live.member": 80,
+  "category.vote": 60,
 };
 
 /** Plain-language snapshot of the audio system for the on-screen status readout. */
@@ -15,12 +14,10 @@ export interface SoundStatus {
   /** "not started" | "running" | "suspended" | "closed". */
   context: string;
   muted: boolean;
-  musicEnabled: boolean;
-  musicTrack: string | null;
   lastCue: string | null;
   lastCueAt: number | null;
   overrides: string[];
-  reason: "idle" | "no-config" | "muted" | "disabled-cue" | "not-running" | "played";
+  reason: "idle" | "no-config" | "muted" | "disabled-cue" | "not-running" | "played" | "missing";
 }
 
 class SoundManager {
@@ -33,16 +30,12 @@ class SoundManager {
   private overridesLoaded = false;
 
   /** A cue requested while the audio context was still locked, replayed on unlock. */
-  private pendingCue: { id: string; opts: CueOptions } | null = null;
+  private pendingCue: { id: string } | null = null;
   private lastCue: { id: string; at: number } | null = null;
   private reason: SoundStatus["reason"] = "idle";
 
   /** Shared in-flight unlock so concurrent callers await the same attempt. */
   private unlockPromise: Promise<void> | null = null;
-
-  private player = new MusicPlayer();
-  private desiredSlot: string | null = null;
-  private currentTrack: string | null = null;
 
   // Live counters.
   private prevCounts: Record<string, number> = {};
@@ -51,7 +44,6 @@ class SoundManager {
   setConfig(sound: SoundSettings): void {
     this.config = sound;
     engine.applyConfig(sound);
-    this.applyMusic();
   }
 
   get soundConfig(): SoundSettings | null {
@@ -64,8 +56,6 @@ class SoundManager {
     return {
       context: !ctx ? "not started" : ctx.state === "running" ? "running" : ctx.state,
       muted: this.config?.muted ?? false,
-      musicEnabled: this.config?.musicEnabled ?? false,
-      musicTrack: this.currentTrack,
       lastCue: this.lastCue?.id ?? null,
       lastCueAt: this.lastCue?.at ?? null,
       overrides: [...this.overrides],
@@ -88,40 +78,33 @@ class SoundManager {
   private async doUnlock(): Promise<void> {
     await engine.unlock();
     if (this.config) engine.applyConfig(this.config);
-    // Music requested before the context existed is applied now.
-    this.applyMusic();
     if (!this.overridesLoaded) await this.loadOverrides();
     // A cue that arrived while the context was locked should not be lost.
     if (this.pendingCue && engine.running) {
       const p = this.pendingCue;
       this.pendingCue = null;
-      if (this.overrides.has(p.id)) void this.playFile(p.id, p.opts);
-      else playCue(engine, p.id, p.opts);
+      if (this.overrides.has(p.id)) void this.playFile(p.id);
     }
   }
 
   private async loadOverrides(): Promise<void> {
     this.overridesLoaded = true;
-    try {
-      const res = await fetch("/api/sounds");
-      if (!res.ok) return;
-      const list = (await res.json()) as string[];
-      for (const name of list) this.overrides.add(name.replace(/\.[a-z0-9]+$/i, ""));
-    } catch {
-      /* no override dir yet */
-    }
+    await this.fetchOverrides();
   }
 
   /** Re-read the override list after an upload/removal and drop stale decoded buffers. */
   async refreshOverrides(): Promise<void> {
-    this.overrides.clear();
     this.buffers.clear();
+    await this.fetchOverrides();
+  }
+
+  private async fetchOverrides(): Promise<void> {
+    this.overrides.clear();
     try {
       const res = await fetch("/api/sounds", { cache: "no-store" });
-      if (res.ok) {
-        const list = (await res.json()) as string[];
-        for (const name of list) this.overrides.add(name.replace(/\.[a-z0-9]+$/i, ""));
-      }
+      if (!res.ok) return;
+      const list = (await res.json()) as string[];
+      for (const name of list) this.overrides.add(name.replace(/\.[a-z0-9]+$/i, ""));
     } catch {
       /* offline */
     }
@@ -132,8 +115,8 @@ class SoundManager {
     return this.overrides.has(id);
   }
 
-  /** Play a one-shot cue, honoring mute, per-cue toggles, rate limits and file overrides. */
-  play(id: string, opts: CueOptions = {}): void {
+  /** Play a one-shot cue, honoring mute, per-cue toggles and rate limits. */
+  play(id: string): void {
     const cfg = this.config;
     if (!cfg) {
       this.reason = "no-config";
@@ -154,36 +137,30 @@ class SoundManager {
 
     this.onCue?.(id);
     this.lastCue = { id, at: Date.now() };
+
     if (this.overrides.has(id)) {
       this.reason = "played";
-      void this.playFile(id, opts);
+      void this.playFile(id);
       return;
     }
-    // No audio context yet / blocked: remember the cue and replay it on unlock.
-    if (!engine.running) {
-      this.pendingCue = { id, opts };
-      this.reason = "not-running";
-      console.warn("[sound] deferred until audio unlock:", id);
-      return;
-    }
-    playCue(engine, id, opts);
-    this.reason = "played";
+    // No uploaded file for this cue yet: stay silent (the Sound tab shows it as missing).
+    this.reason = "missing";
   }
 
-  private async playFile(id: string, opts: CueOptions): Promise<void> {
+  private async playFile(id: string): Promise<void> {
     const ctx = engine.ctx;
     const out = engine.bus("sfx");
     if (!ctx || !out || !engine.running) {
-      this.pendingCue = { id, opts };
+      this.pendingCue = { id };
       return;
     }
     let buffer = this.buffers.get(id);
     if (!buffer) {
       const found = await this.findOverrideFile(id);
       if (!found) {
-        // The override disappeared — use the built-in synth instead of going silent.
+        // The override disappeared — nothing to play.
         this.overrides.delete(id);
-        playCue(engine, id, opts);
+        this.reason = "missing";
         return;
       }
       try {
@@ -191,20 +168,34 @@ class SoundManager {
         buffer = await ctx.decodeAudioData(await res.arrayBuffer());
         this.buffers.set(id, buffer);
       } catch {
-        // Broken file: drop the override and fall back so the cue still plays.
+        // Broken file: drop the override so the UI stops claiming it is uploaded.
         this.overrides.delete(id);
-        playCue(engine, id, opts);
+        this.reason = "missing";
         return;
       }
     }
+    const t = ctx.currentTime;
     const src = ctx.createBufferSource();
     src.buffer = buffer;
-    src.connect(out);
-    src.start();
+    const g = ctx.createGain();
+    const dur = buffer.duration;
+    const fadeIn = Math.min(0.012, dur * 0.25);
+    const fadeOut = Math.min(0.05, dur * 0.25);
+    // Gentle fade in/out so uploaded files never click or pop.
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(1, t + Math.max(0.001, fadeIn));
+    if (dur > fadeIn + fadeOut) {
+      g.gain.setValueAtTime(1, t + dur - fadeOut);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    }
+    src.connect(g);
+    g.connect(out);
+    src.start(t);
+    src.stop(t + dur + 0.03);
   }
 
   private async findOverrideFile(id: string): Promise<string | null> {
-    for (const ext of [".mp3", ".ogg", ".wav", ".webm"]) {
+    for (const ext of [".mp3", ".ogg", ".wav", ".webm", ".m4a"]) {
       const url = `/sounds/${id}${ext}`;
       try {
         const res = await fetch(url, { method: "HEAD" });
@@ -214,56 +205,6 @@ class SoundManager {
       }
     }
     return null;
-  }
-
-  // ---- music ----------------------------------------------------------------
-
-  /**
-   * Remember the desired slot (a show slot like `music.match.qf`, or a library
-   * track id from a preview) and (re)apply it once audio is available.
-   */
-  setMusic(slot: string | null): void {
-    this.desiredSlot = slot;
-    this.applyMusic();
-  }
-
-  /**
-   * Resolve the desired slot through the picked background track, then start /
-   * stop / re-level the bed. Runs again whenever the sound settings change, so
-   * picking a different track or moving the volume slider takes effect live.
-   */
-  private applyMusic(): void {
-    if (!engine.ctx || !engine.running) return;
-    const cfg = this.config;
-    const enabled = cfg ? cfg.musicEnabled && !cfg.muted : false;
-    const target =
-      enabled && this.desiredSlot
-        ? resolveTrack(this.desiredSlot, cfg ? cfg.musicTrack ?? AUTO_TRACK : AUTO_TRACK)
-        : null;
-
-    if (target !== this.currentTrack) {
-      this.currentTrack = target;
-      if (!target) {
-        this.player.stop();
-        return;
-      }
-      const def = MUSIC_BY_ID[target];
-      const out = engine.bus("music");
-      if (!def || !out) {
-        this.player.stop();
-        return;
-      }
-      this.player.start(def, out, this.levelFor(target));
-      return;
-    }
-    if (target) this.player.setLevel(this.levelFor(target));
-  }
-
-  private levelFor(id: string): number {
-    const def = MUSIC_BY_ID[id];
-    if (!def) return 0;
-    const trim = this.config && this.config.trackVolume[id] !== undefined ? this.config.trackVolume[id] : 1;
-    return def.level * trim;
   }
 
   /** Detect vote leader changes and fire the lead cue. */

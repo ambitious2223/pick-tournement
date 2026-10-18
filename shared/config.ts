@@ -36,6 +36,7 @@ export const DEFAULT_SETTINGS: Settings = {
   chatWeight: 1,
   giftWeight: 10,
   dedupeChat: true,
+  allowVoteChange: true,
   tieRule: "sudden-death",
   autoNextMatch: true,
   autoNextTournament: false,
@@ -47,8 +48,13 @@ export const DEFAULT_SETTINGS: Settings = {
   bracketOutroSeconds: 8,
   roundRecapSeconds: 6,
   resultSeconds: 6,
+  showBracketIntro: true,
+  showBracketOutro: true,
+  showRoundRecap: true,
   showBackground: "#070a14",
   bracketPace: 1,
+  bracketZoom: 3,
+  controlCinematic: false,
   stageTextScale: 1.15,
   stageScale: 1,
   simVotesPerTick: 3,
@@ -57,63 +63,63 @@ export const DEFAULT_SETTINGS: Settings = {
   sound: {
     muted: false,
     master: 0.8,
-    music: 0.35,
     sfx: 0.85,
     voice: 1,
-    musicEnabled: true,
-    musicTrack: "auto",
     disabledCues: [],
-    trackVolume: {},
   },
 };
 
+/** One row of the estimated show schedule for a single 16-item tournament. */
+export interface ShowPhaseEstimate {
+  key: "category" | "roundIntro" | "bracketIntro" | "match" | "bracketOutro" | "roundRecap" | "result" | "champion";
+  count: number;
+  /** Total seconds this phase contributes across the tournament. */
+  seconds: number;
+}
+
+/**
+ * Estimates the phases a full 16-item tournament will play and how long each
+ * takes, honouring the bracket-cinematic toggles. Pure, so Control can show a
+ * live runtime estimate while the host tunes pace, timings and toggles.
+ */
+export function estimateShowSchedule(s: Settings): { phases: ShowPhaseEstimate[]; totalSeconds: number } {
+  const pace = s.bracketPace ?? 1;
+  let roundIntro = 0;
+  let bracketIntro = 0;
+  let bracketOutro = 0;
+  let roundRecap = 0;
+  let match = 0;
+  let results = 0;
+  let matches = 0;
+
+  ROUND_ORDER.forEach((round, i) => {
+    const size = ROUND_SIZES[round] ?? 0;
+    const tension = bracketTension(i);
+    matches += size;
+    match += size * (s.roundSecondsByRound?.[round] ?? s.roundSeconds);
+    results += size * s.resultSeconds;
+    roundIntro += s.roundIntroSeconds;
+    if (s.showBracketIntro) bracketIntro += size * s.bracketIntroSeconds * tension * pace;
+    if (s.showBracketOutro) bracketOutro += size * s.bracketOutroSeconds * tension * pace;
+    // The final has no "next round", so no recap after it.
+    if (s.showRoundRecap && round !== "final") roundRecap += s.roundRecapSeconds * tension * pace;
+  });
+
+  const phases: ShowPhaseEstimate[] = [
+    { key: "category", count: 1, seconds: s.categorySeconds },
+    { key: "roundIntro", count: ROUND_ORDER.length, seconds: roundIntro },
+    { key: "bracketIntro", count: s.showBracketIntro ? matches : 0, seconds: bracketIntro },
+    { key: "match", count: matches, seconds: match },
+    { key: "bracketOutro", count: s.showBracketOutro ? matches : 0, seconds: bracketOutro },
+    { key: "roundRecap", count: s.showRoundRecap ? ROUND_ORDER.length - 1 : 0, seconds: roundRecap },
+    { key: "result", count: matches, seconds: results },
+    { key: "champion", count: 1, seconds: s.resultSeconds },
+  ];
+  const totalSeconds = phases.reduce((sum, phase) => sum + phase.seconds, 0);
+  return { phases, totalSeconds };
+}
+
 export const SERVER_PORT = 8787;
-
-/** Every sound cue id (kept in sync with src/sound/cues.ts RECIPES). */
-export const SOUND_CUE_IDS = [
-  "category.start",
-  "category.vote",
-  "category.winner",
-  "round.intro",
-  "bracket.intro",
-  "bracket.focus",
-  "bracket.zoom.in",
-  "bracket.reveal",
-  "bracket.loser",
-  "bracket.tension",
-  "bracket.outro",
-  "bracket.winner",
-  "match.countdown",
-  "match.start",
-  "match.tick",
-  "match.suddenDeath",
-  "match.end",
-  "vote.chat",
-  "vote.gift.small",
-  "vote.gift.medium",
-  "vote.gift.large",
-  "vote.lead",
-  "result.win",
-  "result.lose",
-  "champion.win",
-  "champion.reveal",
-  "champion.supporter",
-  "live.like",
-  "live.follow",
-  "live.share",
-  "live.subscribe",
-  "live.member",
-] as const;
-
-/** Every show slot a music bed can be requested for (see src/sound/music.ts SLOT_TRACK). */
-export const MUSIC_TRACK_IDS = [
-  "music.category",
-  "music.match.r16",
-  "music.match.qf",
-  "music.match.sf",
-  "music.match.final",
-  "music.champion",
-] as const;
 
 /**
  * Effect keys the session implements. The manifest declares exactly these; a

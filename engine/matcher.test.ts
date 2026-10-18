@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Category, Item } from "../shared/types.ts";
-import { matchCategory, matchItem, normalize } from "./matcher.ts";
+import { matchCategory, matchItem, normalize, pollNumber } from "./matcher.ts";
 
 const squad: (Item | null)[] = [
   { id: "salah", name: "محمد صلاح", aliases: ["صلاح"] },
@@ -81,6 +81,35 @@ test("two competitors sharing a first word need more letters", () => {
   assert.equal(matchItem("Ahme", players), null);
 });
 
+test("a longer leading word resolves where a bare first word cannot", () => {
+  const players: (Item | null)[] = [
+    { id: "helmy", name: "Ahmed Helmy", aliases: [] },
+    { id: "ezz", name: "Ahmed Ezz", aliases: [] },
+  ];
+  assert.equal(matchItem("Ahmed Hel", players), "helmy");
+  assert.equal(matchItem("Ahmed Ez", players), "ezz");
+});
+
+test("sentence-length names only vote from their leading words", () => {
+  const players: (Item | null)[] = [
+    { id: "name", name: "تنسى اسم الشخص بعد ما يعرّفك عن نفسه", aliases: [] },
+    { id: "wave", name: "تلوّح لشخص ويطلع مو عم يسلّم عليك", aliases: [] },
+    { id: "call", name: "تنادي شخص باسم شخص تاني", aliases: [] },
+    { id: "miss", name: "تنادي الأنسة ماما بالغلط", aliases: [] },
+  ];
+  // The whole sentence, or its leading words, count.
+  assert.equal(matchItem("تنسى اسم الشخص بعد ما يعرّفك عن نفسه", players), "name");
+  assert.equal(matchItem("تنسى اسم", players), "name");
+  assert.equal(matchItem("تلوّح لشخص", players), "wave");
+  // A word from the middle of the sentence is chat noise, not a vote.
+  assert.equal(matchItem("الشخص", players), null);
+  assert.equal(matchItem("يعرّفك", players), null);
+  // A shared first word is not enough; the second word disambiguates.
+  assert.equal(matchItem("تنادي", players), null);
+  assert.equal(matchItem("تنادي شخص", players), "call");
+  assert.equal(matchItem("تنادي الأنسة", players), "miss");
+});
+
 test("a dedicated Arabic name is matchable without an alias", () => {
   const players: (Item | null)[] = [
     { id: "keffiyeh", name: "Keffiyeh", nameAr: "الكوفية", aliases: [] },
@@ -97,4 +126,18 @@ test("an equally close typo is refused rather than guessed", () => {
   ];
   assert.equal(matchItem("runnes", players), null);
   assert.equal(matchItem("runner", players), "a");
+});
+
+test("a lone number picks a category candidate, nothing else does", () => {
+  assert.equal(pollNumber("1", 8), 1);
+  assert.equal(pollNumber("8", 8), 8);
+  assert.equal(pollNumber("١", 8), 1);
+  assert.equal(pollNumber("1!", 8), 1);
+  assert.equal(pollNumber("9", 8), null);
+  assert.equal(pollNumber("0", 8), null);
+  assert.equal(pollNumber("10", 8), null);
+  assert.equal(pollNumber("vote 1", 8), null);
+  assert.equal(pollNumber("1 2", 8), null);
+  assert.equal(pollNumber("hello", 8), null);
+  assert.equal(pollNumber("1", 0), null);
 });

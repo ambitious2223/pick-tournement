@@ -51,7 +51,7 @@ untested.
 - The **server is authoritative** and holds the live session; the browser renders state received via
   SSE. Control commands go through `POST /api/command`.
 - Keep files small and single-purpose (`shared/`, `engine/`, `server/`,
-  `src/{broadcast,control,studio,debug,sound,i18n}`).
+  `src/{broadcast,control,studio,debug,pages,sound,i18n}`).
 - Categories are plain JSON in `data/categories/`, each tagged with its language (`lang`), editable
   at runtime through the Studio (no rebuild). Arabic and English are **separate libraries** with
   separate queues; the server only exposes the active language's categories.
@@ -89,15 +89,19 @@ untested.
   `scripts/smoke-hub.ts` — drives every declared hub effect end-to-end and restores `data/session.json`;
   `scripts/smoke-key.ts` — proves the game key resolves with no manual step.
 - `src/broadcast` — the show window (automatic show flow, themes, animations).
-- `src/sound` — Web Audio engine, cue catalog, manager, `useSound` hook.
+- `src/sound` — upload-only sound: `catalog.ts` (every cue + its Arabic/English description),
+  `manager.ts` (plays `data/sounds/<id>.<ext>` with gentle fades, marks missing cues), `engine.ts`
+  (master/sfx/voice buses), `useSound.ts`. No built-in tones or music — a cue is silent until uploaded.
 - `src/i18n` — Arabic/English strings + RTL provider. The language toggle also switches the content
   library (`lang:set`); each page adopts the server's language on first load.
 - `src/bracket` — `BracketCinema.tsx` (the overlay-only bracket cinematic camera, choreographed by
   `useCinemaCamera.ts`) plus `MatchStage` (Control's stage/board); `src/stage` — the round voting view.
 - `src/overlay` — round widgets (ItemCard, VoteBar, RoundTimer, WinnerReveal, CategoryPoll, VoteToasts).
-- `src/control` — host controls (Run/Show/Sound/Settings/Queue, plus `SimControls.tsx`: the simulator
-  and its speed, show start/stop, one-tap demos, stage size and bracket pacing). `src/studio` —
-  card-based content editing. `src/debug` — vote injection, live connection, sound mixer, raw state.
+- `src/control` — host controls (Run/Settings/Queue/Simulator). Run holds the automatic show buttons,
+  match controls and quick mute/master volume; Settings holds the background color, sound-file setup
+  and show look/pacing (both behind Advanced); `SimControls.tsx` is practice mode only.
+  `src/studio` — card-based content editing. `src/debug` — vote injection, live connection, photos,
+  timings, event log and raw state. `src/pages/Setup.tsx` — the in-app setup guide at `/setup`.
 - `src/ui` — shared primitives, `ThumbMosaic`, `ImageCropModal`, `ColorWheel`, `Tabs`.
 - `tikora.manifest.json` — effects/events declared to the Tikora hub. Generated from
   `scripts/manifest.ts`; edit that file and run `npm run manifest`, never the JSON by hand.
@@ -108,6 +112,7 @@ untested.
   (`127.0.0.1:8787`) so there is no second URL to get wrong. It binds loopback only — never LAN.
 - `npm run dev` (server `:8787` + Vite `:5173`) is for development only.
 - The show window lives at `/overlay` (alias `/show`); the app opens on the Control room `/control`.
+  The one-time setup guide (not a wizard) lives at `/setup` and is linked from the top bar.
 - The bracket cinematic and the viewer vote toasts live **only** on the show window; Control shows
   the static board. Between matches the show window alternates cinematic ↔ voting.
 - Control and Debug lock the shell to the viewport so only the content area scrolls.

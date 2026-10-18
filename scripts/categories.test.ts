@@ -26,8 +26,10 @@ test("every category file parses and is well formed", () => {
     const stem = file.replace(/\.json$/, "");
     assert.equal(data.id, stem, `${file}: id does not match its file name`);
     assert.match(data.id, SLUG, `${file}: id is not a slug`);
-    assert.ok(data.name && data.name.trim(), `${file}: missing English name`);
-    assert.ok(data.nameAr && data.nameAr.trim(), `${file}: missing Arabic name`);
+    assert.ok(data.name && data.name.trim(), `${file}: missing name`);
+    if (data.nameAr !== undefined) {
+      assert.ok(data.nameAr.trim(), `${file}: blank Arabic name`);
+    }
     assert.ok(Array.isArray(data.giftPair) && data.giftPair.length === 2, `${file}: giftPair must hold two gifts`);
     for (const gift of data.giftPair ?? []) {
       assert.ok(gift.id && gift.name, `${file}: a gift in giftPair is missing id or name`);
@@ -41,8 +43,8 @@ test("every competitor has an id, a name and clean aliases", () => {
     for (const item of data.items) {
       assert.match(item.id, SLUG, `${file}: "${item.name}" has a bad id "${item.id}"`);
       assert.ok(item.name && item.name.trim(), `${file}: an item has no name`);
-      assert.ok(item.aliases && item.aliases.length > 0, `${file}: "${item.name}" has no aliases`);
-      for (const alias of item.aliases) {
+      assert.ok(Array.isArray(item.aliases), `${file}: "${item.name}" has no aliases list`);
+      for (const alias of item.aliases ?? []) {
         assert.ok(alias.trim(), `${file}: "${item.name}" has a blank alias`);
         assert.ok(normalize(alias), `${file}: alias "${alias}" normalizes to nothing`);
       }
@@ -72,7 +74,7 @@ test("no two competitors in a category could be confused with each other", () =>
           names.add(arabicKey);
         }
       }
-      for (const alias of item.aliases) {
+      for (const alias of item.aliases ?? []) {
         const aliasKey = normalize(alias);
         if (aliasKey && aliasKey !== key) {
           assert.ok(!names.has(aliasKey), `${file}: "${alias}" for ${item.name} collides with another competitor`);

@@ -1,5 +1,5 @@
-import { useState, type ReactNode } from "react";
-import type { Item, SessionState } from "../../shared/types.ts";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { Item, RoundId, SessionState, ShowPhase } from "../../shared/types.ts";
 import { useI18n, type TKey } from "../i18n/index.tsx";
 import { useSound } from "../sound/useSound.ts";
 import { enableSound, useSoundStatus } from "../sound/SoundStatus.tsx";
@@ -9,7 +9,11 @@ import { Stage } from "../stage/Stage.tsx";
 import { ItemVisual } from "../overlay/ItemVisual.tsx";
 import { CategoryPoll } from "../overlay/CategoryPoll.tsx";
 import { VoteToasts } from "../overlay/VoteToasts.tsx";
+import { ClashOutro, type ClashOutroData } from "../overlay/ClashOutro.tsx";
 import { Avatar } from "../ui/Avatar.tsx";
+
+/** How long the decided clash is held on screen before the next phase. */
+const OUTRO_MS = 1400;
 
 function TopSupporters({ supporters }: { supporters: SessionState["live"]["supporters"] }): ReactNode {
   const { t } = useI18n();
@@ -106,6 +110,51 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
   const show = state?.show;
   useSound(state);
 
+  // Clash outro: when the show leaves the "match" phase, hold the just-decided
+  // clash on screen for a beat (the loser drops, the winner flares) before the
+  // next phase takes over. The result record is verified against the clash we
+  // last rendered so a stale result (e.g. a skipped bye) never triggers it.
+  const [outro, setOutro] = useState<{ data: ClashOutroData; id: number } | null>(null);
+  const prevPhaseRef = useRef<ShowPhase | null>(null);
+  const lastMatchRef = useRef<{ round: RoundId; a: string | null; b: string | null } | null>(null);
+  const outroTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const outroIdRef = useRef(0);
+  useEffect(() => {
+    const phase = show?.phase ?? null;
+    const match = state ? activeMatch(state) : null;
+    if (phase === "match" && match) {
+      lastMatchRef.current = { round: match.round, a: match.a, b: match.b };
+    }
+    const prev = prevPhaseRef.current;
+    prevPhaseRef.current = phase;
+    const result = show?.result ?? null;
+    if (prev === "match" && phase !== "match" && result && result.winner) {
+      const last = lastMatchRef.current;
+      if (last && result.round === last.round && result.a === last.a && result.b === last.b) {
+        outroIdRef.current += 1;
+        const id = outroIdRef.current;
+        setOutro({
+          id,
+          data: {
+            round: result.round,
+            a: result.a,
+            b: result.b,
+            winner: result.winner,
+            votesA: result.votesA,
+            votesB: result.votesB,
+          },
+        });
+        if (outroTimerRef.current) clearTimeout(outroTimerRef.current);
+        outroTimerRef.current = setTimeout(() => {
+          setOutro((current) => (current && current.id === id ? null : current));
+        }, OUTRO_MS);
+      }
+    }
+  }, [state, show?.phase, show?.result]);
+  useEffect(() => () => {
+    if (outroTimerRef.current) clearTimeout(outroTimerRef.current);
+  }, []);
+
   if (!state || !show) {
     return (
       <div className="overlay-root grid h-screen place-items-center bg-ink text-white/50">
@@ -121,10 +170,14 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
 
   let body: ReactNode;
 
-  if (show.phase === "category") {
+  if (outro) {
+    body = <ClashOutro key={outro.id} state={state} data={outro.data} variant="overlay" durationMs={OUTRO_MS} />;
+  } else if (show.phase === "category") {
     body = (
       <div key="category" className="animate-view-in flex h-full w-full items-center justify-center p-4">
-        <CategoryPoll state={state} />
+        <div className="flex h-full w-full flex-col rounded-2xl border border-line/60 bg-ink/95 p-3 shadow-2xl">
+          <CategoryPoll state={state} />
+        </div>
       </div>
     );
   } else if (show.phase === "round-intro" && match) {
@@ -154,7 +207,7 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
   } else if (show.phase === "match") {
     body = (
       <div key="match" className="flex h-full w-full items-center justify-center p-2">
-        <div className="animate-match-in flex h-full w-full flex-col rounded-2xl border border-line/60 bg-ink/90 p-3 shadow-2xl backdrop-blur-sm">
+        <div className="animate-match-in flex h-full w-full flex-col rounded-2xl border border-line/60 bg-ink/95 p-3 shadow-2xl backdrop-blur-sm">
           <Stage state={state} variant="overlay" />
         </div>
       </div>
@@ -169,7 +222,7 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
         <h1 className="text-3xl font-black text-brand">{t("show.resultTitle")}</h1>
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
           <ResultSide item={a} votes={result.votesA} winner={result.winner === result.a} side="a" lang={lang} />
-          <div className="text-2xl font-black text-white/30">VS</div>
+          <div className="text-2xl font-black text-white">VS</div>
           <ResultSide item={b} votes={result.votesB} winner={result.winner === result.b} side="b" lang={lang} />
         </div>
         <div className="text-2xl font-black text-[color:var(--round)]">
@@ -191,7 +244,7 @@ export function Broadcast({ state }: { state: SessionState | null }): ReactNode 
     // overlay is useful without starting the automatic show.
     body = (
       <div key="live" className="flex h-full w-full items-center justify-center p-2">
-        <div className="animate-match-in flex h-full w-full flex-col rounded-2xl border border-line/60 bg-ink/90 p-3 shadow-2xl backdrop-blur-sm">
+        <div className="animate-match-in flex h-full w-full flex-col rounded-2xl border border-line/60 bg-ink/95 p-3 shadow-2xl backdrop-blur-sm">
           <Stage state={state} variant="overlay" />
         </div>
       </div>

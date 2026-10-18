@@ -26,7 +26,7 @@ import {
   roundIndexFor,
   type HandledEffectKey,
 } from "../shared/config.ts";
-import { matchCategory, matchItem, normalize } from "../engine/matcher.ts";
+import { matchCategory, matchItem, normalize, pollNumber } from "../engine/matcher.ts";
 import { cacheAvatar } from "./avatars.ts";
 import { saveLiveConfig, type LiveConfig } from "./liveConfig.ts";
 import { loadManifest } from "./manifest.ts";
@@ -118,21 +118,24 @@ export class Session {
   private static mergeSettings(saved: SessionState | null): Settings {
     const base: Settings = {
       ...DEFAULT_SETTINGS,
-      sound: { ...DEFAULT_SETTINGS.sound, trackVolume: { ...DEFAULT_SETTINGS.sound.trackVolume } },
+      sound: { ...DEFAULT_SETTINGS.sound },
     };
     if (!saved?.settings) return base;
     const merged: Settings = {
       ...base,
       ...saved.settings,
-      sound: {
-        ...base.sound,
-        ...saved.settings.sound,
-        trackVolume: { ...base.sound.trackVolume, ...saved.settings.sound?.trackVolume },
-      },
+      sound: { ...base.sound, ...saved.settings.sound },
     };
     // Migrate older saved values (e.g. showBackground was "transparent" | "dark").
     if (!/^#[0-9a-f]{6}$/i.test(merged.showBackground)) merged.showBackground = base.showBackground;
     if (typeof merged.bracketPace !== "number" || !Number.isFinite(merged.bracketPace)) merged.bracketPace = base.bracketPace;
+    if (typeof merged.bracketZoom !== "number" || !Number.isFinite(merged.bracketZoom)) merged.bracketZoom = base.bracketZoom;
+    // Drop music settings retired when the app moved to upload-only sound.
+    const sound = merged.sound as unknown as Record<string, unknown>;
+    delete sound.music;
+    delete sound.musicEnabled;
+    delete sound.musicTrack;
+    delete sound.trackVolume;
     const stale = merged as unknown as Record<string, unknown>;
     delete stale.safeTopPct;
     delete stale.safeBottomPct;
@@ -373,7 +376,7 @@ export class Session {
   /** Launch a standalone category vote: auto-picks candidates, winner starts its tournament. */
   startPoll(): void {
     if (this.state.show.active) this.stopShow();
-    this.startShow(this.pickCandidates(8));
+    this.startShow(this.pickCandidates(5));
   }
 
   /** Shuffle the categories and take up to `count` as the poll's candidate set. */
@@ -397,6 +400,7 @@ export class Session {
     this.clearSideEffects();
     this.demoOrder = null;
     this.demoIndex = 0;
+    this.clearQueueOverrides();
     this.state.show.active = false;
     this.state.show.paused = false;
     this.state.show.phase = "idle";
@@ -465,11 +469,24 @@ export class Session {
     this.emit();
   }
 
-  /** The categories a vote may target: the offered set, or all when none was set. */
+  /**
+   * The categories a vote may target, in the exact order they are shown on the
+   * poll (so a typed number maps to the same candidate the viewer sees).
+   */
   private candidateCategories(): Category[] {
     const ids = this.state.show.categoryCandidates;
     if (ids.length === 0) return this.state.categories;
-    return this.state.categories.filter((c) => ids.includes(c.id));
+    return ids
+      .map((id) => this.category(id))
+      .filter((c): c is Category => Boolean(c));
+  }
+
+  /** The category a voter already picked on the current poll, if any. */
+  private categoryChoiceOf(key: string): string | null {
+    for (const [categoryId, list] of Object.entries(this.state.show.categoryVoterList)) {
+      if (list.some((voter) => voter.id === key)) return categoryId;
+    }
+    return null;
   }
 
   private resolveCategoryVote(): string | null {
@@ -527,6 +544,10 @@ export class Session {
       this.beginRoundIntro();
       return;
     }
+    if (!this.state.settings.showBracketIntro) {
+      this.endBracketIntro();
+      return;
+    }
     this.state.show.phase = "bracket-intro";
     this.setShowPhaseTimer(this.bracketPhaseMs(this.state.settings.bracketIntroSeconds));
     this.emit();
@@ -540,6 +561,10 @@ export class Session {
   }
 
   private beginBracketOutro(): void {
+    if (!this.state.settings.showBracketOutro) {
+      this.beginResult();
+      return;
+    }
     this.state.show.phase = "bracket-outro";
     this.setShowPhaseTimer(this.bracketPhaseMs(this.state.settings.bracketOutroSeconds));
     this.emit();
@@ -547,6 +572,10 @@ export class Session {
 
   private beginRoundRecap(): void {
     this.pendingRoundRecap = false;
+    if (!this.state.settings.showRoundRecap) {
+      this.beginBracketIntro();
+      return;
+    }
     this.state.show.phase = "round-recap";
     this.log("round", "Round recap.");
     this.setShowPhaseTimer(this.bracketPhaseMs(this.state.settings.roundRecapSeconds));
@@ -1366,17 +1395,39 @@ export class Session {
   chatVote(text: string, viewer: string, voter?: PollVoter): void {
     const who: PollVoter = voter ?? { id: normalize(viewer) || "anonymous", name: viewer || "Viewer", avatar: "" };
     if (this.state.show.active && this.state.show.phase === "category") {
-      const categoryId = matchCategory(text, this.candidateCategories());
+      const candidates = this.candidateCategories();
+      const picked = pollNumber(text, candidates.length);
+      const categoryId = picked ? candidates[picked - 1]?.id ?? null : matchCategory(text, candidates);
       if (!categoryId) return;
       const key = normalize(viewer) || "anonymous";
-      if (this.state.settings.dedupeChat && this.state.show.categoryVoters.includes(key)) return;
+      const dedupe = this.state.settings.dedupeChat;
+      const previous = dedupe ? this.categoryChoiceOf(key) : null;
+      if (dedupe && previous) {
+        // One vote per viewer, but with `allowVoteChange` a returning voter can
+        // switch: drop the old pick, then re-add below.
+        if (previous === categoryId || !this.state.settings.allowVoteChange) return;
+        const rest = (this.state.show.categoryVoterList[previous] ?? []).filter((v) => v.id !== key);
+        if (rest.length > 0) this.state.show.categoryVoterList[previous] = rest;
+        else delete this.state.show.categoryVoterList[previous];
+        this.state.show.categoryVotes[previous] = Math.max(
+          0,
+          (this.state.show.categoryVotes[previous] ?? 0) - this.state.settings.chatWeight,
+        );
+      } else if (dedupe && this.state.show.categoryVoters.includes(key)) {
+        return;
+      }
       this.state.show.categoryVotes[categoryId] =
         (this.state.show.categoryVotes[categoryId] ?? 0) + this.state.settings.chatWeight;
-      this.state.show.categoryVoters.push(key);
+      if (!this.state.show.categoryVoters.includes(key)) this.state.show.categoryVoters.push(key);
       const list = this.state.show.categoryVoterList[categoryId] ?? [];
       list.push(who);
       this.state.show.categoryVoterList[categoryId] = list;
-      this.log("vote", `${viewer} voted category ${this.category(categoryId)?.name ?? categoryId}`);
+      this.log(
+        "vote",
+        previous && previous !== categoryId
+          ? `${viewer} switched category vote to ${this.category(categoryId)?.name ?? categoryId}`
+          : `${viewer} voted category ${this.category(categoryId)?.name ?? categoryId}`,
+      );
       this.emit();
       return;
     }
@@ -1394,7 +1445,12 @@ export class Session {
       this.applyBoost(match, itemId, this.state.settings.chatWeight);
       const side = sideOf(match, itemId);
       if (side) this.recordVote(who, side);
-      this.log("vote", `${viewer} voted for ${this.item(itemId)?.name ?? itemId}`);
+      this.log(
+        "vote",
+        result.reason === "changed"
+          ? `${viewer} switched vote to ${this.item(itemId)?.name ?? itemId}`
+          : `${viewer} voted for ${this.item(itemId)?.name ?? itemId}`,
+      );
       this.emit();
     }
   }
@@ -1551,17 +1607,30 @@ export class Session {
   }
 
   updateSettings(patch: Partial<SessionState["settings"]>): void {
+    const seconds = patch.roundSeconds;
+    let nextByRound: Settings["roundSecondsByRound"] | null = null;
+    if (seconds !== undefined && patch.roundSecondsByRound === undefined) {
+      nextByRound = { r16: seconds, qf: seconds, sf: seconds, final: seconds };
+    } else if (patch.roundSecondsByRound) {
+      nextByRound = { ...this.state.settings.roundSecondsByRound, ...patch.roundSecondsByRound };
+    }
     this.state.settings = {
       ...this.state.settings,
       ...patch,
-      ...(patch.roundSecondsByRound
-        ? { roundSecondsByRound: { ...this.state.settings.roundSecondsByRound, ...patch.roundSecondsByRound } }
-        : {}),
+      ...(nextByRound ? { roundSecondsByRound: nextByRound } : {}),
     };
-    // A live simulator picks up a new tick speed immediately.
+    if (nextByRound) this.clearQueueOverrides();
     if (this.state.simulated && patch.simIntervalMs !== undefined) this.rearmSimulator();
     this.persist();
     this.emit();
+  }
+
+  private clearQueueOverrides(): void {
+    if (!this.state.queue.some((entry) => entry.roundSecondsOverride !== undefined)) return;
+    this.state.queue = this.state.queue.map((entry) =>
+      entry.roundSecondsOverride === undefined ? entry : { categoryId: entry.categoryId },
+    );
+    this.persist();
   }
 
   updateSound(patch: Partial<SoundSettings>): void {
@@ -1587,7 +1656,6 @@ export class Session {
       ...this.state.settings,
       autoNextMatch: true,
       autoNextTournament: true,
-      roundSecondsByRound: { r16: round, qf: round, sf: round, final: round },
     };
     this.state.queue = ids.map((categoryId) => ({ categoryId, roundSecondsOverride: round }));
     this.state.queueIndex = 0;
@@ -1621,6 +1689,44 @@ export class Session {
     this.advanceDemo();
   }
 
+  /**
+   * Offline rehearsal: one full 16-item tournament at the real per-round
+   * timings, simulator on, starting from the category vote so the whole show
+   * flow (cinematics included) can be watched before going live. Stops at the
+   * champion instead of rolling into the next category.
+   */
+  startRehearsal(categoryId?: string): void {
+    const chosen =
+      (categoryId ? this.category(categoryId) : null) ??
+      this.state.categories
+        .toSorted((a, b) => b.items.filter((i) => i.image).length - a.items.filter((i) => i.image).length)
+        .find((c) => c.items.length > 0) ??
+      this.state.categories[0];
+    if (!chosen) {
+      this.log("error", "No category to rehearse.");
+      this.emit();
+      return;
+    }
+    this.stopTimer();
+    this.clearShowTimer();
+    this.setSimulated(true);
+    this.state.settings = { ...this.state.settings, autoNextMatch: true, autoNextTournament: false };
+    this.state.queue = [{ categoryId: chosen.id }];
+    this.state.queueIndex = 0;
+    this.state.tournament = null;
+    this.state.matchEndsAt = null;
+    this.demoOrder = [chosen.id];
+    this.demoIndex = 0;
+    this.showRound = null;
+    this.pendingRoundRecap = false;
+    this.showFallbackCategory = chosen.id;
+    this.state.show.active = true;
+    this.state.show.paused = false;
+    this.state.status = "running";
+    this.log("info", `Rehearsal: ${chosen.name} at real timings.`);
+    this.beginCategoryVote([chosen.id]);
+  }
+
   reset(): void {
     this.stopTimer();
     this.clearShowTimer();
@@ -1629,6 +1735,7 @@ export class Session {
     this.setSimulated(false);
     this.demoOrder = null;
     this.demoIndex = 0;
+    this.clearQueueOverrides();
     this.state.tournament = null;
     this.state.matchEndsAt = null;
     this.state.stageView = "match";
@@ -1771,6 +1878,11 @@ export class Session {
       case "demo:start": {
         const arg = payload as { seconds?: number; categories?: string[]; single?: boolean } | undefined;
         this.startDemo(arg?.seconds ?? 2, arg?.categories, arg?.single);
+        break;
+      }
+      case "rehearsal:start": {
+        const arg = payload as { categoryId?: string } | undefined;
+        this.startRehearsal(arg?.categoryId);
         break;
       }
       case "session:reset":

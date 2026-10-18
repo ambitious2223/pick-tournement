@@ -1,13 +1,15 @@
-import { useState, type ReactNode } from "react";
+import { useState, type ChangeEvent, type ReactNode } from "react";
 import type { Category, Item } from "../../shared/types.ts";
 import { TextInput, Button } from "../ui/primitives.tsx";
-import { ImageCropModal } from "../ui/ImageCropModal.tsx";
+import { ImageCropModal, type CropOutcome } from "../ui/ImageCropModal.tsx";
 import { ItemVisual } from "../overlay/ItemVisual.tsx";
 import { send, uploadImage, fetchImageFromUrl } from "../lib/live.ts";
+import { prepareImageFile } from "../lib/heic.ts";
 import { slug } from "../lib/slug.ts";
 import { useI18n } from "../i18n/index.tsx";
 
 const MAX_ITEMS = 16;
+const ACCEPT = "image/png,image/jpeg,image/webp,image/gif,image/avif,image/heic,image/heif,.heic,.heif";
 
 function blankItem(index: number): Item {
   return { id: `new-${Date.now().toString(36)}-${index}`, name: "", aliases: [] };
@@ -58,15 +60,30 @@ export function CategoryEditor({
     setDraft({ ...draft, items: draft.items.filter((item) => item.id !== id) });
   };
 
-  const uploadFor = async (id: string, file: File): Promise<void> => {
+  const uploadFor = async (id: string, outcome: CropOutcome): Promise<void> => {
     setBusyId(id);
     setError(null);
     try {
-      const url = await uploadImage(file);
+      const url = await uploadImage(outcome.file);
       setItem(id, { image: url });
       setCropFor(null);
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const onPick = async (id: string, e: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = e.target.files?.[0] ?? null;
+    e.target.value = "";
+    if (!file) return;
+    setError(null);
+    setBusyId(id);
+    try {
+      setCropFor({ id, file: await prepareImageFile(file) });
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setBusyId(null);
     }
@@ -190,16 +207,14 @@ export function CategoryEditor({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <label className="cursor-pointer rounded-lg border border-line px-2 py-0.5 text-[0.65rem] text-white/60 transition hover:border-brand">
+                  <label className="relative inline-flex cursor-pointer items-center rounded-lg border border-line px-2 py-0.5 text-[0.65rem] font-semibold text-white/70 transition hover:border-brand hover:text-brand">
                     {busy ? "…" : t("content.uploadPhoto")}
                     <input
                       type="file"
-                      accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) setCropFor({ id: item.id, file });
-                      }}
+                      accept={ACCEPT}
+                      disabled={busy}
+                      onChange={(e) => void onPick(item.id, e)}
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     />
                   </label>
                   <button
@@ -262,9 +277,10 @@ export function CategoryEditor({
       </div>
       {cropFor ? (
         <ImageCropModal
-          file={cropFor.file}
+          source={{ kind: "file", file: cropFor.file }}
           onCancel={() => setCropFor(null)}
-          onDone={(cropped) => void uploadFor(cropFor.id, cropped)}
+          onDone={(outcome) => void uploadFor(cropFor.id, outcome)}
+          uploadError={error}
           busy={busyId === cropFor.id}
         />
       ) : null}

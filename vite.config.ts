@@ -20,5 +20,7 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    // The HEIC decoder is intentionally a large, lazily-loaded chunk.
+    chunkSizeWarningLimit: 4000,
   },
 });

@@ -5,10 +5,11 @@ import { ErrorBoundary } from "./ui/ErrorBoundary.tsx";
 import { Control } from "./control/Control.tsx";
 import { Studio } from "./studio/Studio.tsx";
 import { Debug } from "./debug/Debug.tsx";
+import { Setup } from "./pages/Setup.tsx";
 import { Broadcast } from "./broadcast/Broadcast.tsx";
 import { useI18n } from "./i18n/index.tsx";
 
-const ROUTES = ["/control", "/studio", "/debug", "/overlay", "/show"] as const;
+const ROUTES = ["/control", "/studio", "/debug", "/setup", "/overlay", "/show"] as const;
 
 function routeFor(pathname: string): string {
   const clean = pathname.replace(/\/+$/, "") || "/";
@@ -63,6 +64,7 @@ export function App(): ReactNode {
           {route === "/control" ? <Control state={state} /> : null}
           {route === "/studio" ? <Studio state={state} /> : null}
           {route === "/debug" ? <Debug state={state} /> : null}
+          {route === "/setup" ? <Setup /> : null}
         </ErrorBoundary>
       </main>
     </div>
@@ -74,6 +76,7 @@ function TopNav({ route }: { route: string }): ReactNode {
   const links = [
     { href: "/control", label: t("nav.control") },
     { href: "/studio", label: t("nav.studio") },
+    { href: "/setup", label: t("nav.setup") },
   ];
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-ink/85 backdrop-blur">

@@ -2,27 +2,23 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import type { SessionState, SoundSettings } from "../../shared/types.ts";
 import { Toggle, Button } from "../ui/primitives.tsx";
 import { send } from "../lib/live.ts";
-import { CUE_IDS } from "../sound/cues.ts";
+import { CUE_GROUPS, type CueDef } from "../sound/catalog.ts";
 import { sound } from "../sound/manager.ts";
-import { MusicLibrary } from "../sound/MusicLibrary.tsx";
 import { SoundStatusLine, enableSound } from "../sound/SoundStatus.tsx";
 import { useI18n, type TKey } from "../i18n/index.tsx";
 
 const patch = (p: Partial<SoundSettings>): void => void send("sound:update", p);
 
-const GROUPS: { key: TKey; cues: string[] }[] = [
-  { key: "sound.grp.category", cues: ["category.start", "category.vote", "category.winner"] },
-  { key: "sound.grp.round", cues: ["round.intro"] },
-  {
-    key: "sound.grp.bracket",
-    cues: ["bracket.intro", "bracket.focus", "bracket.zoom.in", "bracket.reveal", "bracket.loser", "bracket.tension", "bracket.outro", "bracket.winner"],
-  },
-  { key: "sound.grp.match", cues: ["match.countdown", "match.start", "match.tick", "match.suddenDeath", "match.end"] },
-  { key: "sound.grp.votes", cues: ["vote.chat", "vote.gift.small", "vote.gift.medium", "vote.gift.large", "vote.lead"] },
-  { key: "sound.grp.result", cues: ["result.win", "result.lose"] },
-  { key: "sound.grp.champion", cues: ["champion.win", "champion.reveal", "champion.supporter"] },
-  { key: "sound.grp.live", cues: ["live.like", "live.follow", "live.share", "live.subscribe", "live.member"] },
-];
+const GROUP_LABEL: Record<string, TKey> = {
+  category: "sound.grp.category",
+  round: "sound.grp.round",
+  bracket: "sound.grp.bracket",
+  match: "sound.grp.match",
+  votes: "sound.grp.votes",
+  result: "sound.grp.result",
+  champion: "sound.grp.champion",
+  live: "sound.grp.live",
+};
 
 function Slider({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }): ReactNode {
   return (
@@ -40,8 +36,24 @@ function Slider({ label, value, onChange }: { label: string; value: number; onCh
   );
 }
 
-export function SoundControls({ state }: { state: SessionState }): ReactNode {
+/** The everyday sound controls: mute and one master volume slider. */
+export function SoundQuickControls({ state }: { state: SessionState }): ReactNode {
   const { t } = useI18n();
+  const s = state.settings.sound;
+
+  return (
+    <section className="panel flex flex-col gap-2 p-3">
+      <div className="text-[0.7rem] font-bold uppercase tracking-widest text-brand">{t("sound.title")}</div>
+      <Toggle label={t("sound.muted")} checked={s.muted} onChange={(v) => patch({ muted: v })} />
+      <Slider label={t("sound.master")} value={s.master} onChange={(v) => patch({ master: v })} />
+      <p className="text-[0.6rem] leading-relaxed text-white/40">{t("sound.quickHint")}</p>
+    </section>
+  );
+}
+
+/** The full setup screen: buses and every cue's upload / preview / remove. */
+export function SoundAdvanced({ state }: { state: SessionState }): ReactNode {
+  const { t, lang } = useI18n();
   const s: SoundSettings = state.settings.sound;
   const [custom, setCustom] = useState<Set<string>>(() => new Set());
   const [busy, setBusy] = useState<string | null>(null);
@@ -104,7 +116,6 @@ export function SoundControls({ state }: { state: SessionState }): ReactNode {
       await fetch(`/api/sounds/${encodeURIComponent(id)}`, { method: "DELETE" });
       await sound.refreshOverrides();
       await loadCustom();
-      preview(id);
     } catch {
       /* ignore */
     } finally {
@@ -112,63 +123,78 @@ export function SoundControls({ state }: { state: SessionState }): ReactNode {
     }
   };
 
-  const row = (id: string): ReactNode => {
+  const row = (cue: CueDef): ReactNode => {
+    const id = cue.id;
     const off = s.disabledCues.includes(id);
     const isCustom = custom.has(id);
+    const when = lang === "ar" ? cue.when.ar : cue.when.en;
+    const what = lang === "ar" ? cue.what.ar : cue.what.en;
     return (
       <div
         key={id}
-        className={`flex items-center gap-1.5 rounded-md border px-2 py-1.5 text-[0.65rem] ${
+        className={`flex flex-col gap-1 rounded-md border px-2 py-1.5 ${
           off ? "border-line bg-ink-2/40 opacity-50" : "border-line bg-ink-2"
         }`}
       >
-        <button type="button" onClick={() => toggleCue(id)} className="min-w-0 flex-1 truncate text-start" title={id}>
-          {id}
-        </button>
-        <span className={`shrink-0 rounded px-1 py-0.5 text-[0.55rem] ${isCustom ? "bg-brand/20 text-brand" : "text-white/30"}`}>
-          {isCustom ? t("sound.customBadge") : t("sound.builtinBadge")}
-        </span>
-        <button type="button" onClick={() => preview(id)} className="shrink-0 text-white/50 hover:text-brand" title={t("sound.preview")}>
-          ▶
-        </button>
-        <label
-          className="shrink-0 cursor-pointer text-white/50 hover:text-brand"
-          title={isCustom ? t("sound.replace") : t("sound.upload")}
-        >
-          {busy === id ? "…" : "⬆"}
-          <input
-            type="file"
-            accept="audio/mpeg,audio/mp3,audio/ogg,audio/wav,audio/x-wav,audio/webm,audio/mp4,audio/x-m4a,.mp3,.ogg,.wav,.webm,.m4a"
-            className="hidden"
-            onChange={(e) => {
-              void upload(id, e.target.files?.[0]);
-              e.target.value = "";
-            }}
-          />
-        </label>
-        {isCustom ? (
-          <button type="button" onClick={() => void reset(id)} className="shrink-0 text-white/50 hover:text-hot" title={t("sound.resetBuiltin")}>
-            ↺
+        <div className="flex items-center gap-1.5 text-[0.65rem]">
+          <button type="button" onClick={() => toggleCue(id)} className="min-w-0 flex-1 truncate text-start font-semibold" title={id}>
+            {id}
           </button>
-        ) : null}
+          <span
+            className={`shrink-0 rounded px-1 py-0.5 text-[0.55rem] ${
+              isCustom ? "bg-lime/20 text-lime" : "bg-hot/15 text-hot"
+            }`}
+          >
+            {isCustom ? t("sound.uploadedBadge") : t("sound.missingBadge")}
+          </span>
+          <button
+            type="button"
+            onClick={() => preview(id)}
+            disabled={!isCustom}
+            className="shrink-0 text-white/50 hover:text-brand disabled:opacity-25"
+            title={t("sound.preview")}
+          >
+            ▶
+          </button>
+          <label
+            className="shrink-0 cursor-pointer text-white/50 hover:text-brand"
+            title={isCustom ? t("sound.replace") : t("sound.upload")}
+          >
+            {busy === id ? "…" : "⬆"}
+            <input
+              type="file"
+              accept="audio/mpeg,audio/mp3,audio/ogg,audio/wav,audio/x-wav,audio/webm,audio/mp4,audio/x-m4a,.mp3,.ogg,.wav,.webm,.m4a"
+              className="hidden"
+              onChange={(e) => {
+                void upload(id, e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </label>
+          {isCustom ? (
+            <button type="button" onClick={() => void reset(id)} className="shrink-0 text-white/50 hover:text-hot" title={t("sound.removeUpload")}>
+              ↺
+            </button>
+          ) : null}
+        </div>
+        <p className="text-[0.58rem] leading-snug text-white/40">
+          <span className="text-white/55">{when}</span>
+          <span className="mx-1 text-white/25">·</span>
+          {what}
+        </p>
       </div>
     );
   };
 
   return (
-    <section className="panel flex flex-col gap-3 p-3">
-      <div className="text-[0.7rem] font-bold uppercase tracking-widest text-brand">{t("sound.title")}</div>
+    <div className="flex flex-col gap-3">
       <SoundStatusLine settings={s} />
       <Toggle label={t("sound.muted")} checked={s.muted} onChange={(v) => patch({ muted: v })} />
-      <Toggle label={t("sound.musicEnabled")} checked={s.musicEnabled} onChange={(v) => patch({ musicEnabled: v })} />
       <div className="flex flex-col gap-1.5">
         <Slider label={t("sound.master")} value={s.master} onChange={(v) => patch({ master: v })} />
-        <Slider label={t("sound.music")} value={s.music} onChange={(v) => patch({ music: v })} />
         <Slider label={t("sound.sfx")} value={s.sfx} onChange={(v) => patch({ sfx: v })} />
         <Slider label={t("sound.voice")} value={s.voice} onChange={(v) => patch({ voice: v })} />
       </div>
-
-      <MusicLibrary settings={s} showVolume />
 
       <div className="mt-1 flex items-center justify-between gap-2 border-t border-line/60 pt-3">
         <span className="text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("sound.cuesTitle")}</span>
@@ -176,20 +202,17 @@ export function SoundControls({ state }: { state: SessionState }): ReactNode {
           {t("sound.test")}
         </Button>
       </div>
+      <p className="text-[0.6rem] leading-relaxed text-white/40">{t("sound.uploadHint")}</p>
       {msg ? <p className="text-[0.65rem] text-lime">{msg}</p> : null}
 
       <div className="flex flex-col gap-3">
-        {GROUPS.map((group) => {
-          const cues = group.cues.filter((id) => CUE_IDS.includes(id));
-          if (cues.length === 0) return null;
-          return (
-            <div key={group.key} className="flex flex-col gap-1">
-              <div className="text-[0.6rem] font-bold uppercase tracking-widest text-white/35">{t(group.key)}</div>
-              {cues.map((id) => row(id))}
-            </div>
-          );
-        })}
+        {CUE_GROUPS.map(({ group, cues }) => (
+          <div key={group} className="flex flex-col gap-1">
+            <div className="text-[0.6rem] font-bold uppercase tracking-widest text-white/35">{t(GROUP_LABEL[group] ?? "sound.grp.category")}</div>
+            {cues.map((cue) => row(cue))}
+          </div>
+        ))}
       </div>
-    </section>
+    </div>
   );
 }

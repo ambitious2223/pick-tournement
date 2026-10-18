@@ -1,31 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react";
-import type { Item, Match, RoundId, SessionState } from "../../shared/types.ts";
+import type { Item, Match, SessionState } from "../../shared/types.ts";
 import { bracketTension, ROUND_ORDER, roundIndexFor } from "../../shared/config.ts";
 import { useI18n } from "../i18n/index.tsx";
 import { activeCategory, getItem, itemName } from "../lib/selectors.ts";
 import { ItemVisual } from "../overlay/ItemVisual.tsx";
 import { useCinemaCamera, type CinemaMode } from "./useCinemaCamera.ts";
-
-const CARD_W = 13;
-const HALF = CARD_W / 2;
-const ROUND_MATCHES: Record<string, number> = { r16: 8, qf: 4, sf: 2, final: 1 };
-const X_LEFT = [7, 21, 35];
-const X_RIGHT = [93, 79, 65];
-
-/** Percentage slot (center) for a match in the mirrored bracket. */
-function slot(round: RoundId, index: number): { x: number; y: number } | null {
-  const depth = ROUND_ORDER.indexOf(round);
-  if (depth < 0 || index < 0) return null;
-  const count = ROUND_MATCHES[round] ?? 1;
-  if (round === "final") return { x: 50, y: 50 };
-  if (index >= count) return null;
-  const half = count / 2;
-  const left = index < half;
-  const local = left ? index : index - half;
-  const x = (left ? X_LEFT[depth] : X_RIGHT[depth]) ?? 50;
-  const y = ((local + 0.5) / half) * 100;
-  return { x, y };
-}
+import { CARD_W, HALF, X_LEFT, X_RIGHT, slot } from "./camera.ts";
 
 function CompRow({
   item,
@@ -85,10 +65,12 @@ export function BracketCinema({
   state,
   mode,
   variant = "overlay",
+  cinematic = false,
 }: {
   state: SessionState;
   mode: CinemaMode;
   variant?: "overlay" | "control";
+  cinematic?: boolean;
 }): ReactNode {
   const { t, lang, round } = useI18n();
   const tournament = state.tournament;
@@ -97,9 +79,12 @@ export function BracketCinema({
     mode === "intro" ? state.settings.bracketIntroSeconds : mode === "outro" ? state.settings.bracketOutroSeconds : state.settings.roundRecapSeconds;
   const durationMs = baseSeconds * 1000 * bracketTension(roundIndex) * (state.settings.bracketPace ?? 1);
   const activeKey = tournament ? `${tournament.currentRound}:${tournament.currentMatchIndex}:${mode}` : "none";
-  const { transform } = useCinemaCamera(activeKey, mode, roundIndex, durationMs);
+  const focus = tournament ? slot(tournament.currentRound, tournament.currentMatchIndex) : null;
+  const { transform } = useCinemaCamera(activeKey, mode, focus, durationMs, state.settings.bracketZoom ?? 3);
   const overlay = variant === "overlay";
-  const camera = overlay ? transform : "none";
+  const moving = overlay || cinematic;
+  const camera = moving ? transform : "none";
+  const transitionMs = Math.min(1200, Math.round(durationMs * 0.45));
 
   const [drawn, setDrawn] = useState(false);
   useEffect(() => {
@@ -146,7 +131,11 @@ export function BracketCinema({
     <div className={`relative h-full w-full overflow-hidden round-${tournament.currentRound}`}>
       <div
         className="absolute inset-0"
-        style={{ transform: camera, transition: overlay ? "transform 1.2s cubic-bezier(0.22,1,0.36,1)" : undefined }}
+        style={{
+          transform: camera,
+          transition: moving ? `transform ${transitionMs}ms cubic-bezier(0.22,1,0.36,1)` : undefined,
+          willChange: moving ? "transform" : undefined,
+        }}
       >
         <div className="relative h-full w-full">
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">

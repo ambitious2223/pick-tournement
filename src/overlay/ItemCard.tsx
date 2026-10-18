@@ -56,7 +56,7 @@ export function ItemCard({
   }, [votes]);
 
   return (
-    <div className={`animate-rise relative flex w-full min-w-0 flex-col items-center gap-2 ${dim ? "opacity-40" : ""}`}>
+    <div className={`relative flex w-full min-w-0 flex-col items-center gap-2 ${dim ? "opacity-40" : ""}`}>
       <div className={`relative shrink-0 ${size}`}>
         <div className={`h-full w-full overflow-hidden rounded-xl ring-2 ${ring} ${glow}`}>
           <ItemVisual item={item} className="h-full w-full" emojiClassName={emojiClass} />
@@ -95,7 +95,7 @@ export function ItemCard({
           <span className="min-w-0 truncate font-semibold text-white/85">{gift.name}</span>
         </div>
       ) : null}
-      <div className="shadow-text mt-2 max-w-[16rem] truncate text-center font-black" style={{ fontSize: namePx }}>
+      <div className="shadow-text mt-2 line-clamp-2 w-full break-words text-center font-black leading-tight" style={{ fontSize: namePx }}>
         {item ? itemName(item, lang) : t("common.tbd")}
       </div>
       <div className="relative">

@@ -6,7 +6,7 @@ import { send } from "../lib/live.ts";
 import { slug } from "../lib/slug.ts";
 import { categoryName } from "../lib/selectors.ts";
 import { ItemRow } from "./ItemRow.tsx";
-import { ContentPanel } from "../control/ContentPanel.tsx";
+import { ContentPanel } from "./ContentPanel.tsx";
 import { useI18n } from "../i18n/index.tsx";
 
 function blankItems(): Item[] {
@@ -235,7 +235,7 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
         ) : null}
       </Panel>
 
-      <Panel title={t("control.content")} className="lg:col-span-2">
+      <Panel title={t("studio.content")} className="lg:col-span-2">
         <ContentPanel state={state} />
       </Panel>
     </div>

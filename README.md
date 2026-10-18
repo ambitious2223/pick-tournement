@@ -22,10 +22,11 @@ local **Tikora** hub — no TikTok login inside this app.
   content set — its own categories and its own play queue. Arabic is the default library; the
   English library starts empty. Switching language stops a running show first, so a bracket never
   points at the other library's competitors.
-- **Content Studio and a Content tab** — create and edit categories as visual cards (a photo tile
-  per competitor); browse them in Control → Content with per-category photo coverage, a Fetch photos
-  button, and removal of a whole category or of individual competitors. A **Debug console** covers
-  injecting votes, the Live connection and the Sound & Music mixer.
+- **Content Studio and a Queue tab** — create and edit categories as visual cards (a photo tile per
+  competitor) in Studio, then line up the next categories in Control → Queue. A **Debug console**
+  covers injecting votes, the Live connection, photos, timings, the event log and raw state.
+- **A plain-language Setup guide** at `/setup`, linked from the top bar, walks through the one-time
+  setup and the everyday controls.
 - Categories live in `data/categories/`, each tagged with its language (`lang`) and its own chat
   aliases.
 
@@ -36,8 +37,9 @@ seeds the categories, downloads free photos once, builds the app, starts **one s
 (`127.0.0.1:8787`) and opens the Control room in a new tab. Skip the browser with `PL_NO_BROWSER=1`,
 or the one-time photo fetch with `PL_NO_PHOTOS=1`.
 
-**First time?** Open the Control room, put categories in the queue, then press **Start** and watch
-the show window at `/overlay`.
+**First time?** Open the Control room, put categories in the queue, then press **Start show** on the
+**Run** tab and watch the show window at `/overlay`. The in-app **Guide** at `/setup` lists the same
+steps with the current buttons.
 
 Or by hand:
 
@@ -50,20 +52,21 @@ npm run serve         # one server on http://127.0.0.1:8787
 ```
 
 - Control room → `/control` · Show window → `/overlay` (alias `/show`)
-- Content Studio → `/studio` · Debug console → `/debug`
+- Setup guide → `/setup` · Content Studio → `/studio` · Debug console → `/debug`
 
 ## The show window
 
 `/overlay` (also `/show`) runs the whole show and is the only page that plays sound, so the Control
 room never doubles the audio. It has a solid background whose color you pick live from the hue
-wheel on the Control **Show** tab (default near-black).
+wheel in **Control → Settings → Appearance** (default near-black).
 
-Open `http://127.0.0.1:8787/overlay` in the window you capture, then **Control → Show → Start**.
+Open `http://127.0.0.1:8787/overlay` in the window you capture, then press **Control → Run → Start
+show**.
 
 Between matches the overlay alternates with a **bracket cinematic** — it zooms into the live match,
-then pulls back out after the result — paced from **Control → Simulator → Bracket pacing** (intro /
-outro / recap length and the overall speed). The on-screen voting instructions are **off by
-default**; turn them back on under **Control → Settings → Show voting instructions**.
+then pulls back out after the result — paced from **Control → Settings → Advanced → Show look &
+pacing** (intro / outro / recap length and the overall speed). The on-screen voting instructions are
+**off by default**; turn them back on under **Control → Settings → Show voting instructions**.
 
 ## Connecting to TikTok Live (via Tikora)
 
@@ -96,21 +99,59 @@ Nothing cosmetic, sound or host-side is declared — gameplay only. Build the li
 `scripts/manifest.ts` and run **`npm run manifest`**; tests fail if the file, the effect list and
 the handlers disagree, and `npm run smoke` proves each effect changes the match as claimed.
 
-No Tikora? Open **Control → Simulator**. It has the simulated crowd plus its own controls: how many
-votes per tick and how fast, the gift chance, **Start/Stop the automatic show**, one-tap **Demo 1 /
-Demo all** (which run the whole show, cinematic included), a **Stage size** slider (photos + text on
-the show window) and the **bracket pacing**.
+No Tikora? Open **Control → Simulator**. It has the simulated crowd, how many votes per tick and how
+fast, the gift chance, and one-tap **Demo 1 / Demo all / Rehearsal** (which run the whole show,
+cinematic included) so you can preview everything offline. The show itself starts from **Run**;
+stage size and bracket pacing live in **Settings → Advanced**.
 
-## Sound & music
+## Sound effects (upload only)
 
-Web Audio mixer with **Master / Music / SFX / Voice** buses, a reverb send, procedural cues and a
-**10-track music library**.
+Pick League has **no built-in tones any more**. Every cue stays silent until you upload a file for
+it; **Settings → Advanced → Sound files** shows each one as **Missing** or **Uploaded**. Cues are
+short effects — mp3, ogg, wav, webm or m4a (≤ 8 MB) — uploaded there, landing in gitignored
+`data/sounds/<id>.<ext>` and served at `/sounds/…`. Each cue plays through the SFX bus with a gentle
+fade in/out, is rate-limited where noted, and can be muted per cue or previewed.
 
-- Tune it in **Debug → Sound & Music** (bus sliders, per-cue on/off, per-track volume, Preview) or
-  pick the background track in **Control → Sound**. Settings apply live and persist.
-- Replace any built-in cue with **`data/sounds/<cue>.mp3|ogg|wav|webm`** (gitignored, served at
-  `/sounds/…`).
-- Broadcast page only — press **🔊 Tap to enable sound** once.
+After the one-time setup, everyday sound lives on the **Run** tab: mute and the master volume
+slider. The other buses (**SFX / Voice**) stay in Settings → Advanced. The broadcast page is the
+only page that plays audio — press **🔊 Tap to enable sound** once.
+
+| Cue id | When it plays | What it should be |
+| --- | --- | --- |
+| `category.start` | the show opens the “vote for the next category” screen | rising, welcoming sting (~1.2s) |
+| `category.vote` | each chat message that votes for a category | quick, soft tick |
+| `category.winner` | the category vote closes and a category is chosen | short uplifting 3-note flourish |
+| `round.intro` | a new round is announced (Round of 16 → Final) | tension riser that grows each round |
+| `bracket.intro` | the bracket cinematic starts (zoom-in) | energetic whoosh |
+| `bracket.focus` | the camera settles on the live match | small tick |
+| `bracket.zoom.in` | during the bracket zoom into the live match | rising sweep |
+| `bracket.reveal` | the cinematic reveals the next match / outcome | bright 4-note hit |
+| `bracket.loser` | a competitor is eliminated in the bracket | soft descending thud |
+| `bracket.tension` | later rounds only (semis/final) during the bracket | heartbeat pulse |
+| `bracket.outro` | the bracket cinematic winds down (zoom-out) | smooth wind-down |
+| `bracket.winner` | the bracket advances a winner | warm 2-note confirmation |
+| `match.countdown` | the 3-2-1 just before a match goes live | short countdown beep |
+| `match.start` | a match goes live | bright triple chirp with a kick |
+| `match.tick` | each of the last 10 seconds | short clock tick |
+| `match.suddenDeath` | a tie triggers sudden death | low dramatic stab |
+| `match.end` | the match clock ends | closing impact |
+| `vote.chat` | every chat vote during a match (rate-limited) | tiny blip |
+| `vote.gift.small` | a small gift (under 10 coins) | cheerful 2-note sparkle |
+| `vote.gift.medium` | a medium gift (10–49 coins) | 3-note riff |
+| `vote.gift.large` | a big gift (50+ coins) | big 4-note fanfare |
+| `vote.lead` | the vote lead changes sides | rising 2-note alert |
+| `result.win` | the result screen appears | uplifting 4-note run |
+| `result.lose` | the losing side is shown | soft descending tone |
+| `champion.win` | a champion is crowned (also the “test sound” cue) | full victory fanfare |
+| `champion.reveal` | 0.8s after a champion is crowned | shimmer / sparkle |
+| `champion.supporter` | each top supporter is revealed on the final | bright ping |
+| `live.like` | viewers are liking (rate-limited) | soft marimba tick |
+| `live.follow` | a new follower | 2-note chime |
+| `live.share` | a viewer shares the stream | 2-note blip |
+| `live.subscribe` | a new subscriber | 4-note rise |
+| `live.member` | a new member joins (rate-limited) | single warm tone |
+
+The same list, with Arabic and English descriptions, is shown in the app next to every upload.
 
 ## How voting resolves
 

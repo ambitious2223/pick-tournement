@@ -334,6 +334,255 @@ body {
   animation: flash 0.5s ease-out forwards;
 }
 
+/* ---- clash entry: the two competitors lunge in from opposite edges ------ */
+
+@keyframes clash-in-a {
+  0% {
+    opacity: 0;
+    transform: translateX(-85%) rotate(-7deg) scale(1.08);
+  }
+  55% {
+    opacity: 1;
+    transform: translateX(4%) rotate(1.5deg) scale(0.98);
+  }
+  75% {
+    opacity: 1;
+    transform: translateX(-1.5%) rotate(-0.5deg) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+@keyframes clash-in-a-rtl {
+  0% {
+    opacity: 0;
+    transform: translateX(85%) rotate(7deg) scale(1.08);
+  }
+  55% {
+    opacity: 1;
+    transform: translateX(-4%) rotate(-1.5deg) scale(0.98);
+  }
+  75% {
+    opacity: 1;
+    transform: translateX(1.5%) rotate(0.5deg) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+@keyframes clash-in-b {
+  0% {
+    opacity: 0;
+    transform: translateX(85%) rotate(7deg) scale(1.08);
+  }
+  55% {
+    opacity: 1;
+    transform: translateX(-4%) rotate(-1.5deg) scale(0.98);
+  }
+  75% {
+    opacity: 1;
+    transform: translateX(1.5%) rotate(0.5deg) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+@keyframes clash-in-b-rtl {
+  0% {
+    opacity: 0;
+    transform: translateX(-85%) rotate(-7deg) scale(1.08);
+  }
+  55% {
+    opacity: 1;
+    transform: translateX(4%) rotate(1.5deg) scale(0.98);
+  }
+  75% {
+    opacity: 1;
+    transform: translateX(-1.5%) rotate(-0.5deg) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+}
+.animate-clash-in-a {
+  animation: clash-in-a 0.6s cubic-bezier(0.16, 0.9, 0.25, 1) both;
+}
+[dir="rtl"] .animate-clash-in-a {
+  animation-name: clash-in-a-rtl;
+}
+.animate-clash-in-b {
+  animation: clash-in-b 0.6s cubic-bezier(0.16, 0.9, 0.25, 1) both;
+}
+[dir="rtl"] .animate-clash-in-b {
+  animation-name: clash-in-b-rtl;
+}
+
+/* ---- stylized VS badge: entry impact, idle breath, glint, shockwave ----- */
+
+@keyframes vs-impact {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.28);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-vs-impact {
+  animation: vs-impact 0.5s cubic-bezier(0.16, 0.9, 0.25, 1) 0.3s both;
+}
+
+@keyframes vs-shockwave {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+.animate-vs-shockwave {
+  animation: vs-shockwave 0.65s cubic-bezier(0.16, 0.9, 0.25, 1) 0.3s forwards;
+  opacity: 0;
+}
+
+@keyframes vs-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.045);
+  }
+}
+.animate-vs-breathe {
+  animation: vs-breathe 2.4s ease-in-out infinite;
+}
+
+@keyframes vs-glint {
+  0% {
+    transform: translateX(-160%) skewX(-18deg);
+  }
+  55%,
+  100% {
+    transform: translateX(320%) skewX(-18deg);
+  }
+}
+.animate-vs-glint {
+  animation: vs-glint 3.4s ease-in-out 1s infinite;
+}
+
+/* ---- clash outro: the loser flinches and drops, the winner flares ------- */
+
+@keyframes clash-out-lose {
+  0% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+  18% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-12%) translateY(14%) rotate(-7deg) scale(0.86);
+  }
+}
+@keyframes clash-out-lose-rtl {
+  0% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1);
+  }
+  18% {
+    opacity: 1;
+    transform: translateX(0) rotate(0deg) scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(12%) translateY(14%) rotate(7deg) scale(0.86);
+  }
+}
+.animate-clash-out-lose {
+  animation: clash-out-lose 0.9s cubic-bezier(0.3, 0.7, 0.3, 1) 0.25s both;
+}
+[dir="rtl"] .animate-clash-out-lose {
+  animation-name: clash-out-lose-rtl;
+}
+
+@keyframes clash-out-win {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  22% {
+    transform: scale(1.09);
+    filter: brightness(1.6);
+  }
+  45% {
+    transform: scale(1.02);
+    filter: brightness(1.15);
+  }
+  100% {
+    transform: scale(1.035);
+    filter: brightness(1.1);
+  }
+}
+.animate-clash-out-win {
+  animation: clash-out-win 0.9s cubic-bezier(0.16, 0.9, 0.25, 1) 0.1s both;
+}
+
+@keyframes vs-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1.35);
+    filter: brightness(2.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+    filter: brightness(2.6);
+  }
+}
+.animate-vs-out {
+  animation: vs-out 0.7s cubic-bezier(0.3, 0.7, 0.3, 1) 0.15s both;
+}
+
+/* Whole-frame fade for the last stretch of the outro hold (duration is set
+   inline to match the linger, so the fade always ends right at the swap). */
+@keyframes outro-exit {
+  0% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.animate-outro-exit {
+  animation: outro-exit linear both;
+}
+
 /* Arabic (RTL) is a connected script: letter-spacing and uppercase make it
    wider than its container and cause clipping. Neutralize them in RTL. */
 [dir="rtl"] .uppercase,

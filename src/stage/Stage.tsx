@@ -1,57 +1,15 @@
 import type { CSSProperties, ReactNode } from "react";
-import type { Category, Gift, Item, SessionState, SideEffect } from "../../shared/types.ts";
+import type { SessionState, SideEffect } from "../../shared/types.ts";
 import { activeCategory, activeItems, activeMatch, categoryName, getItem, itemName, roundSecondsFor } from "../lib/selectors.ts";
 import { useI18n } from "../i18n/index.tsx";
 import { ItemCard } from "../overlay/ItemCard.tsx";
 import { VoteBar } from "../overlay/VoteBar.tsx";
 import { RoundTimer } from "../overlay/RoundTimer.tsx";
+import { VsBadge } from "../overlay/VsBadge.tsx";
 import { WinnerReveal } from "../overlay/WinnerReveal.tsx";
+import { PRESETS, clampScale, giftFor } from "./presets.ts";
 
 type Variant = "overlay" | "control";
-
-interface Preset {
-  visual: string;
-  emoji: string;
-  namePx: number;
-  votePx: number;
-  vs: string;
-  bar: string;
-  gap: string;
-  barMax: string;
-}
-
-const PRESETS: Record<Variant, Preset> = {
-  overlay: {
-    visual: "aspect-square w-full max-w-[calc(43vw*var(--stage-scale,1))] min-w-[160px]",
-    emoji: "text-[calc(10vh*var(--stage-scale,1))]",
-    namePx: 60,
-    votePx: 96,
-    vs: "text-6xl",
-    bar: "h-16",
-    gap: "gap-6",
-    barMax: "",
-  },
-  control: {
-    visual: "h-[clamp(9rem,16vw,14rem)] w-[clamp(9rem,16vw,14rem)]",
-    emoji: "text-[clamp(2.75rem,5.5vw,4.25rem)]",
-    namePx: 24,
-    votePx: 36,
-    vs: "text-3xl",
-    bar: "h-9",
-    gap: "gap-6",
-    barMax: "max-w-4xl",
-  },
-};
-
-function clampScale(value: number | undefined): number {
-  if (!Number.isFinite(value)) return 1;
-  return Math.min(3, Math.max(0.6, value as number));
-}
-
-function giftFor(item: Item | null, category: Category | null, side: "a" | "b"): Gift | null {
-  if (item?.gift) return item.gift;
-  return category?.giftPair?.[side === "a" ? 0 : 1] ?? null;
-}
 
 export function Stage({
   state,
@@ -127,8 +85,8 @@ export function Stage({
   const giftClass = big
     ? "rounded-full bg-lime px-5 py-2 font-black uppercase tracking-wide text-ink shadow-lg"
     : "chip text-xs text-brand-2";
-  const ruleClass = big ? "max-w-[46ch] font-bold leading-snug text-white shadow-text" : "max-w-3xl leading-relaxed text-white/60 text-xs";
-  const vsClass = big ? "font-black text-white/55 shadow-text" : "font-black text-white/30";
+  const ruleClass = big ? "max-w-[46ch] font-bold leading-snug text-white shadow-text" : "max-w-3xl leading-relaxed text-white/80 text-xs";
+  const vsClass = big ? "font-black text-white shadow-text" : "font-black text-white/70";
   const sideAClass = big
     ? "rounded-full border-2 border-brand bg-brand/15 px-4 py-1.5 font-black text-brand shadow-text"
     : "chip text-xs border-brand/60 text-brand";
@@ -152,8 +110,8 @@ export function Stage({
       ) : null}
 
       <div className="flex w-full flex-1 flex-col items-center justify-center gap-4">
-        <div className={`grid w-full grid-cols-[1fr_auto_1fr] items-center ${p.gap}`}>
-          <div className="flex w-full min-w-0 justify-center">
+        <div key={`${match.round}:${match.index}`} className={`grid w-full grid-cols-[1fr_auto_1fr] items-center ${p.gap}`}>
+          <div className="animate-clash-in-a flex w-full min-w-0 justify-center">
             <ItemCard
               key={match.a ?? "a"}
               item={a}
@@ -168,8 +126,7 @@ export function Stage({
               effect={effectFor("a")}
             />
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className={`${vsClass} ${p.vs}`}>VS</div>
+          <div className="relative">
             <RoundTimer
               endsAt={match.endsAt}
               status={state.status}
@@ -177,8 +134,11 @@ export function Stage({
               hold={state.matchHold}
               scale={stageScale}
             />
+            <div className="absolute inset-x-0 top-0 z-10 flex justify-center" style={{ transform: "translateY(-50%)" }}>
+              <VsBadge scale={stageScale} mode="impact" />
+            </div>
           </div>
-          <div className="flex w-full min-w-0 justify-center">
+          <div className="animate-clash-in-b flex w-full min-w-0 justify-center">
             <ItemCard
               key={match.b ?? "b"}
               item={b}

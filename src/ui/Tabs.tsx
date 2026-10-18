@@ -16,7 +16,7 @@ export function Tabs<T extends string>({
   onChange: (id: T) => void;
 }): ReactNode {
   return (
-    <div role="tablist" className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-ink-2/70 p-1">
+    <div role="tablist" className="grid grid-cols-2 gap-1 rounded-xl border border-line bg-ink-2/70 p-1">
       {tabs.map((tab) => {
         const active = tab.id === value;
         return (

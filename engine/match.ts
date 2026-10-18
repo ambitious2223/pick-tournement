@@ -16,7 +16,7 @@ export function hasVoted(match: Match, viewer: string): boolean {
 
 export interface VoteResult {
   ok: boolean;
-  reason?: "no-side" | "duplicate" | "not-live";
+  reason?: "no-side" | "duplicate" | "not-live" | "changed";
 }
 
 export function castChatVote(match: Match, itemId: string, viewer: string, settings: Settings): VoteResult {
@@ -25,7 +25,24 @@ export function castChatVote(match: Match, itemId: string, viewer: string, setti
   if (!side) return { ok: false, reason: "no-side" };
 
   const key = normalize(viewer) || "anonymous";
-  if (settings.dedupeChat && hasVoted(match, key)) return { ok: false, reason: "duplicate" };
+  if (settings.dedupeChat && hasVoted(match, key)) {
+    const from: "a" | "b" = match.votersA.includes(key) ? "a" : "b";
+    // A voter is allowed only one vote — but with `allowVoteChange` they can
+    // move it to the other side, which is the drama of a live swing.
+    if (from === side || !settings.allowVoteChange) return { ok: false, reason: "duplicate" };
+    if (from === "a") {
+      match.votesA = Math.max(0, match.votesA - settings.chatWeight);
+      match.votersA = match.votersA.filter((v) => v !== key);
+      match.votesB += settings.chatWeight;
+      match.votersB.push(key);
+    } else {
+      match.votesB = Math.max(0, match.votesB - settings.chatWeight);
+      match.votersB = match.votersB.filter((v) => v !== key);
+      match.votesA += settings.chatWeight;
+      match.votersA.push(key);
+    }
+    return { ok: true, reason: "changed" };
+  }
 
   if (side === "a") {
     match.votesA += settings.chatWeight;

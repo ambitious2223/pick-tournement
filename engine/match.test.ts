@@ -46,6 +46,29 @@ test("chat votes are deduped per viewer when enabled", () => {
   assert.equal(m.votesA, DEFAULT_SETTINGS.chatWeight);
 });
 
+test("a returning voter can move their vote to the other side", () => {
+  const m = liveMatch();
+  castChatVote(m, "ronaldo", "luna", DEFAULT_SETTINGS);
+  const move = castChatVote(m, "messi", "luna", DEFAULT_SETTINGS);
+  assert.equal(move.ok, true);
+  assert.equal(move.reason, "changed");
+  assert.equal(m.votesA, 0);
+  assert.equal(m.votesB, DEFAULT_SETTINGS.chatWeight);
+  assert.deepEqual(m.votersA, []);
+  assert.deepEqual(m.votersB, [normalize("luna")]);
+  // Voting for the same side again is still a duplicate.
+  assert.equal(castChatVote(m, "messi", "luna", DEFAULT_SETTINGS).reason, "duplicate");
+});
+
+test("vote changing can be turned off", () => {
+  const m = liveMatch();
+  const fixed: Settings = { ...DEFAULT_SETTINGS, allowVoteChange: false };
+  castChatVote(m, "ronaldo", "luna", fixed);
+  assert.equal(castChatVote(m, "messi", "luna", fixed).reason, "duplicate");
+  assert.equal(m.votesA, DEFAULT_SETTINGS.chatWeight);
+  assert.equal(m.votesB, 0);
+});
+
 test("gift votes stack and use the gift weight", () => {
   const m = liveMatch();
   castGiftVote(m, "messi", "omar", DEFAULT_SETTINGS, 3);

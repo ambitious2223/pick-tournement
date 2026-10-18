@@ -109,6 +109,15 @@ export interface HubGift {
   img?: string;
 }
 
+export interface CropRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export type CropMode = "crop" | "stretch";
+
 export interface Item {
   id: string;
   name: string;
@@ -116,6 +125,9 @@ export interface Item {
   nameAr?: string;
   aliases: string[];
   image?: string;
+  imageOriginal?: string;
+  imageCrop?: CropRect;
+  imageCropMode?: CropMode;
   emoji?: string;
   gift?: Gift;
 }
@@ -157,14 +169,9 @@ export type TieRule = "sudden-death" | "random" | "higher-seed";
 export interface SoundSettings {
   muted: boolean;
   master: number;
-  music: number;
   sfx: number;
   voice: number;
-  musicEnabled: boolean;
-  /** Background track: "auto" escalates per round, otherwise a MUSIC_LIBRARY id. */
-  musicTrack: string;
   disabledCues: string[];
-  trackVolume: Record<string, number>;
 }
 
 export interface Settings {
@@ -175,6 +182,8 @@ export interface Settings {
   chatWeight: number;
   giftWeight: number;
   dedupeChat: boolean;
+  /** Let a viewer move their vote to the other side instead of being ignored. */
+  allowVoteChange: boolean;
   tieRule: TieRule;
   autoNextMatch: boolean;
   autoNextTournament: boolean;
@@ -186,10 +195,20 @@ export interface Settings {
   bracketOutroSeconds: number;
   roundRecapSeconds: number;
   resultSeconds: number;
+  /** Play the bracket zoom-in before each match. */
+  showBracketIntro: boolean;
+  /** Play the bracket zoom-out after each match. */
+  showBracketOutro: boolean;
+  /** Play the bracket sweep when a round finishes. */
+  showRoundRecap: boolean;
   /** Show-window background color (hex). */
   showBackground: string;
   /** Multiplier for the bracket cinematic length (0.6 = quick, 1.8 = slow/dramatic). */
   bracketPace: number;
+  /** How far the bracket camera zooms onto the active match (1.2 = near, 5 = tight). */
+  bracketZoom: number;
+  /** Play the bracket cinematic depth in the Control board too, for rehearsal. */
+  controlCinematic: boolean;
   /** Multiplier for match text (header, names, votes, vote bar, vote hint). */
   stageTextScale: number;
   /** Multiplier for the whole overlay stage (photos + text). 1 = default. */
@@ -305,6 +324,7 @@ export interface CommandMap {
   "cue:emit": { id: string };
   "sim:set": { on: boolean } | undefined;
   "demo:start": { seconds?: number; categories?: string[]; single?: boolean } | undefined;
+  "rehearsal:start": { categoryId?: string } | undefined;
   "session:reset": undefined;
 }
 
