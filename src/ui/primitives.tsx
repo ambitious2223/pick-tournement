@@ -23,9 +23,19 @@ export function Button({
   );
 }
 
-export function Panel({ title, children, className = "" }: { title?: string; children: ReactNode; className?: string }): ReactNode {
+export function Panel({
+  title,
+  children,
+  className = "",
+  dataTour,
+}: {
+  title?: string;
+  children: ReactNode;
+  className?: string;
+  dataTour?: string;
+}): ReactNode {
   return (
-    <section className={`panel p-4 ${className}`}>
+    <section data-tour={dataTour} className={`panel p-4 ${className}`}>
       {title ? <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-brand">{title}</h2> : null}
       {children}
     </section>

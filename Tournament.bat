@@ -57,14 +57,9 @@ if errorlevel 1 (
 )
 
 echo.
-echo   Setup Guide   : http://127.0.0.1:8787/setup
-echo   Control Room  : http://127.0.0.1:8787/control
-echo   Content Studio: http://127.0.0.1:8787/studio
-echo   Debug Console : http://127.0.0.1:8787/debug
-echo   Broadcast(OBS): http://127.0.0.1:8787/overlay
-echo.
-echo   New here? Open the Setup Guide first - it walks through connecting
-echo   TikTok (via Tikora) and adding the OBS browser source.
+echo   Pick League runs in one window: Control, Studio, Queue and Debug.
+echo   New here? Press "Get started" in the top bar for the quick tour.
+echo   To show the game on stream, capture this window with OBS Window Capture.
 echo.
 
 rem One server, one port, so there is no second URL to get wrong.
@@ -74,7 +69,7 @@ echo Keep this window open while testing. Press Ctrl+C to stop.
 echo.
 if defined TIKORA_NO_BROWSER set "PL_NO_BROWSER=1"
 if /i "%PL_NO_BROWSER%"=="1" (
-  echo Browser auto-open is OFF. Paste a link above into the tab you want.
+  echo Browser auto-open is OFF.
   call npm run serve
 ) else (
   echo Opening the Control Room in your default browser once it is ready...

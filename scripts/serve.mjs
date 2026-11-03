@@ -104,9 +104,9 @@ if (wantsBrowser) {
   waitForServer(OPEN_URL).then((ready) => {
     if (ready) {
       openDefaultBrowser(OPEN_URL);
-      console.log(`[serve] opened ${OPEN_URL} in your default browser (new tab)`);
+      console.log("[serve] opened the Control room in your default browser (new tab)");
     } else {
-      console.log(`[serve] server was not ready in time - open ${OPEN_URL} manually`);
+      console.log("[serve] server was not ready in time - run this again to retry");
     }
   });
 }

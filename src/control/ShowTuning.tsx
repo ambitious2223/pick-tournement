@@ -24,7 +24,7 @@ export function ShowTuning({ settings }: { settings: Settings }): ReactNode {
   const s = settings;
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div data-tour="tuning-presets" className="flex flex-col gap-1.5">
       <p className="mb-1 text-[0.6rem] leading-relaxed text-white/40">{t("sim.advancedHint")}</p>
 
       <Slider

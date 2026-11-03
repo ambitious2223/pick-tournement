@@ -116,9 +116,9 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
 
   return (
     <div className="grid gap-5 lg:grid-cols-[22rem_1fr]">
-      <Panel title={t("studio.categories")}>
+      <Panel title={t("studio.categories")} dataTour="studio-categories">
         <div className="mb-3 flex gap-2">
-          <Button variant="primary" className="flex-1" onClick={newCategory}>
+          <Button variant="primary" data-tour="studio-new" className="flex-1" onClick={newCategory}>
             {t("studio.new")}
           </Button>
           <Button variant="ghost" onClick={() => importRef.current?.click()}>
@@ -132,14 +132,20 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
             onChange={(e) => void importCategory(e.target.files?.[0])}
           />
         </div>
-        <Button variant="hot" className="mb-3 w-full" disabled={fetching} onClick={() => void fetchPhotosFor()}>
+        <Button
+          variant="hot"
+          data-tour="studio-fetch-photos"
+          className="mb-3 w-full"
+          disabled={fetching}
+          onClick={() => void fetchPhotosFor()}
+        >
           {fetching ? t("studio.fetching") : t("studio.fetchAll")}
         </Button>
         {fetchMsg ? <p className="mb-2 text-xs text-lime">{fetchMsg}</p> : null}
         {state.categories.length === 0 ? (
           <p className="text-xs text-white/40">{t("content.noCategories")}</p>
         ) : (
-          <ul className="grid grid-cols-2 gap-2">
+          <ul data-tour="studio-category-list" className="grid grid-cols-2 gap-2">
             {state.categories.map((c) => (
               <li key={c.id}>
                 <button
@@ -161,17 +167,20 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
         )}
       </Panel>
 
-      <Panel title={draft ? t("studio.editCategory") : t("studio.selectOrCreate")}>
+      <Panel
+        title={draft ? t("studio.editCategory") : t("studio.selectOrCreate")}
+        dataTour="studio-editor"
+      >
         {draft ? (
           <div className="flex flex-col gap-4">
-            <div className="card flex flex-wrap items-center gap-3 p-3">
+            <div data-tour="studio-name" className="card flex flex-wrap items-center gap-3 p-3">
               <TextInput
                 className="min-w-[12rem] flex-1"
                 value={draft.name}
                 onChange={(e) => setDraft({ ...draft, name: e.target.value })}
                 placeholder={t("studio.categoryName")}
               />
-              <div className="card flex items-center gap-2 px-2.5 py-1.5">
+              <div data-tour="studio-gifts" className="card flex items-center gap-2 px-2.5 py-1.5">
                 <span className="text-xl leading-none">{draft.giftPair?.[0]?.icon ?? "🌹"}</span>
                 <input
                   className="w-12 rounded-lg border border-line bg-ink-2 px-2 py-1 text-center text-lg outline-none focus:border-brand"
@@ -193,7 +202,7 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
               </div>
             </div>
 
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+            <div data-tour="studio-competitors" className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
               {draft.items.map((item, i) => (
                 <ItemRow
                   key={i}
@@ -209,7 +218,7 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <Button variant="lime" onClick={() => void save(draft)}>
+              <Button variant="lime" data-tour="studio-save" onClick={() => void save(draft)}>
                 {t("studio.saveCategory")}
               </Button>
               <Button variant="ghost" disabled={fetching} onClick={() => void fetchPhotosFor(draft.id)}>
@@ -235,7 +244,7 @@ export function Studio({ state }: { state: SessionState | null }): ReactNode {
         ) : null}
       </Panel>
 
-      <Panel title={t("studio.content")} className="lg:col-span-2">
+      <Panel title={t("studio.content")} className="lg:col-span-2" dataTour="studio-content">
         <ContentPanel state={state} />
       </Panel>
     </div>

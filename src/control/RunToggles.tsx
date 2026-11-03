@@ -28,9 +28,9 @@ export function RunToggles({ settings }: { settings: Settings }): ReactNode {
   const { t } = useI18n();
 
   return (
-    <div className="mt-1 border-t border-line/60 pt-2">
+    <div data-tour="run-behavior" className="mt-1 border-t border-line/60 pt-2">
       <div className="mb-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("run.behavior")}</div>
-      <div className="grid grid-cols-2 gap-1.5">
+      <div data-tour="interactions-actions" className="grid grid-cols-2 gap-1.5">
         {TOGGLES.map(({ key, label, desc }) => {
           const on = settings[key];
           const text = t(label);

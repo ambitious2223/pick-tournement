@@ -35,7 +35,7 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
     <section className="panel flex flex-col gap-2 p-3">
       <div className="text-[0.7rem] font-bold uppercase tracking-widest text-brand">{t("control.run")}</div>
 
-      <div className="rounded-lg border border-line bg-ink-2/60 p-2">
+      <div data-tour="battle-primary" className="rounded-lg border border-line bg-ink-2/60 p-2">
         <div className="mb-1.5 text-[0.65rem] font-bold uppercase tracking-widest text-white/40">{t("run.showTitle")}</div>
         <div className="grid grid-cols-2 gap-2">
           {show.active ? (
@@ -89,6 +89,7 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
       ) : (
         <Button
           variant="lime"
+          data-tour="poll-button"
           className="py-2 text-base"
           onClick={() => {
             if (state.tournament && !window.confirm(t("poll.confirmReplace"))) return;
@@ -111,6 +112,7 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
       <div className="grid grid-cols-2 gap-2">
         <Button
           variant="primary"
+          data-tour="match-start"
           className={SM}
           onClick={() => void send("tournament:start", selected ? { categoryId: selected } : undefined)}
         >
@@ -160,7 +162,7 @@ export function MatchControls({ state }: { state: SessionState }): ReactNode {
               {t("control.matchView")}
             </Button>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div data-tour="winner-controls" className="grid grid-cols-3 gap-2">
             <Button variant="ghost" className={SM} disabled={!running} onClick={() => void send("match:extend", 10)}>
               {t("control.extend")}
             </Button>

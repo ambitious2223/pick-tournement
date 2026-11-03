@@ -370,10 +370,7 @@ async function main(): Promise<void> {
   });
 
   server.listen(SERVER_PORT, "127.0.0.1", () => {
-    console.log(`[pick-league] server listening on http://127.0.0.1:${SERVER_PORT}`);
-    console.log(`[pick-league] overlay:  http://127.0.0.1:${SERVER_PORT}/overlay`);
-    console.log(`[pick-league] control:  http://127.0.0.1:${SERVER_PORT}/control`);
-    console.log(`[pick-league] debug:    http://127.0.0.1:${SERVER_PORT}/debug`);
+    console.log("[pick-league] server ready");
   });
 }
 

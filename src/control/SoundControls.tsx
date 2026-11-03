@@ -42,7 +42,7 @@ export function SoundQuickControls({ state }: { state: SessionState }): ReactNod
   const s = state.settings.sound;
 
   return (
-    <section className="panel flex flex-col gap-2 p-3">
+    <section data-tour="quick-bar" className="panel flex flex-col gap-2 p-3">
       <div className="text-[0.7rem] font-bold uppercase tracking-widest text-brand">{t("sound.title")}</div>
       <Toggle label={t("sound.muted")} checked={s.muted} onChange={(v) => patch({ muted: v })} />
       <Slider label={t("sound.master")} value={s.master} onChange={(v) => patch({ master: v })} />

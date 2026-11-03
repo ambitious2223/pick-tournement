@@ -19,7 +19,7 @@ export function QueueEditor({ state }: { state: SessionState }): ReactNode {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div data-tour="queue-panel" className="flex flex-col gap-2">
       <Select
         defaultValue=""
         className="px-2 py-1 text-xs"

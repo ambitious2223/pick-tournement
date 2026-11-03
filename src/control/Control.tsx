@@ -18,21 +18,7 @@ function isTyping(target: EventTarget | null): boolean {
   return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable;
 }
 
-type ControlTab = "run" | "settings" | "queue" | "sim";
-
-const CONTROL_TABS: readonly ControlTab[] = ["run", "settings", "queue", "sim"];
-
-function readTab(): ControlTab {
-  const fromUrl = new URLSearchParams(window.location.search).get("tab");
-  if (fromUrl && (CONTROL_TABS as readonly string[]).includes(fromUrl)) return fromUrl as ControlTab;
-  try {
-    const saved = window.localStorage.getItem("pl.control.tab");
-    if (saved && (CONTROL_TABS as readonly string[]).includes(saved)) return saved as ControlTab;
-  } catch {
-    // ignore storage errors (private mode, etc.)
-  }
-  return "run";
-}
+export type PanelTab = "run" | "settings" | "queue" | "sim";
 
 type SettingsSection = "appearance" | "advanced";
 
@@ -41,18 +27,17 @@ function readSettingsSection(): SettingsSection | null {
   return open === "appearance" || open === "advanced" ? open : null;
 }
 
-export function Control({ state }: { state: SessionState | null }): ReactNode {
+export function Control({
+  state,
+  activeTab,
+  onTabChange,
+}: {
+  state: SessionState | null;
+  activeTab: PanelTab;
+  onTabChange: (tab: PanelTab) => void;
+}): ReactNode {
   const { t } = useI18n();
-  const [tab, setTab] = useState<ControlTab>(readTab);
   const [settingsSection] = useState<SettingsSection | null>(readSettingsSection);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem("pl.control.tab", tab);
-    } catch {
-      // ignore storage errors
-    }
-  }, [tab]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -88,11 +73,11 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
 
   if (!state) return <p className="text-white/50">{t("common.connecting")}</p>;
 
-  const tabs: TabItem<ControlTab>[] = [
+  const tabs: TabItem<PanelTab>[] = [
     { id: "run", label: t("control.run") },
     { id: "settings", label: t("control.settings") },
     { id: "queue", label: t("control.queue"), hint: state.queue.length ? String(state.queue.length) : undefined },
-    { id: "sim", label: t("control.simulator"), hint: state.simulated ? "•" : undefined },
+    { id: "sim", label: t("control.simulator"), hint: state.simulated ? "�?�" : undefined },
   ];
 
   return (
@@ -111,31 +96,26 @@ export function Control({ state }: { state: SessionState | null }): ReactNode {
       </section>
 
       <aside className="flex min-h-0 flex-col gap-3">
-        <div className="flex items-center gap-2 px-1 text-[0.65rem] text-white/45">
-          <span className={`h-2 w-2 rounded-full ${state.live.connected ? "bg-lime" : "bg-hot"}`} />
-          <span>{t("live.title")}: {state.live.connected ? t("live.connected") : t("live.disconnected")}</span>
-        </div>
-
-        <Tabs tabs={tabs} value={tab} onChange={setTab} />
+        <Tabs tabs={tabs} value={activeTab} onChange={onTabChange} />
 
         <div className="scroll-thin max-h-[65vh] min-h-0 flex-1 overflow-y-auto pe-1 xl:max-h-none">
-          {tab === "run" ? (
+          {activeTab === "run" ? (
             <div className="flex flex-col gap-3">
               <MatchControls state={state} />
               <SoundQuickControls state={state} />
             </div>
           ) : null}
-          {tab === "settings" ? (
+          {activeTab === "settings" ? (
             <Panel title={t("control.settings")}>
               <SettingsPanel state={state} initialOpen={settingsSection} />
             </Panel>
           ) : null}
-          {tab === "queue" ? (
+          {activeTab === "queue" ? (
             <Panel title={t("control.queue")}>
               <QueueEditor state={state} />
             </Panel>
           ) : null}
-          {tab === "sim" ? (
+          {activeTab === "sim" ? (
             <Panel title={t("control.simulator")}>
               <SimControls state={state} />
             </Panel>
